@@ -1,55 +1,93 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0099cc"
     tools:context=".AvionicsActivity" >
 
-    <!--
-         The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc.
-    -->
+    <TextView
+        android:id="@+id/rpmView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/value_not_available"
+        android:textAppearance="@style/largeValueText" />
 
     <TextView
-        android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="@string/dummy_content"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold" />
+        android:id="@+id/rpmLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/rpmView"
+        android:layout_alignBottom="@id/rpmView"
+        android:layout_toRightOf="@id/rpmView"
+        android:text="@string/rpm"
+        android:textAppearance="@style/largeValueUnit" />
 
-    <!--
-         This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows.
-    -->
+    <TextView
+        android:id="@+id/powerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/rpmView"
+        android:layout_below="@id/rpmView"
+        android:layout_marginTop="10dp"
+        android:text="@string/value_not_available"
+        android:textAppearance="@style/largeValueText" />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true" >
+    <TextView
+        android:id="@+id/powerLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/powerView"
+        android:layout_alignBottom="@id/powerView"
+        android:layout_toRightOf="@id/powerView"
+        android:text="@string/power"
+        android:textAppearance="@style/largeValueUnit" />
 
-        <LinearLayout
-            android:id="@+id/fullscreen_content_controls"
-            style="?buttonBarStyle"
-            android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/heartView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/powerView"
+        android:layout_below="@id/powerView"
+        android:layout_marginTop="10dp"
+        android:text="@string/value_not_available"
+        android:textAppearance="@style/largeValueText" />
+
+    <TextView
+        android:id="@+id/heartLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/heartView"
+        android:layout_alignBottom="@id/heartView"
+        android:layout_toRightOf="@id/heartView"
+        android:text="@string/heart_rate"
+        android:textAppearance="@style/largeValueUnit"
+        android:textColor="@android:color/holo_red_dark" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" >
+
+        <TextView
+            android:id="@+id/headingView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent" >
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/value_not_available"
+            android:textAppearance="@style/largeValueText" />
 
-            <Button
-                android:id="@+id/dummy_button"
-                style="?buttonBarButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/dummy_button" />
-        </LinearLayout>
-    </FrameLayout>
+        <TextView
+            android:id="@+id/headingLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/headingView"
+            android:layout_toRightOf="@id/headingView"
+            android:text="@string/heading"
+            android:textAppearance="@style/largeValueUnit" />
+    </RelativeLayout>
 
-</FrameLayout>
+</RelativeLayout>

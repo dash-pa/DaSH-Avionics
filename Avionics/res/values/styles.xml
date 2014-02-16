@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources  xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -34,5 +34,13 @@
     </style>
 
     <style name="ButtonBarButton" />
+
+    <style name="largeValueText" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">60sp</item>
+    </style>
+
+    <style name="largeValueUnit" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">30sp</item>
+    </style>
 
 </resources>

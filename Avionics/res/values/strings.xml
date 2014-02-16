@@ -2,7 +2,19 @@
 <resources>
 
     <string name="app_name">DaSH Avionics</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
 
+    <!-- When there's no known value for a metric. -->
+    <string name="value_not_available">XX</string>
+
+    <!-- RPM metric -->
+    <string name="rpm">rpm</string>
+
+    <!-- Power metric -->
+    <string name="power">W</string>
+
+    <!-- Heart rate metric -->
+    <string name="heart_rate">♥</string>
+
+    <!-- Heading metric -->
+    <string name="heading">°</string>
 </resources>
