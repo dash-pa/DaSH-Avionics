@@ -118,7 +118,8 @@ public class AvionicsActivity extends Activity implements ServiceConnection, Val
 		@Override
 		public void handleMessage(Message msg) {
 			ValueUpdater updaterRef = updater.get();
-			if (updaterRef == null) return;
+			if (updaterRef == null)
+				return;
 
 			switch (msg.what) {
 			case SensorsService.MSG_UPDATED_VALUE:

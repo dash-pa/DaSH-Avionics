@@ -59,7 +59,8 @@ public class SensorsService extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			List<Messenger> clientsRef = clients.get();
-			if (clientsRef == null) return;
+			if (clientsRef == null)
+				return;
 
 			synchronized (clientsRef) {
 				switch (msg.what) {
@@ -99,11 +100,11 @@ public class SensorsService extends Service {
 		return messenger.getBinder();
 	}
 
-	@Background(id="fake_results")
+	@Background(id = "fake_results")
 	protected void startSendingResults() {
 		ValueType[] valueTypes = ValueType.values();
 
-		while(true) {
+		while (true) {
 			int typeIdx = (int) (Math.random() * valueTypes.length);
 			ValueType type = valueTypes[typeIdx];
 			int value = (int) (Math.random() * 100);
@@ -119,7 +120,8 @@ public class SensorsService extends Service {
 	}
 
 	private void sendMessage(ValueType valueType, int value) {
-		Message msg = Message.obtain(null, MSG_UPDATED_VALUE, valueType.ordinal(), value);
+		Message msg = Message.obtain(null, MSG_UPDATED_VALUE,
+				valueType.ordinal(), value);
 		synchronized (clients) {
 			for (int i = clients.size() - 1; i >= 0; i--) {
 				try {
