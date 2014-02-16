@@ -2,7 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="@android:color/background_dark"
+    android:keepScreenOn="true"
+    android:padding="10dp"
     tools:context=".AvionicsActivity" >
 
     <TextView

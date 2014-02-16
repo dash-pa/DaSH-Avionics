@@ -36,7 +36,7 @@
     <style name="ButtonBarButton" />
 
     <style name="largeValueText" parent="@android:style/TextAppearance.Large">
-        <item name="android:textSize">60sp</item>
+        <item name="android:textSize">80sp</item>
     </style>
 
     <style name="largeValueUnit" parent="@android:style/TextAppearance.Large">
