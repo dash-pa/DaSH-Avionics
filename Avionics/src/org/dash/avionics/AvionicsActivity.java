@@ -15,7 +15,7 @@ import android.widget.TextView;
 public class AvionicsActivity extends Activity {
 
 	@ViewById
-	TextView rpmView, powerView, heartView, headingView;
+	TextView rpmView, powerView, heartView, headingView, speedView, heightView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

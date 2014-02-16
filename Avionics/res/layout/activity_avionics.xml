@@ -14,7 +14,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:text="@string/value_not_available"
-        android:textAppearance="@style/largeValueText" />
+        android:textAppearance="@style/largeValueText"
+        android:lines="1" />
 
     <TextView
         android:id="@+id/rpmLabel"
@@ -24,17 +25,18 @@
         android:layout_alignBottom="@id/rpmView"
         android:layout_toRightOf="@id/rpmView"
         android:text="@string/rpm"
-        android:textAppearance="@style/largeValueUnit" />
+        android:textAppearance="@style/largeValueUnit"
+        android:labelFor="@id/rpmView" />
 
     <TextView
         android:id="@+id/powerView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/rpmView"
+        android:layout_alignRight="@id/rpmView"
         android:layout_below="@id/rpmView"
-        android:layout_marginTop="10dp"
         android:text="@string/value_not_available"
-        android:textAppearance="@style/largeValueText" />
+        android:textAppearance="@style/largeValueText"
+        android:lines="1" />
 
     <TextView
         android:id="@+id/powerLabel"
@@ -44,17 +46,18 @@
         android:layout_alignBottom="@id/powerView"
         android:layout_toRightOf="@id/powerView"
         android:text="@string/power"
-        android:textAppearance="@style/largeValueUnit" />
+        android:textAppearance="@style/largeValueUnit"
+        android:labelFor="@id/powerView" />
 
     <TextView
         android:id="@+id/heartView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/powerView"
+        android:layout_alignRight="@id/powerView"
         android:layout_below="@id/powerView"
-        android:layout_marginTop="10dp"
         android:text="@string/value_not_available"
-        android:textAppearance="@style/largeValueText" />
+        android:textAppearance="@style/largeValueText"
+        android:lines="1" />
 
     <TextView
         android:id="@+id/heartLabel"
@@ -65,31 +68,74 @@
         android:layout_toRightOf="@id/heartView"
         android:text="@string/heart_rate"
         android:textAppearance="@style/largeValueUnit"
-        android:textColor="@android:color/holo_red_dark" />
+        android:textColor="@android:color/holo_red_dark"
+        android:labelFor="@id/heartView" />
 
-    <RelativeLayout
+    <TextView
+        android:id="@+id/headingView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" >
+        android:layout_alignBaseline="@id/rpmLabel"
+        android:layout_alignBottom="@id/rpmLabel"
+        android:layout_toRightOf="@id/rpmLabel"
+        android:layout_marginLeft="40sp"
+        android:text="@string/value_not_available"
+        android:textAppearance="@style/largeValueText"
+        android:lines="1" />
 
-        <TextView
-            android:id="@+id/headingView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="@string/value_not_available"
-            android:textAppearance="@style/largeValueText" />
+    <TextView
+        android:id="@+id/headingLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/headingView"
+        android:layout_toRightOf="@id/headingView"
+        android:text="@string/heading"
+        android:textAppearance="@style/largeValueUnit"
+        android:labelFor="@id/headingView" />
 
-        <TextView
-            android:id="@+id/headingLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/headingView"
-            android:layout_toRightOf="@id/headingView"
-            android:text="@string/heading"
-            android:textAppearance="@style/largeValueUnit" />
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/speedView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/headingView"
+        android:layout_alignBaseline="@id/powerLabel"
+        android:layout_alignBottom="@id/powerLabel"
+        android:text="@string/value_not_available"
+        android:textAppearance="@style/largeValueText"
+        android:lines="1" />
+
+    <TextView
+        android:id="@+id/speedLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/speedView"
+        android:layout_alignBottom="@id/speedView"
+        android:layout_toRightOf="@id/speedView"
+        android:text="@string/speed"
+        android:textAppearance="@style/largeValueUnit"
+        android:labelFor="@id/speedView" />
+
+    <TextView
+        android:id="@+id/heightView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/speedView"
+        android:layout_alignBaseline="@id/heartLabel"
+        android:layout_alignBottom="@id/heartLabel"
+        android:layout_below="@id/speedView"
+        android:text="@string/value_not_available"
+        android:textAppearance="@style/largeValueText"
+        android:lines="1" />
+
+    <TextView
+        android:id="@+id/heightLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/heightView"
+        android:layout_alignBottom="@id/heightView"
+        android:layout_toRightOf="@id/heightView"
+        android:text="@string/height"
+        android:textAppearance="@style/largeValueUnit"
+        android:labelFor="@id/heightView" />
 
 </RelativeLayout>

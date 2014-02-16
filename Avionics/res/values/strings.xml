@@ -4,7 +4,7 @@
     <string name="app_name">DaSH Avionics</string>
 
     <!-- When there's no known value for a metric. -->
-    <string name="value_not_available">XX</string>
+    <string name="value_not_available">XXX</string>
 
     <!-- RPM metric -->
     <string name="rpm">rpm</string>
@@ -17,4 +17,10 @@
 
     <!-- Heading metric -->
     <string name="heading">°</string>
+
+    <!-- Speed metric -->
+    <string name="speed">kt</string>
+
+    <!-- Height metric -->
+    <string name="height">ft</string>
 </resources>
