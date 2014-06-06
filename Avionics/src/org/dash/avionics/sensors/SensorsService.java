@@ -1,5 +1,6 @@
-package org.dash.avionics;
+package org.dash.avionics.sensors;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.util.Log;
 
 @EService
 public class SensorsService extends Service {
@@ -45,6 +47,8 @@ public class SensorsService extends Service {
 	 * Target we publish for clients to send messages to IncomingHandler.
 	 */
 	private final Messenger messenger;
+
+	private final ArduinoSensorManager arduinoManager;
 
 	/**
 	 * Handler of incoming messages from clients.
@@ -79,16 +83,17 @@ public class SensorsService extends Service {
 
 	public SensorsService() {
 		messenger = new Messenger(new IncomingHandler(clients));
+		arduinoManager = new ArduinoSensorManager();
 	}
 
 	@Override
 	public void onCreate() {
-		startSendingResults();
+		startArduinoSensors();
 	}
 
 	@Override
 	public void onDestroy() {
-		BackgroundExecutor.cancelAll("fake_results", true);
+		BackgroundExecutor.cancelAll("arduino", true);
 	}
 
 	/**
@@ -100,28 +105,39 @@ public class SensorsService extends Service {
 		return messenger.getBinder();
 	}
 
-	@Background(id = "fake_results")
-	protected void startSendingResults() {
-		ValueType[] valueTypes = ValueType.values();
-
+	@Background(id = "arduino")
+	protected void startArduinoSensors() {
+		// Keep trying to connect and read from the sensors.
 		while (true) {
-			int typeIdx = (int) (Math.random() * valueTypes.length);
-			ValueType type = valueTypes[typeIdx];
-			int value = (int) (Math.random() * 100);
-
-			sendMessage(type, value);
-
 			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				break;
+				arduinoManager.connect();
+			} catch (IOException e) {
+				Log.e("Arduino", "Failed to initialize", e);
+				arduinoManager.disconnect();
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException ie) {
+					// Do nothing.
+				}
+				continue;
 			}
+
+			ValueUpdate update;
+			try {
+				update = arduinoManager.readUpdate();
+			} catch (IOException e) {
+				Log.w("Arduino", "Failed to read from Arduino", e);
+				arduinoManager.disconnect();
+				continue;
+			}
+
+			sendMessage(update);
 		}
 	}
 
-	private void sendMessage(ValueType valueType, int value) {
+	private void sendMessage(ValueUpdate update) {
 		Message msg = Message.obtain(null, MSG_UPDATED_VALUE,
-				valueType.ordinal(), value);
+				update.type.ordinal(), update.value);
 		synchronized (clients) {
 			for (int i = clients.size() - 1; i >= 0; i--) {
 				try {

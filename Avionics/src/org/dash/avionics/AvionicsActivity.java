@@ -3,11 +3,20 @@ package org.dash.avionics;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Fullscreen;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.api.BackgroundExecutor;
+import org.dash.avionics.sensors.SensorsService;
+import org.dash.avionics.sensors.SensorsService_;
+import org.dash.avionics.sensors.ValueType;
+import org.dash.avionics.sensors.ValueUpdate;
+import org.dash.avionics.sensors.ValueUpdater;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -19,18 +28,23 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 @Fullscreen
 @EActivity(R.layout.activity_avionics)
-public class AvionicsActivity extends Activity implements ServiceConnection, ValueUpdater {
+public class AvionicsActivity extends Activity implements ServiceConnection,
+		ValueUpdater {
+	private static final long MAX_DATA_AGE_MS = 2 * 1000;
 
 	@ViewById
 	protected TextView rpmView, powerView, heartView, headingView, speedView,
 			heightView;
 
 	private Map<ValueType, TextView> viewsByType = new HashMap<ValueType, TextView>(
+			10);
+	private Map<ValueType, Long> lastUpdateByType = new ConcurrentHashMap<ValueType, Long>(
 			10);
 	private final Messenger incomingMessenger = new Messenger(
 			new IncomingHandler(this));
@@ -72,10 +86,13 @@ public class AvionicsActivity extends Activity implements ServiceConnection, Val
 		super.onResume();
 
 		bindService();
+		runWatchdog();
 	}
 
 	@Override
 	protected void onPause() {
+		BackgroundExecutor.cancelAll("watchdog", true);
+
 		Message msg = Message
 				.obtain(null, SensorsService.MSG_UNREGISTER_CLIENT);
 		msg.replyTo = incomingMessenger;
@@ -90,8 +107,34 @@ public class AvionicsActivity extends Activity implements ServiceConnection, Val
 		super.onPause();
 	}
 
-	public void updateValue(ValueType valueType, int value) {
-		viewsByType.get(valueType).setText(String.valueOf(value));
+	@Background(id = "watchdog", delay = 1000)
+	protected void runWatchdog() {
+		long now = System.currentTimeMillis();
+		for (ValueType type : ValueType.values()) {
+			Long lastTimestamp = lastUpdateByType.get(type);
+			if (lastTimestamp == null || lastTimestamp < now - MAX_DATA_AGE_MS) {
+				Log.w("Watchdog", "No recent update for type " + type);
+				setValueUnknown(type);
+			}
+		}
+
+		runWatchdog();
+	}
+
+	@UiThread
+	protected void setValueUnknown(ValueType type) {
+		viewsByType.get(type).setText(R.string.value_not_available);
+	}
+
+	@UiThread
+	protected void setValue(ValueUpdate update) {
+		viewsByType.get(update.type).setText(String.valueOf(update.value));
+
+	}
+
+	public void updateValue(ValueUpdate update) {
+		lastUpdateByType.put(update.type, System.currentTimeMillis());
+		setValue(update);
 	}
 
 	@Override
@@ -122,9 +165,12 @@ public class AvionicsActivity extends Activity implements ServiceConnection, Val
 				return;
 
 			switch (msg.what) {
-			case SensorsService.MSG_UPDATED_VALUE:
-				updaterRef.updateValue(ValueType.values()[msg.arg1], msg.arg2);
+			case SensorsService.MSG_UPDATED_VALUE: {
+				ValueUpdate update = new ValueUpdate(
+						ValueType.values()[msg.arg1], msg.arg2);
+				updaterRef.updateValue(update);
 				break;
+			}
 			default:
 				super.handleMessage(msg);
 			}
