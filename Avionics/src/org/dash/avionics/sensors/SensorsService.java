@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
+import org.dash.avionics.data.MeasurementStorage;
 import org.dash.avionics.data.ValueUpdate;
 import org.dash.avionics.sensors.ant.AntSensorManager;
 import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
@@ -55,6 +56,9 @@ public class SensorsService extends Service implements ValueUpdater {
 	protected ArduinoSensorManager arduinoSensor;
 	@Bean
 	protected AntSensorManager antSensor;
+
+	@Bean
+	MeasurementStorage storage;
 
 	/**
 	 * Handler of incoming messages from clients.
@@ -129,6 +133,8 @@ public class SensorsService extends Service implements ValueUpdater {
 				}
 			}
 		}
+
+		storage.insertMeasurement(update);
 	}
 
 }
