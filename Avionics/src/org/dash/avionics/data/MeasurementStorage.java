@@ -20,7 +20,7 @@ public class MeasurementStorage extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL(MeasurementColumns.MEASUREMENT_TABLE_CREATE);
+		db.execSQL(MeasurementStorageColumns.MEASUREMENT_TABLE_CREATE);
 	}
 
 	@Override
@@ -29,11 +29,11 @@ public class MeasurementStorage extends SQLiteOpenHelper {
 	}
 
 	@Background(id="storage-insert")
-	public void insertMeasurement(ValueUpdate measurement) {
+	public void insertMeasurement(Measurement measurement) {
 		ContentValues values = new ContentValues();
-		values.put(MeasurementColumns.VALUE_TIMESTAMP, measurement.timestamp);
-		values.put(MeasurementColumns.VALUE_TYPE, measurement.type.ordinal());
-		values.put(MeasurementColumns.VALUE, measurement.value);
-		getWritableDatabase().insertOrThrow(MeasurementColumns.MEASUREMENT_TABLE_NAME, null, values);
+		values.put(MeasurementStorageColumns.VALUE_TIMESTAMP, measurement.timestamp);
+		values.put(MeasurementStorageColumns.VALUE_TYPE, measurement.type.ordinal());
+		values.put(MeasurementStorageColumns.VALUE, measurement.value);
+		getWritableDatabase().insertOrThrow(MeasurementStorageColumns.MEASUREMENT_TABLE_NAME, null, values);
 	}
 }

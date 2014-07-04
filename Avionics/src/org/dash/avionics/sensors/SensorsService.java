@@ -6,8 +6,9 @@ import java.util.List;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
+import org.dash.avionics.data.MeasurementListener;
 import org.dash.avionics.data.MeasurementStorage;
-import org.dash.avionics.data.ValueUpdate;
+import org.dash.avionics.data.Measurement;
 import org.dash.avionics.sensors.ant.AntSensorManager;
 import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
 
@@ -20,7 +21,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 @EService
-public class SensorsService extends Service implements ValueUpdater {
+public class SensorsService extends Service implements MeasurementListener {
 
 	/**
 	 * Command to the service to register a client, receiving callbacks from the
@@ -117,7 +118,7 @@ public class SensorsService extends Service implements ValueUpdater {
 	}
 
 	@Override
-	public void updateValue(ValueUpdate update) {
+	public void onNewMeasurement(Measurement update) {
 		// Forward the update to the subscribed clients.
 		Message msg = Message.obtain(null, MSG_UPDATED_VALUE,
 				update.type.ordinal(), (int) (update.value * 10));

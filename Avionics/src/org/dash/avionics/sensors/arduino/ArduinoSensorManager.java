@@ -8,10 +8,10 @@ import java.util.UUID;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.api.BackgroundExecutor;
-import org.dash.avionics.data.ValueType;
-import org.dash.avionics.data.ValueUpdate;
+import org.dash.avionics.data.MeasurementListener;
+import org.dash.avionics.data.MeasurementType;
+import org.dash.avionics.data.Measurement;
 import org.dash.avionics.sensors.SensorManager;
-import org.dash.avionics.sensors.ValueUpdater;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -25,7 +25,7 @@ public class ArduinoSensorManager implements SensorManager {
 
 	@Background(serial="arduino-loop")
 	@Override
-	public void connect(ValueUpdater updater) {
+	public void connect(MeasurementListener updater) {
 		// Keep trying to connect and read from the sensors.
 		while (true) {
 			try {
@@ -41,7 +41,7 @@ public class ArduinoSensorManager implements SensorManager {
 				continue;
 			}
 
-			ValueUpdate update;
+			Measurement update;
 			try {
 				update = readUpdate();
 			} catch (IOException e) {
@@ -50,7 +50,7 @@ public class ArduinoSensorManager implements SensorManager {
 				continue;
 			}
 
-			updater.updateValue(update);
+			updater.onNewMeasurement(update);
 		}
 	}
 
@@ -124,8 +124,8 @@ public class ArduinoSensorManager implements SensorManager {
 		arduinoOutput = socket.getInputStream();
 	}
 
-	private ValueUpdate readUpdate() throws IOException {
-		ValueUpdate update = null;
+	private Measurement readUpdate() throws IOException {
+		Measurement update = null;
 		while (update == null) {
 			String updateStr = readLine();
 			update = parseUpdate(updateStr);
@@ -157,7 +157,7 @@ public class ArduinoSensorManager implements SensorManager {
 		return builder.toString();
 	}
 
-	private ValueUpdate parseUpdate(String line) {
+	private Measurement parseUpdate(String line) {
 		int splitPos = line.indexOf(':');
 		if (splitPos == -1 || line.length() < splitPos + 1) {
 			Log.e("Arduino", "Malformed line '" + line + "'.");
@@ -165,7 +165,7 @@ public class ArduinoSensorManager implements SensorManager {
 		}
 
 		String typeStr = line.substring(0, splitPos);
-		ValueType type = parseLineType(typeStr);
+		MeasurementType type = parseLineType(typeStr);
 		if (type == null) {
 			return null;
 		}
@@ -173,16 +173,16 @@ public class ArduinoSensorManager implements SensorManager {
 		String valueStr = line.substring(splitPos + 1);
 		float value = parseLineValue(valueStr);
 
-		return new ValueUpdate(type, value);
+		return new Measurement(type, value);
 	}
 
-	private ValueType parseLineType(String typeStr) {
+	private MeasurementType parseLineType(String typeStr) {
 		if (typeStr.equals("RPM")) {
-			return ValueType.PROP_RPM;
+			return MeasurementType.PROP_RPM;
 		} else if (typeStr.equals("ALT")) {
-			return ValueType.HEIGHT;
+			return MeasurementType.HEIGHT;
 		} else if (typeStr.equals("KPH")) {
-			return ValueType.SPEED;
+			return MeasurementType.SPEED;
 		}
 		return null;
 	}

@@ -13,8 +13,9 @@ import org.androidannotations.annotations.Fullscreen;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.api.BackgroundExecutor;
-import org.dash.avionics.data.ValueType;
-import org.dash.avionics.data.ValueUpdate;
+import org.dash.avionics.data.MeasurementListener;
+import org.dash.avionics.data.MeasurementType;
+import org.dash.avionics.data.Measurement;
 import org.dash.avionics.sensors.*;
 
 import android.app.Activity;
@@ -34,16 +35,16 @@ import android.widget.TextView;
 @Fullscreen
 @EActivity(R.layout.activity_avionics)
 public class AvionicsActivity extends Activity implements ServiceConnection,
-		ValueUpdater {
+		MeasurementListener {
 	private static final long MAX_DATA_AGE_MS = 2 * 1000;
 
 	@ViewById
 	protected TextView rpmView, powerView, heartView, headingView, speedView,
 			heightView;
 
-	private Map<ValueType, TextView> viewsByType = new HashMap<ValueType, TextView>(
+	private Map<MeasurementType, TextView> viewsByType = new HashMap<MeasurementType, TextView>(
 			10);
-	private Map<ValueType, Long> lastUpdateByType = new ConcurrentHashMap<ValueType, Long>(
+	private Map<MeasurementType, Long> lastUpdateByType = new ConcurrentHashMap<MeasurementType, Long>(
 			10);
 	private final Messenger incomingMessenger = new Messenger(
 			new IncomingHandler(this));
@@ -58,12 +59,12 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 
 	@AfterViews
 	protected void setValues() {
-		viewsByType.put(ValueType.PROP_RPM, rpmView);
-		viewsByType.put(ValueType.POWER, powerView);
-		viewsByType.put(ValueType.HEART_BEAT, heartView);
-		viewsByType.put(ValueType.HEADING, headingView);
-		viewsByType.put(ValueType.SPEED, speedView);
-		viewsByType.put(ValueType.HEIGHT, heightView);
+		viewsByType.put(MeasurementType.PROP_RPM, rpmView);
+		viewsByType.put(MeasurementType.POWER, powerView);
+		viewsByType.put(MeasurementType.HEART_BEAT, heartView);
+		viewsByType.put(MeasurementType.HEADING, headingView);
+		viewsByType.put(MeasurementType.SPEED, speedView);
+		viewsByType.put(MeasurementType.HEIGHT, heightView);
 
 		bindService();
 	}
@@ -111,7 +112,7 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 	@Background(id = "watchdog", delay = 1000)
 	protected void runWatchdog() {
 		long now = System.currentTimeMillis();
-		for (ValueType type : ValueType.values()) {
+		for (MeasurementType type : MeasurementType.values()) {
 			Long lastTimestamp = lastUpdateByType.get(type);
 			if (lastTimestamp == null || lastTimestamp < now - MAX_DATA_AGE_MS) {
 				Log.w("Watchdog", "No recent update for type " + type);
@@ -123,18 +124,18 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 	}
 
 	@UiThread
-	protected void setValueUnknown(ValueType type) {
+	protected void setValueUnknown(MeasurementType type) {
 		viewsByType.get(type).setText(R.string.value_not_available);
 	}
 
 	@UiThread
-	protected void setValue(ValueUpdate update) {
+	protected void setValue(Measurement update) {
 		String valueStr = String.format(Locale.US, "%.1f", update.value);
 		viewsByType.get(update.type).setText(valueStr);
 	}
 
 	@Override
-	public void updateValue(ValueUpdate update) {
+	public void onNewMeasurement(Measurement update) {
 		lastUpdateByType.put(update.type, System.currentTimeMillis());
 		setValue(update);
 	}
@@ -155,23 +156,23 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 	 * Handler of incoming messages from service.
 	 */
 	private static class IncomingHandler extends Handler {
-		private final WeakReference<ValueUpdater> updater;
+		private final WeakReference<MeasurementListener> updater;
 
-		public IncomingHandler(ValueUpdater updater) {
-			this.updater = new WeakReference<ValueUpdater>(updater);
+		public IncomingHandler(MeasurementListener updater) {
+			this.updater = new WeakReference<MeasurementListener>(updater);
 		}
 
 		@Override
 		public void handleMessage(Message msg) {
-			ValueUpdater updaterRef = updater.get();
+			MeasurementListener updaterRef = updater.get();
 			if (updaterRef == null)
 				return;
 
 			switch (msg.what) {
 			case SensorsService.MSG_UPDATED_VALUE: {
-				ValueUpdate update = new ValueUpdate(
-						ValueType.values()[msg.arg1], msg.arg2 / 10.0f);
-				updaterRef.updateValue(update);
+				Measurement update = new Measurement(
+						MeasurementType.values()[msg.arg1], msg.arg2 / 10.0f);
+				updaterRef.onNewMeasurement(update);
 				break;
 			}
 			default:

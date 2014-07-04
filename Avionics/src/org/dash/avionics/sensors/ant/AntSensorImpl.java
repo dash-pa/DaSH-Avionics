@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.util.EnumSet;
 
 import org.androidannotations.annotations.EBean;
-import org.dash.avionics.data.ValueType;
-import org.dash.avionics.data.ValueUpdate;
-import org.dash.avionics.sensors.ValueUpdater;
+import org.dash.avionics.data.MeasurementListener;
+import org.dash.avionics.data.MeasurementType;
+import org.dash.avionics.data.Measurement;
 
 import android.content.Context;
 import android.util.Log;
@@ -51,13 +51,13 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
 	private PccReleaseHandle<AntPlusBikePowerPcc> powerReleaseHandle;
 
 	// External callback.
-	private ValueUpdater updater;
+	private MeasurementListener updater;
 
 	AntSensorImpl(Context context) {
 		this.context = context;
 	}
 
-	void connect(ValueUpdater updater) {
+	void connect(MeasurementListener updater) {
 		if (this.updater != null) {
 			throw new IllegalStateException("Trying to register a second updater");
 		}
@@ -190,7 +190,7 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
 	@Override
     public void onNewCalculatedCadence(final long estTimestamp,
             final EnumSet<EventFlag> eventFlags, final BigDecimal calculatedCadence) {
-		updater.updateValue(new ValueUpdate(ValueType.CRANK_RPM, calculatedCadence.floatValue()));
+		updater.onNewMeasurement(new Measurement(MeasurementType.CRANK_RPM, calculatedCadence.floatValue()));
 	}
 
 	@Override
@@ -198,7 +198,7 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
             final long estTimestamp, final EnumSet<EventFlag> eventFlags,
             final DataSource dataSource,
             final BigDecimal calculatedPower) {
-		updater.updateValue(new ValueUpdate(ValueType.POWER, calculatedPower.floatValue()));
+		updater.onNewMeasurement(new Measurement(MeasurementType.POWER, calculatedPower.floatValue()));
 	}
 
 	@Override
@@ -210,7 +210,7 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
 			return;
 		}
 
-		updater.updateValue(new ValueUpdate(ValueType.HEART_BEAT, computedHeartRate));
+		updater.onNewMeasurement(new Measurement(MeasurementType.HEART_BEAT, computedHeartRate));
 	}
 
 	@Override
