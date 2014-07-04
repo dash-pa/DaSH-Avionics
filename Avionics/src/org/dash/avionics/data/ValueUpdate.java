@@ -1,13 +1,13 @@
-package org.dash.avionics.sensors;
+package org.dash.avionics.data;
 
 public class ValueUpdate {
-	public ValueUpdate(ValueType type, int value) {
+	public ValueUpdate(ValueType type, float value) {
 		this.type = type;
 		this.value = value;
 	}
 
 	public final ValueType type;
-	public final int value;
+	public final float value;
 
 	@Override
 	public String toString() {

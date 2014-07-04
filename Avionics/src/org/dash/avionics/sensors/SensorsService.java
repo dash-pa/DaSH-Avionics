@@ -1,13 +1,14 @@
 package org.dash.avionics.sensors;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
-import org.androidannotations.api.BackgroundExecutor;
+import org.dash.avionics.data.ValueUpdate;
+import org.dash.avionics.sensors.ant.AntSensorManager;
+import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
 
 import android.app.Service;
 import android.content.Intent;
@@ -16,10 +17,9 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.util.Log;
 
 @EService
-public class SensorsService extends Service {
+public class SensorsService extends Service implements ValueUpdater {
 
 	/**
 	 * Command to the service to register a client, receiving callbacks from the
@@ -48,7 +48,13 @@ public class SensorsService extends Service {
 	 */
 	private final Messenger messenger;
 
-	private final ArduinoSensorManager arduinoManager;
+	/*
+	 * Managers for many types of sensors.
+	 */
+	@Bean
+	protected ArduinoSensorManager arduinoSensor;
+	@Bean
+	protected AntSensorManager antSensor;
 
 	/**
 	 * Handler of incoming messages from clients.
@@ -83,17 +89,18 @@ public class SensorsService extends Service {
 
 	public SensorsService() {
 		messenger = new Messenger(new IncomingHandler(clients));
-		arduinoManager = new ArduinoSensorManager();
 	}
 
 	@Override
 	public void onCreate() {
-		startArduinoSensors();
+		antSensor.connect(this);
+		arduinoSensor.connect(this);
 	}
 
 	@Override
 	public void onDestroy() {
-		BackgroundExecutor.cancelAll("arduino", true);
+		antSensor.disconnect();
+		arduinoSensor.disconnect();
 	}
 
 	/**
@@ -105,39 +112,11 @@ public class SensorsService extends Service {
 		return messenger.getBinder();
 	}
 
-	@Background(id = "arduino")
-	protected void startArduinoSensors() {
-		// Keep trying to connect and read from the sensors.
-		while (true) {
-			try {
-				arduinoManager.connect();
-			} catch (IOException e) {
-				Log.e("Arduino", "Failed to initialize", e);
-				arduinoManager.disconnect();
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException ie) {
-					// Do nothing.
-				}
-				continue;
-			}
-
-			ValueUpdate update;
-			try {
-				update = arduinoManager.readUpdate();
-			} catch (IOException e) {
-				Log.w("Arduino", "Failed to read from Arduino", e);
-				arduinoManager.disconnect();
-				continue;
-			}
-
-			sendMessage(update);
-		}
-	}
-
-	private void sendMessage(ValueUpdate update) {
+	@Override
+	public void updateValue(ValueUpdate update) {
+		// Forward the update to the subscribed clients.
 		Message msg = Message.obtain(null, MSG_UPDATED_VALUE,
-				update.type.ordinal(), update.value);
+				update.type.ordinal(), (int) (update.value * 10));
 		synchronized (clients) {
 			for (int i = clients.size() - 1; i >= 0; i--) {
 				try {
@@ -151,4 +130,5 @@ public class SensorsService extends Service {
 			}
 		}
 	}
+
 }

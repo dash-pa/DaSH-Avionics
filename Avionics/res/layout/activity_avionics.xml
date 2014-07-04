@@ -107,6 +107,7 @@
         android:layout_alignBaseline="@id/powerLabel"
         android:text="@string/value_not_available"
         android:textAppearance="@style/largeValueText"
+        android:textSize="120sp"
         android:textAlignment="gravity"
         android:gravity="right"
         android:lines="1" />

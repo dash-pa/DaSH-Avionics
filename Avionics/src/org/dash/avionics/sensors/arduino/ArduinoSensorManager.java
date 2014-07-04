@@ -1,20 +1,60 @@
-package org.dash.avionics.sensors;
+package org.dash.avionics.sensors.arduino;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 import java.util.UUID;
 
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EBean;
+import org.androidannotations.api.BackgroundExecutor;
+import org.dash.avionics.data.ValueType;
+import org.dash.avionics.data.ValueUpdate;
+import org.dash.avionics.sensors.SensorManager;
+import org.dash.avionics.sensors.ValueUpdater;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-public class ArduinoSensorManager {
+@EBean
+public class ArduinoSensorManager implements SensorManager {
 	private InputStream arduinoOutput;
 	private BluetoothSocket socket;
 
-	public void connect() throws IOException {
+	@Background(serial="arduino-loop")
+	@Override
+	public void connect(ValueUpdater updater) {
+		// Keep trying to connect and read from the sensors.
+		while (true) {
+			try {
+				connectToDevice();
+			} catch (IOException e) {
+				Log.e("Arduino", "Failed to initialize", e);
+				disconnectFromDevice();
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException ie) {
+					// Do nothing.
+				}
+				continue;
+			}
+
+			ValueUpdate update;
+			try {
+				update = readUpdate();
+			} catch (IOException e) {
+				Log.w("Sensors", "Failed to read from Arduino", e);
+				disconnectFromDevice();
+				continue;
+			}
+
+			updater.updateValue(update);
+		}
+	}
+
+	private void connectToDevice() throws IOException {
 		if (socket != null) {
 			if (socket.isConnected()) {
 				return;
@@ -22,7 +62,7 @@ public class ArduinoSensorManager {
 
 			// Connection is stale, try to reconnect.
 			Log.w("Arduino", "Trying to reconnect over bluetooth");
-			disconnect();
+			disconnectFromDevice();
 		}
 
 		Log.i("Arduino", "Connecting");
@@ -35,7 +75,14 @@ public class ArduinoSensorManager {
 		}
 	}
 
+	@Override
 	public void disconnect() {
+		Log.i("Arduino", "Disconnecting");
+		BackgroundExecutor.cancelAll("arduino-loop", true);
+		disconnectFromDevice();
+	}
+
+	private void disconnectFromDevice() {
 		if (socket == null || arduinoOutput == null) {
 			Log.w("Arduino", "Trying to disconnect already-disconnected socket");
 			return;
@@ -77,10 +124,7 @@ public class ArduinoSensorManager {
 		arduinoOutput = socket.getInputStream();
 	}
 
-	/**
-	 * Reads an update from the Arduino over bluetooth, and returns its parsed version.
-	 */
-	public ValueUpdate readUpdate() throws IOException {
+	private ValueUpdate readUpdate() throws IOException {
 		ValueUpdate update = null;
 		while (update == null) {
 			String updateStr = readLine();
@@ -127,14 +171,14 @@ public class ArduinoSensorManager {
 		}
 
 		String valueStr = line.substring(splitPos + 1);
-		int value = parseLineValue(valueStr);
+		float value = parseLineValue(valueStr);
 
 		return new ValueUpdate(type, value);
 	}
 
 	private ValueType parseLineType(String typeStr) {
 		if (typeStr.equals("RPM")) {
-			return ValueType.RPM;
+			return ValueType.PROP_RPM;
 		} else if (typeStr.equals("ALT")) {
 			return ValueType.HEIGHT;
 		} else if (typeStr.equals("KPH")) {
@@ -143,7 +187,7 @@ public class ArduinoSensorManager {
 		return null;
 	}
 
-	private int parseLineValue(String valueStr) {
-		return (int) Double.parseDouble(valueStr);
+	private float parseLineValue(String valueStr) {
+		return Float.parseFloat(valueStr);
 	}
 }

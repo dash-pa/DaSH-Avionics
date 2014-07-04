@@ -19,8 +19,8 @@
     <string name="heading">°</string>
 
     <!-- Speed metric -->
-    <string name="speed">kt</string>
+    <string name="speed">km/h</string>
 
     <!-- Height metric -->
-    <string name="height">ft</string>
+    <string name="height">cm</string>
 </resources>

@@ -2,6 +2,7 @@ package org.dash.avionics;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,11 +13,9 @@ import org.androidannotations.annotations.Fullscreen;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.api.BackgroundExecutor;
-import org.dash.avionics.sensors.SensorsService;
-import org.dash.avionics.sensors.SensorsService_;
-import org.dash.avionics.sensors.ValueType;
-import org.dash.avionics.sensors.ValueUpdate;
-import org.dash.avionics.sensors.ValueUpdater;
+import org.dash.avionics.data.ValueType;
+import org.dash.avionics.data.ValueUpdate;
+import org.dash.avionics.sensors.*;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -59,7 +58,7 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 
 	@AfterViews
 	protected void setValues() {
-		viewsByType.put(ValueType.RPM, rpmView);
+		viewsByType.put(ValueType.PROP_RPM, rpmView);
 		viewsByType.put(ValueType.POWER, powerView);
 		viewsByType.put(ValueType.HEART_BEAT, heartView);
 		viewsByType.put(ValueType.HEADING, headingView);
@@ -96,10 +95,12 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 		Message msg = Message
 				.obtain(null, SensorsService.MSG_UNREGISTER_CLIENT);
 		msg.replyTo = incomingMessenger;
-		try {
-			outgoingMessenger.send(msg);
-		} catch (RemoteException e) {
-			// Service is already dead.
+		if (outgoingMessenger == null) {
+			try {
+				outgoingMessenger.send(msg);
+			} catch (RemoteException e) {
+				// Service is already dead.
+			}
 		}
 		unbindService(this);
 		outgoingMessenger = null;
@@ -128,10 +129,11 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 
 	@UiThread
 	protected void setValue(ValueUpdate update) {
-		viewsByType.get(update.type).setText(String.valueOf(update.value));
-
+		String valueStr = String.format(Locale.US, "%.1f", update.value);
+		viewsByType.get(update.type).setText(valueStr);
 	}
 
+	@Override
 	public void updateValue(ValueUpdate update) {
 		lastUpdateByType.put(update.type, System.currentTimeMillis());
 		setValue(update);
@@ -143,8 +145,9 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 		View decorView = getWindow().getDecorView();
 		if (hasFocus) {
 			// TODO: Support older versions
-			decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+			decorView
+					.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+			// | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 		}
 	}
 
@@ -167,7 +170,7 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 			switch (msg.what) {
 			case SensorsService.MSG_UPDATED_VALUE: {
 				ValueUpdate update = new ValueUpdate(
-						ValueType.values()[msg.arg1], msg.arg2);
+						ValueType.values()[msg.arg1], msg.arg2 / 10.0f);
 				updaterRef.updateValue(update);
 				break;
 			}

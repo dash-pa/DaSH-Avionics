@@ -1,5 +1,5 @@
 Avionics/bin
 Avionics/gen
-Avionics/\.apt_generated
+Avionics/apt_generated
 \.metadata
 \.DS_Store
