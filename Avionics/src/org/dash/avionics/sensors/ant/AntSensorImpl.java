@@ -3,10 +3,11 @@ package org.dash.avionics.sensors.ant;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
+import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementListener;
 import org.dash.avionics.data.MeasurementType;
-import org.dash.avionics.data.Measurement;
 
 import android.content.Context;
 import android.util.Log;
@@ -64,7 +65,13 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
 
 		this.updater = updater;
 
+		Log.i("ANT", "Starting first ANT+ search for " + RELEVANT_DEVICE_TYPES);
+		startSearching();
+	}
+
+	protected void startSearching() {
 		// Start searching for devices.
+		Log.v("ANT", "ANT+ search commenced.");
 		deviceSearch = new MultiDeviceSearch(context, RELEVANT_DEVICE_TYPES, this, this);
 	}
 
@@ -113,8 +120,17 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
 
 	@Override
 	public void onSearchStopped(RequestAccessResult result) {
-		Log.i("ANT", "ANT+ search stopped.");
+		Log.v("ANT", "ANT+ search stopped.");
+		deviceSearch.close();
 		deviceSearch = null;
+
+		// Keep searching.
+		try {
+			Thread.sleep(2000);
+			startSearching();
+		} catch (InterruptedException e) {
+			// Do nothing.
+		}
 	}
 
 	@Override

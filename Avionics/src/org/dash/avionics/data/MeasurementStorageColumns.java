@@ -14,6 +14,6 @@ public interface MeasurementStorageColumns extends BaseColumns {
 		"CREATE TABLE " + MEASUREMENT_TABLE_NAME + "(" +
 				VALUE_TIMESTAMP + " INTEGER NOT NULL, " +
 				VALUE_TYPE + " INTEGER NOT NULL, " +
-				VALUE + " REAL NOT NULL";
+				VALUE + " REAL NOT NULL);";
 
 }

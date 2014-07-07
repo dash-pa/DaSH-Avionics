@@ -36,7 +36,20 @@ import android.widget.TextView;
 @EActivity(R.layout.activity_avionics)
 public class AvionicsActivity extends Activity implements ServiceConnection,
 		MeasurementListener {
-	private static final long MAX_DATA_AGE_MS = 2 * 1000;
+	private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
+	// ANT+ needs larger delays
+	private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
+	private static final Map<MeasurementType, Long> MAX_DATA_AGES_MS = new HashMap<MeasurementType, Long>();
+	{
+		MAX_DATA_AGES_MS.put(MeasurementType.PROP_RPM, DEFAULT_MAX_DATA_AGE_MS);
+		MAX_DATA_AGES_MS.put(MeasurementType.HEADING, DEFAULT_MAX_DATA_AGE_MS);
+		MAX_DATA_AGES_MS.put(MeasurementType.HEIGHT, DEFAULT_MAX_DATA_AGE_MS);
+		MAX_DATA_AGES_MS.put(MeasurementType.SPEED, DEFAULT_MAX_DATA_AGE_MS);
+
+		MAX_DATA_AGES_MS.put(MeasurementType.POWER, ANTPLUS_MAX_DATA_AGE_MS);
+		MAX_DATA_AGES_MS.put(MeasurementType.CRANK_RPM, ANTPLUS_MAX_DATA_AGE_MS);
+		MAX_DATA_AGES_MS.put(MeasurementType.HEART_BEAT, ANTPLUS_MAX_DATA_AGE_MS);
+	}
 
 	@ViewById
 	protected TextView rpmView, powerView, heartView, headingView, speedView,
@@ -109,12 +122,13 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 		super.onPause();
 	}
 
-	@Background(id = "watchdog", delay = 1000)
+	@Background(id = "watchdog", delay = 500)
 	protected void runWatchdog() {
 		long now = System.currentTimeMillis();
 		for (MeasurementType type : MeasurementType.values()) {
 			Long lastTimestamp = lastUpdateByType.get(type);
-			if (lastTimestamp == null || lastTimestamp < now - MAX_DATA_AGE_MS) {
+			long maxAge = MAX_DATA_AGES_MS.get(type);
+			if (lastTimestamp == null || lastTimestamp < now - maxAge) {
 				Log.w("Watchdog", "No recent update for type " + type);
 				setValueUnknown(type);
 			}
@@ -125,13 +139,25 @@ public class AvionicsActivity extends Activity implements ServiceConnection,
 
 	@UiThread
 	protected void setValueUnknown(MeasurementType type) {
-		viewsByType.get(type).setText(R.string.value_not_available);
+		TextView view = viewsByType.get(type);
+		if (view == null) {
+			Log.v("UI", "No view for type " + type);
+			return;
+		}
+
+		view.setText(R.string.value_not_available);
 	}
 
 	@UiThread
 	protected void setValue(Measurement update) {
+		TextView view = viewsByType.get(update.type);
+		if (view == null) {
+			Log.v("UI", "No view for type " + update.type);
+			return;
+		}
+
 		String valueStr = String.format(Locale.US, "%.1f", update.value);
-		viewsByType.get(update.type).setText(valueStr);
+		view.setText(valueStr);
 	}
 
 	@Override
