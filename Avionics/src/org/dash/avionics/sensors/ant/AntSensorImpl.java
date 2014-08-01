@@ -3,11 +3,10 @@ package org.dash.avionics.sensors.ant;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.dash.avionics.data.Measurement;
-import org.dash.avionics.data.MeasurementListener;
 import org.dash.avionics.data.MeasurementType;
+import org.dash.avionics.sensors.SensorListener;
 
 import android.content.Context;
 import android.util.Log;
@@ -52,13 +51,13 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
 	private PccReleaseHandle<AntPlusBikePowerPcc> powerReleaseHandle;
 
 	// External callback.
-	private MeasurementListener updater;
+	private SensorListener updater;
 
 	AntSensorImpl(Context context) {
 		this.context = context;
 	}
 
-	void connect(MeasurementListener updater) {
+	void connect(SensorListener updater) {
 		if (this.updater != null) {
 			throw new IllegalStateException("Trying to register a second updater");
 		}

@@ -2,7 +2,7 @@ package org.dash.avionics.sensors.ant;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
-import org.dash.avionics.data.MeasurementListener;
+import org.dash.avionics.sensors.SensorListener;
 import org.dash.avionics.sensors.SensorManager;
 
 @EBean
@@ -12,7 +12,7 @@ public class AntSensorManager implements SensorManager {
 	protected AntSensorImpl impl;
 
 	@Override
-	public void connect(MeasurementListener updater) {
+	public void connect(SensorListener updater) {
 		impl.connect(updater);
 	}
 

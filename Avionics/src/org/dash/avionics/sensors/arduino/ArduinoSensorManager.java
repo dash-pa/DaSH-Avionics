@@ -8,9 +8,9 @@ import java.util.UUID;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.api.BackgroundExecutor;
-import org.dash.avionics.data.MeasurementListener;
 import org.dash.avionics.data.MeasurementType;
 import org.dash.avionics.data.Measurement;
+import org.dash.avionics.sensors.SensorListener;
 import org.dash.avionics.sensors.SensorManager;
 
 import android.bluetooth.BluetoothAdapter;
@@ -25,7 +25,7 @@ public class ArduinoSensorManager implements SensorManager {
 
 	@Background(serial="arduino-loop")
 	@Override
-	public void connect(MeasurementListener updater) {
+	public void connect(SensorListener updater) {
 		// Keep trying to connect and read from the sensors.
 		while (true) {
 			try {
@@ -181,8 +181,6 @@ public class ArduinoSensorManager implements SensorManager {
 			return MeasurementType.PROP_RPM;
 		} else if (typeStr.equals("ALT")) {
 			return MeasurementType.HEIGHT;
-		} else if (typeStr.equals("KPH")) {
-			return MeasurementType.SPEED;
 		}
 		return null;
 	}
