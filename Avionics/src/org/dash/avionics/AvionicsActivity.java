@@ -44,8 +44,6 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 		MAX_DATA_AGES_MS.put(MeasurementType.SPEED, DEFAULT_MAX_DATA_AGE_MS);
 
 		MAX_DATA_AGES_MS.put(MeasurementType.POWER, ANTPLUS_MAX_DATA_AGE_MS);
-		MAX_DATA_AGES_MS
-				.put(MeasurementType.CRANK_RPM, ANTPLUS_MAX_DATA_AGE_MS);
 		MAX_DATA_AGES_MS.put(MeasurementType.HEART_BEAT,
 				ANTPLUS_MAX_DATA_AGE_MS);
 	}
@@ -111,10 +109,16 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 	protected void runWatchdog() {
 		long now = System.currentTimeMillis();
 		for (MeasurementType type : MeasurementType.values()) {
+			Long maxAge = MAX_DATA_AGES_MS.get(type);
+			if (maxAge == null) {
+				continue;
+			}
+
 			Long lastTimestamp = lastUpdateByType.get(type);
-			long maxAge = MAX_DATA_AGES_MS.get(type);
 			if (lastTimestamp == null || lastTimestamp < now - maxAge) {
-				Log.w("Watchdog", "No recent update for type " + type);
+				if (lastTimestamp != null) {
+					Log.w("Watchdog", "No update for type " + type + " for " + (now - lastTimestamp) + "ms");
+				}
 				setValueUnknown(type);
 			}
 		}
@@ -126,7 +130,6 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 	protected void setValueUnknown(MeasurementType type) {
 		TextView view = viewsByType.get(type);
 		if (view == null) {
-			Log.v("UI", "No view for type " + type);
 			return;
 		}
 
@@ -137,7 +140,6 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 	protected void setValue(Measurement update) {
 		TextView view = viewsByType.get(update.type);
 		if (view == null) {
-			Log.v("UI", "No view for type " + update.type);
 			return;
 		}
 
