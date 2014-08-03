@@ -42,7 +42,7 @@ public class RatioTracker {
 	}
 
 	public float getLastNumerator() {
-		if (denominators.isEmpty()) return 0;
+		if (numerators.isEmpty()) return 0;
 
 		return numerators.get(numerators.size() - 1).value;
 	}

@@ -91,7 +91,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/knownSpeedLabel"
-        android:layout_marginLeft="50sp"
+        android:layout_marginLeft="70sp"
         android:layout_toRightOf="@id/knownSpeedLabel"
         android:gravity="left"
         android:lines="1"
