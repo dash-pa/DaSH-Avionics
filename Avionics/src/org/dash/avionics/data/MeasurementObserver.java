@@ -40,6 +40,7 @@ public class MeasurementObserver extends ContentObserver {
 		MeasurementType type = MeasurementType.values()[cursor.getInt(typeIdx)];
 		long timestamp = cursor.getLong(timestampIdx);
 		float value = cursor.getFloat(valueIdx);
+		cursor.close();
 
 		Measurement measurement = new Measurement(type, value, timestamp);
 		listener.onNewMeasurement(measurement);
