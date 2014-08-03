@@ -6,6 +6,7 @@ import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementStorageColumns;
 import org.dash.avionics.sensors.ant.AntSensorManager;
 import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
+import org.dash.avionics.sensors.fake.FakeSensorManager;
 
 import android.app.Service;
 import android.content.ContentResolver;
@@ -15,6 +16,8 @@ import android.os.IBinder;
 
 @EService
 public class SensorsService extends Service implements SensorListener {
+	private static final boolean USE_FAKE_DATA = false;
+
 	/*
 	 * Managers for many types of sensors.
 	 */
@@ -22,6 +25,8 @@ public class SensorsService extends Service implements SensorListener {
 	protected ArduinoSensorManager arduinoSensor;
 	@Bean
 	protected AntSensorManager antSensor;
+	@Bean
+	protected FakeSensorManager fakeSensor;
 
 	private ContentResolver contentResolver;
 
@@ -29,14 +34,22 @@ public class SensorsService extends Service implements SensorListener {
 	public void onCreate() {
 		contentResolver = getContentResolver();
 
-		antSensor.connect(this);
-		arduinoSensor.connect(this);
+		if (USE_FAKE_DATA) {
+			fakeSensor.connect(this);
+		} else {
+			antSensor.connect(this);
+			arduinoSensor.connect(this);
+		}
 	}
 
 	@Override
 	public void onDestroy() {
-		antSensor.disconnect();
-		arduinoSensor.disconnect();
+		if (USE_FAKE_DATA) {
+			fakeSensor.disconnect();
+		} else {
+			antSensor.disconnect();
+			arduinoSensor.disconnect();
+		}
 	}
 
 	@Override
