@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_dark"
+    android:keepScreenOn="true"
+    android:padding="10dp"
+    tools:context=".CalibrationActivity" >
+
+    <TextView
+        android:id="@+id/knownSpeedLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="130sp"
+        android:text="@string/calibration_known_speed"
+        android:textAlignment="gravity"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <TextView
+        android:id="@+id/knownSpeedView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/knownSpeedLabel"
+        android:layout_below="@id/knownSpeedLabel"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="130sp"
+        android:text="@string/value_not_available"
+        android:textAlignment="gravity"
+        android:textAppearance="@style/mediumValueText" />
+
+    <TextView
+        android:id="@+id/propRpmLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/knownSpeedView"
+        android:layout_below="@id/knownSpeedView"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="130sp"
+        android:text="@string/calibration_prop_rpm"
+        android:textAlignment="gravity"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <TextView
+        android:id="@+id/propRpmView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/propRpmLabel"
+        android:layout_below="@id/propRpmLabel"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="130sp"
+        android:text="@string/value_not_available"
+        android:textAlignment="gravity"
+        android:textAppearance="@style/mediumValueText" />
+
+    <TextView
+        android:id="@+id/calculatedSpeedLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/propRpmView"
+        android:layout_below="@id/propRpmView"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="130sp"
+        android:text="@string/calibration_calculated_speed"
+        android:textAlignment="gravity"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <TextView
+        android:id="@+id/calculatedSpeedView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/calculatedSpeedLabel"
+        android:layout_below="@id/calculatedSpeedLabel"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="130sp"
+        android:text="@string/value_not_available"
+        android:textAlignment="gravity"
+        android:textAppearance="@style/mediumValueText" />
+
+    <TextView
+        android:id="@+id/immediateRatioLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/knownSpeedLabel"
+        android:layout_marginLeft="50sp"
+        android:layout_toRightOf="@id/knownSpeedLabel"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="200sp"
+        android:text="@string/calibration_immediate_ratio"
+        android:textAlignment="gravity"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <TextView
+        android:id="@+id/immediateRatioView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/immediateRatioLabel"
+        android:layout_below="@id/immediateRatioLabel"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="200sp"
+        android:text="@string/value_not_available"
+        android:textAlignment="gravity"
+        android:textAppearance="@style/mediumValueText" />
+
+    <TextView
+        android:id="@+id/averageRatioLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/immediateRatioView"
+        android:layout_below="@id/immediateRatioView"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="200sp"
+        android:text="@string/calibration_5sec_ratio"
+        android:textAlignment="gravity"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <TextView
+        android:id="@+id/averageRatioView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/averageRatioLabel"
+        android:layout_below="@id/averageRatioLabel"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="200sp"
+        android:text="@string/value_not_available"
+        android:textAlignment="gravity"
+        android:textAppearance="@style/mediumValueText" />
+
+    <TextView
+        android:id="@+id/usedRatioLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/averageRatioView"
+        android:layout_below="@id/averageRatioView"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="200sp"
+        android:text="@string/calibration_current_ratio"
+        android:textAlignment="gravity"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+
+    <TextView
+        android:id="@+id/usedRatioView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/usedRatioLabel"
+        android:layout_below="@id/usedRatioLabel"
+        android:gravity="left"
+        android:lines="1"
+        android:minWidth="200sp"
+        android:text="@string/value_not_available"
+        android:textAlignment="gravity"
+        android:textAppearance="@style/mediumValueText" />
+
+    <Button
+        android:id="@+id/useImmediateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/immediateRatioView"
+        android:layout_toRightOf="@id/immediateRatioView"
+        android:text="@string/calibration_use_button" />
+
+    <Button
+        android:id="@+id/useAverageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/averageRatioView"
+        android:layout_toRightOf="@id/averageRatioView"
+        android:text="@string/calibration_use_button" />
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/usedRatioLabel"
+        android:layout_toRightOf="@+id/usedRatioLabel" >
+
+        <RadioButton
+            android:id="@+id/profile1Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/profile1" />
+
+        <RadioButton
+            android:id="@+id/profile2Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile2" />
+
+        <RadioButton
+            android:id="@+id/profile3Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile3" />
+
+        <RadioButton
+            android:id="@+id/profile4Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile4" />
+    </RadioGroup>
+
+</RelativeLayout>

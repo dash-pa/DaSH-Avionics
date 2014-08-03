@@ -29,6 +29,14 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="org.dash.avionics.CalibrationActivity_"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:immersive="true"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape"
+            android:theme="@style/FullscreenTheme" />
+
         <service android:name=".sensors.SensorsService_" />
 
         <provider

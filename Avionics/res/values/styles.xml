@@ -35,6 +35,10 @@
 
     <style name="ButtonBarButton" />
 
+    <style name="mediumValueText" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">60sp</item>
+    </style>
+
     <style name="largeValueText" parent="@android:style/TextAppearance.Large">
         <item name="android:textSize">80sp</item>
     </style>

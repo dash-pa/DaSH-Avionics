@@ -7,11 +7,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Fullscreen;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.api.BackgroundExecutor;
+import org.dash.avionics.calibration.CalibrationManager;
+import org.dash.avionics.calibration.CalibrationProfile;
 import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementListener;
 import org.dash.avionics.data.MeasurementObserver;
@@ -40,8 +44,10 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 		MAX_DATA_AGES_MS.put(MeasurementType.SPEED, DEFAULT_MAX_DATA_AGE_MS);
 
 		MAX_DATA_AGES_MS.put(MeasurementType.POWER, ANTPLUS_MAX_DATA_AGE_MS);
-		MAX_DATA_AGES_MS.put(MeasurementType.CRANK_RPM, ANTPLUS_MAX_DATA_AGE_MS);
-		MAX_DATA_AGES_MS.put(MeasurementType.HEART_BEAT, ANTPLUS_MAX_DATA_AGE_MS);
+		MAX_DATA_AGES_MS
+				.put(MeasurementType.CRANK_RPM, ANTPLUS_MAX_DATA_AGE_MS);
+		MAX_DATA_AGES_MS.put(MeasurementType.HEART_BEAT,
+				ANTPLUS_MAX_DATA_AGE_MS);
 	}
 
 	@ViewById
@@ -55,6 +61,10 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 
 	private MeasurementObserver observer;
 
+	@Bean
+	protected CalibrationManager calibrationManager;
+	private CalibrationProfile calibration;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,7 +72,11 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 		Intent intent = SensorsService_.intent(getApplicationContext()).get();
 		startService(intent);
 
-		observer = new MeasurementObserver(new Handler(), getContentResolver(), this);
+		observer = new MeasurementObserver(new Handler(), getContentResolver(),
+				this);
+
+		// TODO: Add profiles here
+		calibration = calibrationManager.getProfile(0);
 
 		getActionBar().hide();
 	}
@@ -135,6 +149,16 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 	public void onNewMeasurement(Measurement update) {
 		lastUpdateByType.put(update.type, System.currentTimeMillis());
 		setValue(update);
+
+		updateDerivedValues(update);
+	}
+
+	private void updateDerivedValues(Measurement update) {
+		if (update.type == MeasurementType.PROP_RPM) {
+			float speed = update.value * calibration.getPropRatio();
+			onNewMeasurement(new Measurement(MeasurementType.SPEED, speed,
+					update.timestamp));
+		}
 	}
 
 	@Override
@@ -149,5 +173,8 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 		}
 	}
 
-//				updaterRef.onNewMeasurement(update);
+	@Click(R.id.speedView)
+	public void onSpeedClicked() {
+		CalibrationActivity_.intent(this).start();
+	}
 }
