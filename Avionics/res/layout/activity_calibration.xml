@@ -6,7 +6,7 @@
     android:background="@android:color/background_dark"
     android:keepScreenOn="true"
     android:padding="10dp"
-    tools:context=".CalibrationActivity" >
+    tools:context=".PropCalibrationActivity" >
 
     <TextView
         android:id="@+id/knownSpeedLabel"

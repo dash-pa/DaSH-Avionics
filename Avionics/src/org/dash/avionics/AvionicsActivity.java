@@ -14,6 +14,8 @@ import org.androidannotations.annotations.Fullscreen;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.api.BackgroundExecutor;
+import org.dash.avionics.alerts.CruiseSpeedAlerter;
+import org.dash.avionics.alerts.CruiseSpeedAlerter.CruiseSpeedAlertListener;
 import org.dash.avionics.calibration.CalibrationManager;
 import org.dash.avionics.calibration.CalibrationProfile;
 import org.dash.avionics.data.Measurement;
@@ -32,7 +34,7 @@ import android.widget.TextView;
 
 @Fullscreen
 @EActivity(R.layout.activity_avionics)
-public class AvionicsActivity extends Activity implements MeasurementListener {
+public class AvionicsActivity extends Activity implements MeasurementListener, CruiseSpeedAlertListener {
 	private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
 	// ANT+ needs larger delays
 	private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
@@ -62,6 +64,7 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 	@Bean
 	protected CalibrationManager calibrationManager;
 	private CalibrationProfile calibration;
+	private CruiseSpeedAlerter speedAlerter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +75,7 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 
 		observer = new MeasurementObserver(new Handler(), getContentResolver(),
 				this);
-
-		// TODO: Add profiles here
-		calibration = calibrationManager.getProfile(0);
+		speedAlerter = new CruiseSpeedAlerter(this);
 
 		getActionBar().hide();
 	}
@@ -92,6 +93,10 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		// Assumes that the profile doesn't change without going somewhere else to change it.
+		calibration = calibrationManager.loadActiveProfile();
+		speedAlerter.setCalibration(calibration);
 
 		observer.start();
 		runWatchdog();
@@ -152,6 +157,7 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 		lastUpdateByType.put(update.type, System.currentTimeMillis());
 		setValue(update);
 
+		updateAlerters(update);
 		updateDerivedValues(update);
 	}
 
@@ -161,6 +167,27 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 			onNewMeasurement(new Measurement(MeasurementType.SPEED, speed,
 					update.timestamp));
 		}
+	}
+
+	private void updateAlerters(Measurement update) {
+		if (update.type == MeasurementType.SPEED) {
+			speedAlerter.updateCurrentSpeed(update.value);
+		}
+	}
+
+	@Override
+	public void onLowSpeed() {
+		speedView.setTextColor(getResources().getColor(R.color.alert));
+	}
+
+	@Override
+	public void onHighSpeed() {
+		speedView.setTextColor(getResources().getColor(R.color.alert));
+	}
+
+	@Override
+	public void onStoppedAlerting() {
+		speedView.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
 	}
 
 	@Override
@@ -177,6 +204,6 @@ public class AvionicsActivity extends Activity implements MeasurementListener {
 
 	@Click(R.id.speedView)
 	public void onSpeedClicked() {
-		CalibrationActivity_.intent(this).start();
+		PropCalibrationActivity_.intent(this).start();
 	}
 }

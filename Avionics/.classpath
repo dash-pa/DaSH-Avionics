@@ -22,5 +22,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/fit_11.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/guava-17.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
