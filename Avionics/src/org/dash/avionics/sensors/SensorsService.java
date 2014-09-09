@@ -16,7 +16,7 @@ import android.os.IBinder;
 
 @EService
 public class SensorsService extends Service implements SensorListener {
-	private static final boolean USE_FAKE_DATA = true;
+	private static final boolean USE_FAKE_DATA = false;
 
 	/*
 	 * Managers for many types of sensors.

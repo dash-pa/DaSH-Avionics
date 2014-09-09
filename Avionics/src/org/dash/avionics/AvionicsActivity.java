@@ -40,7 +40,7 @@ public class AvionicsActivity extends Activity implements MeasurementListener, C
 	private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
 	private static final Map<MeasurementType, Long> MAX_DATA_AGES_MS = new HashMap<MeasurementType, Long>();
 	{
-		MAX_DATA_AGES_MS.put(MeasurementType.PROP_RPM, DEFAULT_MAX_DATA_AGE_MS);
+		MAX_DATA_AGES_MS.put(MeasurementType.CRANK_RPM, DEFAULT_MAX_DATA_AGE_MS);
 		MAX_DATA_AGES_MS.put(MeasurementType.HEADING, DEFAULT_MAX_DATA_AGE_MS);
 		MAX_DATA_AGES_MS.put(MeasurementType.HEIGHT, DEFAULT_MAX_DATA_AGE_MS);
 		MAX_DATA_AGES_MS.put(MeasurementType.SPEED, DEFAULT_MAX_DATA_AGE_MS);
@@ -82,7 +82,7 @@ public class AvionicsActivity extends Activity implements MeasurementListener, C
 
 	@AfterViews
 	protected void setValues() {
-		viewsByType.put(MeasurementType.PROP_RPM, rpmView);
+		viewsByType.put(MeasurementType.CRANK_RPM, rpmView);
 		viewsByType.put(MeasurementType.POWER, powerView);
 		viewsByType.put(MeasurementType.HEART_BEAT, heartView);
 		viewsByType.put(MeasurementType.HEADING, headingView);

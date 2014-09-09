@@ -15,7 +15,9 @@ import com.dsi.ant.plugins.antplus.pcc.AntPlusBikeCadencePcc;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikeCadencePcc.ICalculatedCadenceReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.DataSource;
+import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.ICalculatedCrankCadenceReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.ICalculatedPowerReceiver;
+import com.dsi.ant.plugins.antplus.pcc.AntPlusBikePowerPcc.IInstantaneousCadenceReceiver;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusHeartRatePcc;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusHeartRatePcc.DataState;
 import com.dsi.ant.plugins.antplus.pcc.AntPlusHeartRatePcc.IHeartRateDataReceiver;
@@ -33,7 +35,7 @@ import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch.RssiCallback;
 import com.dsi.ant.plugins.antplus.pccbase.PccReleaseHandle;
 
 @EBean
-class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, IDeviceStateChangeReceiver, ICalculatedCadenceReceiver, ICalculatedPowerReceiver, IHeartRateDataReceiver, IBatteryStatusReceiver {
+class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, IDeviceStateChangeReceiver, ICalculatedCadenceReceiver, ICalculatedPowerReceiver, IHeartRateDataReceiver, IBatteryStatusReceiver, ICalculatedCrankCadenceReceiver, IInstantaneousCadenceReceiver {
 	private final Context context;
     private static final EnumSet<DeviceType> RELEVANT_DEVICE_TYPES =
     		EnumSet.of(DeviceType.HEARTRATE, DeviceType.BIKE_POWER,
@@ -138,7 +140,7 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
 	}
 
 	protected void connectCadence(int antDeviceNumber, DeviceType type) {
-		boolean isSpeedCadence = (type == DeviceType.BIKE_SPDCAD);
+		boolean isSpeedCadence = type.equals(DeviceType.BIKE_SPDCAD);
         cadenceReleaseHandle = AntPlusBikeCadencePcc.requestAccess(context,
                 antDeviceNumber, 0, isSpeedCadence, cadencePccReceiver, this);
 	}
@@ -185,6 +187,8 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
 			powerPcc = result;
 			powerPcc.subscribeBatteryStatusEvent(AntSensorImpl.this);
 			powerPcc.subscribeCalculatedPowerEvent(AntSensorImpl.this);
+			powerPcc.subscribeCalculatedCrankCadenceEvent(AntSensorImpl.this);
+			powerPcc.subscribeInstantaneousCadenceEvent(AntSensorImpl.this);
 		}
     };
 
@@ -206,6 +210,18 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
     public void onNewCalculatedCadence(final long estTimestamp,
             final EnumSet<EventFlag> eventFlags, final BigDecimal calculatedCadence) {
 		updater.onNewMeasurement(new Measurement(MeasurementType.CRANK_RPM, calculatedCadence.floatValue()));
+	}
+
+	@Override
+	public void onNewCalculatedCrankCadence(long estTimestamp, EnumSet<EventFlag> eventFlags,
+			DataSource dataSource, BigDecimal calculatedCrankCadence) {
+		updater.onNewMeasurement(new Measurement(MeasurementType.CRANK_RPM, calculatedCrankCadence.floatValue()));
+	}
+
+	@Override
+	public void onNewInstantaneousCadence(long estTimestamp, EnumSet<EventFlag> eventFlags,
+			DataSource dataSource, int instantaneousCadence) {
+		// Not used for now.
 	}
 
 	@Override
@@ -236,4 +252,5 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
             final int batteryIdentifier) {
 		// TODO
 	}
+
 }

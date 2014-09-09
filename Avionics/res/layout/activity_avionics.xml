@@ -103,14 +103,14 @@
         android:id="@+id/speedView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/speedLabel"
         android:layout_alignBaseline="@id/powerLabel"
-        android:text="@string/value_not_available"
-        android:textAppearance="@style/largeValueText"
-        android:textSize="120sp"
-        android:textAlignment="gravity"
+        android:layout_toLeftOf="@+id/speedLabel"
         android:gravity="right"
-        android:lines="1" />
+        android:lines="1"
+        android:text="@string/value_not_available"
+        android:textAlignment="gravity"
+        android:textAppearance="@style/largeValueText"
+        android:textSize="100sp" />
 
     <TextView
         android:id="@+id/speedLabel"

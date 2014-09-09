@@ -22,7 +22,15 @@ interface CalibrationStorage {
 	@DefaultFloat(0.01375f)
 	float propSpeedFactor4();
 
-	@DefaultFloat(1.0f)  // TODO
+	// Circunference = 1.497m
+	// Front gear = 34
+	// Rear gear = 19
+	// Hub gear ratio = 133%
+	// Overall gear ratio = 1.33*34/19
+	// Speed = freq(Hz) * circunference * gear ratio m/s
+	//       = freq(rpm)/60 * circunference * gear ratio m/s
+	//       = freq(rpm)/60 * circunference * gear ratio * 3.6 km/h
+	@DefaultFloat(1.497f / 60.0f * 3.6f * 1.33f * 34.0f / 19.0f)
 	float crankSpeedRatio();
 
 	@DefaultInt(0)
