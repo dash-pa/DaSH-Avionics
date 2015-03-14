@@ -61,9 +61,9 @@ public class RatioTracker {
 		}
 
 		long now = System.currentTimeMillis();
-		float numeratorSum = recentSum(numerators, periodMs, now);
-		float denominatorSum = recentSum(denominators, periodMs, now);
-		return numeratorSum / denominatorSum;
+		float numeratorAvg = recentSum(numerators, periodMs, now) / numerators.size();
+		float denominatorAvg = recentSum(denominators, periodMs, now) / denominators.size();
+		return numeratorAvg / denominatorAvg;
 	}
 
 	private float recentSum(List<Measurement> measurements, long periodMs, long now) {
