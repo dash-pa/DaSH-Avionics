@@ -65,13 +65,14 @@ public class AvionicsActivity extends Activity
   protected CalibrationManager calibrationManager;
   private CalibrationProfile calibration;
   private CruiseSpeedAlerter speedAlerter;
+  private Intent serviceIntent;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    Intent intent = SensorsService_.intent(getApplicationContext()).get();
-    startService(intent);
+    serviceIntent = SensorsService_.intent(getApplicationContext()).get();
+    startService(serviceIntent);
 
     observer = new MeasurementObserver(new Handler(), getContentResolver(),
         this);
@@ -109,6 +110,13 @@ public class AvionicsActivity extends Activity
     observer.stop();
 
     super.onPause();
+  }
+
+  @Override
+  protected void onDestroy() {
+    stopService(serviceIntent);
+
+    super.onDestroy();
   }
 
   @SuppressWarnings("InfiniteRecursion")

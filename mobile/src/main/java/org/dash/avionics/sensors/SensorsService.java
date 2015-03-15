@@ -21,6 +21,8 @@ import org.dash.avionics.sensors.viiiiva.ViiiivaSensorManager;
 public class SensorsService extends Service implements SensorListener {
   private static final boolean USE_FAKE_DATA = false;
   private static final boolean USE_VIIIIVA = true;
+  private static final boolean USE_ARDUINO = false;
+  private static final boolean USE_ANT = false;
 
   /*
    * Managers for many types of sensors.
@@ -40,32 +42,18 @@ public class SensorsService extends Service implements SensorListener {
   public void onCreate() {
     contentResolver = getContentResolver();
 
-    if (USE_FAKE_DATA) {
-      fakeSensor.connect(this);
-    } else {
-      if (USE_VIIIIVA) {
-        vivaSensor.connect(this);
-      } else {
-        antSensor.connect(this);
-      }
-
-//      arduinoSensor.connect(this);
-    }
+    if (USE_FAKE_DATA) fakeSensor.connect(this);
+    if (USE_VIIIIVA) vivaSensor.connect(this);
+    if (USE_ANT) antSensor.connect(this);
+    if (USE_ARDUINO) arduinoSensor.connect(this);
   }
 
   @Override
   public void onDestroy() {
-    if (USE_FAKE_DATA) {
-      fakeSensor.disconnect();
-    } else {
-      if (USE_VIIIIVA) {
-        vivaSensor.disconnect();
-      } else {
-        antSensor.disconnect();
-      }
-
-//      arduinoSensor.disconnect();
-    }
+    if (USE_FAKE_DATA) fakeSensor.disconnect();
+    if (USE_VIIIIVA) vivaSensor.disconnect();
+    if (USE_ANT) antSensor.disconnect();
+    if (USE_ARDUINO) arduinoSensor.disconnect();
   }
 
   @Override

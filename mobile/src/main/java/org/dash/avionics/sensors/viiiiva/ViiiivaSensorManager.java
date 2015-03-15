@@ -32,6 +32,8 @@ import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT8;
 @EBean
 public class ViiiivaSensorManager extends BluetoothGattCallback
     implements SensorManager, BluetoothAdapter.LeScanCallback {
+  private boolean characteristicsEnabled;
+
   private enum WriteDescriptorStatus {
     FAILURE, DONE, WORKING
   }
@@ -71,10 +73,13 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
   @Override
   public void disconnect() {
     //noinspection deprecation
+    Log.d("Viiiiva", "Disconnecting");
     btadapter.stopLeScan(this);
     if (gatt != null) {
+      gatt.disconnect();
       gatt.close();
     }
+    characteristicsEnabled = false;
     setWriteDescriptorStatus(WriteDescriptorStatus.DONE);
   }
 
@@ -137,7 +142,13 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
     }
     deviceStr.append("\n}");
     Log.v("Viiiiva", deviceStr.toString());
-    enableCharacteristics();
+
+    synchronized (writeStatusLock) {
+      if (!characteristicsEnabled) {
+        characteristicsEnabled = true;
+        enableCharacteristics();
+      }
+    }
   }
 
   @Background
@@ -240,6 +251,13 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
         }
       }
       Log.v("Viiiiva", "Done wait for not working: " + writeStatus);
+    }
+  }
+
+  @Override
+  public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+    if (status == BluetoothGatt.GATT_SUCCESS) {
+      onCharacteristicChanged(gatt, characteristic);
     }
   }
 
