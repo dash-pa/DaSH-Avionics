@@ -13,10 +13,12 @@ import org.dash.avionics.data.MeasurementStorageColumns;
 import org.dash.avionics.sensors.ant.AntSensorManager;
 import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
 import org.dash.avionics.sensors.fake.FakeSensorManager;
+import org.dash.avionics.sensors.viiiiva.ViiiivaSensorManager;
 
 @EService
 public class SensorsService extends Service implements SensorListener {
-  private static final boolean USE_FAKE_DATA = true;
+  private static final boolean USE_FAKE_DATA = false;
+  private static final boolean USE_VIIIIVA = true;
 
   /*
    * Managers for many types of sensors.
@@ -27,6 +29,8 @@ public class SensorsService extends Service implements SensorListener {
   protected AntSensorManager antSensor;
   @Bean
   protected FakeSensorManager fakeSensor;
+  @Bean
+  protected ViiiivaSensorManager vivaSensor;
 
   private ContentResolver contentResolver;
 
@@ -37,8 +41,13 @@ public class SensorsService extends Service implements SensorListener {
     if (USE_FAKE_DATA) {
       fakeSensor.connect(this);
     } else {
-      antSensor.connect(this);
-      arduinoSensor.connect(this);
+      if (USE_VIIIIVA) {
+        vivaSensor.connect(this);
+      } else {
+        antSensor.connect(this);
+      }
+
+//      arduinoSensor.connect(this);
     }
   }
 
@@ -47,8 +56,13 @@ public class SensorsService extends Service implements SensorListener {
     if (USE_FAKE_DATA) {
       fakeSensor.disconnect();
     } else {
-      antSensor.disconnect();
-      arduinoSensor.disconnect();
+      if (USE_VIIIIVA) {
+        vivaSensor.disconnect();
+      } else {
+        antSensor.disconnect();
+      }
+
+//      arduinoSensor.disconnect();
     }
   }
 
