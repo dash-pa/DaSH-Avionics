@@ -1,5 +1,9 @@
-Avionics/bin
-Avionics/gen
-Avionics/apt_generated
-\.metadata
+build
+mobile/build
+wear/build
+local.properties
+\.gitignore
+\.gradle
+\.idea/workspace.xml
+\.idea/libraries
 \.DS_Store
