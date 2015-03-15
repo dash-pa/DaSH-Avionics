@@ -1,9 +1,11 @@
-package dash.org.avionics;
+package org.dash.avionics;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.widget.TextView;
+
+import org.dash.avionics.R;
 
 public class MainActivity extends Activity {
 

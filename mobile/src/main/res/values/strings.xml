@@ -36,4 +36,6 @@
 	<string name="profile2">Profile 2</string>
 	<string name="profile3">Profile 3</string>
 	<string name="profile4">Profile 4</string>
+
+    <string name="action_settings">Settings</string>
 </resources>

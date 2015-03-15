@@ -1,4 +1,4 @@
-package dash.org.avionics;
+package org.dash.avionics;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
