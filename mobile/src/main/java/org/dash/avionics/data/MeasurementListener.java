@@ -1,5 +1,5 @@
 package org.dash.avionics.data;
 
 public interface MeasurementListener {
-	void onNewMeasurement(Measurement measurement);
+  void onNewMeasurement(Measurement measurement);
 }

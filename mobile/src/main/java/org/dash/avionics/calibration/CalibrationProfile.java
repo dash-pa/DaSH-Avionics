@@ -6,47 +6,47 @@ import org.dash.avionics.alerts.CruiseSpeedCalculator.Aircraft;
 
 public class CalibrationProfile {
 
-	private final IntPrefField activeAircraft;
-	private final FloatPrefField propRatio;
-	private final FloatPrefField crankSpeedRatio;
-	private final FloatPrefField pilotWeight;
+  private final IntPrefField activeAircraft;
+  private final FloatPrefField propRatio;
+  private final FloatPrefField crankSpeedRatio;
+  private final FloatPrefField pilotWeight;
 
-	CalibrationProfile(IntPrefField activeAircraft, FloatPrefField propRatio, FloatPrefField crankSpeedRatio, FloatPrefField pilotWeight) {
-		this.activeAircraft = activeAircraft;
-		this.propRatio = propRatio;
-		this.crankSpeedRatio = crankSpeedRatio;
-		this.pilotWeight = pilotWeight;
-	}
+  CalibrationProfile(IntPrefField activeAircraft, FloatPrefField propRatio, FloatPrefField crankSpeedRatio, FloatPrefField pilotWeight) {
+    this.activeAircraft = activeAircraft;
+    this.propRatio = propRatio;
+    this.crankSpeedRatio = crankSpeedRatio;
+    this.pilotWeight = pilotWeight;
+  }
 
-	public Aircraft getActiveAircraft() {
-		return Aircraft.values()[activeAircraft.get()];
-	}
+  public Aircraft getActiveAircraft() {
+    return Aircraft.values()[activeAircraft.get()];
+  }
 
-	public void setActiveAircraft(Aircraft acft) {
-		activeAircraft.put(acft.ordinal());
-	}
+  public void setActiveAircraft(Aircraft acft) {
+    activeAircraft.put(acft.ordinal());
+  }
 
-	public float getPropRatio() {
-		return propRatio.get();
-	}
+  public float getPropRatio() {
+    return propRatio.get();
+  }
 
-	public void setPropRatio(float value) {
-		propRatio.put(value);
-	}
+  public void setPropRatio(float value) {
+    propRatio.put(value);
+  }
 
-	public float getCrankSpeedRatio() {
-		return crankSpeedRatio.get();
-	}
+  public float getCrankSpeedRatio() {
+    return crankSpeedRatio.get();
+  }
 
-	public void setCrankSpeedRatio(float value) {
-		crankSpeedRatio.put(value);
-	}
+  public void setCrankSpeedRatio(float value) {
+    crankSpeedRatio.put(value);
+  }
 
-	public float getPilotWeight() {
-		return pilotWeight.get();
-	}
+  public float getPilotWeight() {
+    return pilotWeight.get();
+  }
 
-	public void setPilotWeight(float weight) {
-		pilotWeight.put(weight);
-	}
+  public void setPilotWeight(float weight) {
+    pilotWeight.put(weight);
+  }
 }

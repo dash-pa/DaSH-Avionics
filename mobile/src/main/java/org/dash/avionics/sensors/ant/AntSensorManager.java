@@ -7,17 +7,17 @@ import org.dash.avionics.sensors.SensorManager;
 
 @EBean
 public class AntSensorManager implements SensorManager {
-	// Delegate to a package-protected class to hide the interface ugliness.
-	@Bean
-	protected AntSensorImpl impl;
+  // Delegate to a package-protected class to hide the interface ugliness.
+  @Bean
+  protected AntSensorImpl impl;
 
-	@Override
-	public void connect(SensorListener updater) {
-		impl.connect(updater);
-	}
+  @Override
+  public void connect(SensorListener updater) {
+    impl.connect(updater);
+  }
 
-	@Override
-	public void disconnect() {
-		impl.disconnect();
-	}
+  @Override
+  public void disconnect() {
+    impl.disconnect();
+  }
 }

@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">DaSH Avionics</string>
+  <string name="app_name">DaSH Avionics</string>
 
-    <!-- When there's no known value for a metric. -->
-    <string name="value_not_available">XXX</string>
+  <!-- When there's no known value for a metric. -->
+  <string name="value_not_available">XXX</string>
 
-    <!-- RPM metric -->
-    <string name="rpm">rpm</string>
+  <!-- RPM metric -->
+  <string name="rpm">rpm</string>
 
-    <!-- Power metric -->
-    <string name="power">W</string>
+  <!-- Power metric -->
+  <string name="power">W</string>
 
-    <!-- Heart rate metric -->
-    <string name="heart_rate">♥</string>
+  <!-- Heart rate metric -->
+  <string name="heart_rate">♥</string>
 
-    <!-- Heading metric -->
-    <string name="heading">°</string>
+  <!-- Heading metric -->
+  <string name="heading">°</string>
 
-    <!-- Speed metric -->
-    <string name="speed">km/h</string>
+  <!-- Speed metric -->
+  <string name="speed">km/h</string>
 
-    <!-- Height metric -->
-    <string name="height">cm</string>
+  <!-- Height metric -->
+  <string name="height">cm</string>
 
-    <!-- CALIBRATION -->
-    <string name="calibration_known_speed">Known speed</string>
-    <string name="calibration_calculated_speed">Calculated speed</string>
-	<string name="calibration_prop_rpm">Propeller RPM</string>
-	<string name="calibration_immediate_ratio">Instant ratio</string>
-	<string name="calibration_5sec_ratio">5-sec average ratio</string>
-	<string name="calibration_current_ratio">Used ratio</string>
-	<string name="calibration_use_button">Use</string>
-	<string name="profile1">Profile 1</string>
-	<string name="profile2">Profile 2</string>
-	<string name="profile3">Profile 3</string>
-	<string name="profile4">Profile 4</string>
+  <!-- CALIBRATION -->
+  <string name="calibration_known_speed">Known speed</string>
+  <string name="calibration_calculated_speed">Calculated speed</string>
+  <string name="calibration_prop_rpm">Propeller RPM</string>
+  <string name="calibration_immediate_ratio">Instant ratio</string>
+  <string name="calibration_5sec_ratio">5-sec average ratio</string>
+  <string name="calibration_current_ratio">Used ratio</string>
+  <string name="calibration_use_button">Use</string>
+  <string name="profile1">Profile 1</string>
+  <string name="profile2">Profile 2</string>
+  <string name="profile3">Profile 3</string>
+  <string name="profile4">Profile 4</string>
 
-    <string name="action_settings">Settings</string>
+  <string name="action_settings">Settings</string>
 </resources>

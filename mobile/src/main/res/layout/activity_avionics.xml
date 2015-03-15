@@ -1,147 +1,147 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/background_dark"
-    android:keepScreenOn="true"
-    android:padding="10dp"
-    tools:context=".AvionicsActivity" >
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/background_dark"
+                android:keepScreenOn="true"
+                android:padding="10dp"
+                tools:context=".AvionicsActivity">
 
-    <TextView
-        android:id="@+id/rpmView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/value_not_available"
-        android:minWidth="200sp"
-        android:textAppearance="@style/largeValueText"
-        android:textAlignment="gravity"
-        android:gravity="right"
-        android:lines="1" />
+  <TextView
+      android:id="@+id/rpmView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentTop="true"
+      android:text="@string/value_not_available"
+      android:minWidth="200sp"
+      android:textAppearance="@style/largeValueText"
+      android:textAlignment="gravity"
+      android:gravity="right"
+      android:lines="1"/>
 
-    <TextView
-        android:id="@+id/rpmLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/rpmView"
-        android:layout_alignBottom="@id/rpmView"
-        android:layout_toRightOf="@id/rpmView"
-        android:text="@string/rpm"
-        android:textAppearance="@style/largeValueUnit"
-        android:labelFor="@id/rpmView" />
+  <TextView
+      android:id="@+id/rpmLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@id/rpmView"
+      android:layout_alignBottom="@id/rpmView"
+      android:layout_toRightOf="@id/rpmView"
+      android:text="@string/rpm"
+      android:textAppearance="@style/largeValueUnit"
+      android:labelFor="@id/rpmView"/>
 
-    <TextView
-        android:id="@+id/powerView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/powerLabel"
-        android:layout_below="@id/rpmView"
-        android:text="@string/value_not_available"
-        android:textAppearance="@style/largeValueText"
-        android:textAlignment="gravity"
-        android:gravity="right"
-        android:lines="1" />
+  <TextView
+      android:id="@+id/powerView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toLeftOf="@+id/powerLabel"
+      android:layout_below="@id/rpmView"
+      android:text="@string/value_not_available"
+      android:textAppearance="@style/largeValueText"
+      android:textAlignment="gravity"
+      android:gravity="right"
+      android:lines="1"/>
 
-    <TextView
-        android:id="@id/powerLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/powerView"
-        android:layout_alignLeft="@id/rpmLabel"
-        android:text="@string/power"
-        android:textAppearance="@style/largeValueUnit"
-        android:labelFor="@id/powerView" />
+  <TextView
+      android:id="@id/powerLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@id/powerView"
+      android:layout_alignLeft="@id/rpmLabel"
+      android:text="@string/power"
+      android:textAppearance="@style/largeValueUnit"
+      android:labelFor="@id/powerView"/>
 
-    <TextView
-        android:id="@+id/heartView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/heartLabel"
-        android:layout_below="@id/powerView"
-        android:text="@string/value_not_available"
-        android:textAppearance="@style/largeValueText"
-        android:textAlignment="gravity"
-        android:gravity="right"
-        android:lines="1" />
+  <TextView
+      android:id="@+id/heartView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toLeftOf="@+id/heartLabel"
+      android:layout_below="@id/powerView"
+      android:text="@string/value_not_available"
+      android:textAppearance="@style/largeValueText"
+      android:textAlignment="gravity"
+      android:gravity="right"
+      android:lines="1"/>
 
-    <TextView
-        android:id="@id/heartLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/heartView"
-        android:layout_alignLeft="@id/powerLabel"
-        android:text="@string/heart_rate"
-        android:textAppearance="@style/largeValueUnit"
-        android:textColor="@android:color/holo_red_dark"
-        android:labelFor="@id/heartView" />
+  <TextView
+      android:id="@id/heartLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@id/heartView"
+      android:layout_alignLeft="@id/powerLabel"
+      android:text="@string/heart_rate"
+      android:textAppearance="@style/largeValueUnit"
+      android:textColor="@android:color/holo_red_dark"
+      android:labelFor="@id/heartView"/>
 
-    <TextView
-        android:id="@+id/headingView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/rpmLabel"
-        android:layout_toRightOf="@id/rpmLabel"
-        android:minWidth="200sp"
-        android:text="@string/value_not_available"
-        android:textAppearance="@style/largeValueText"
-        android:textAlignment="gravity"
-        android:gravity="right"
-        android:lines="1" />
+  <TextView
+      android:id="@+id/headingView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@id/rpmLabel"
+      android:layout_toRightOf="@id/rpmLabel"
+      android:minWidth="200sp"
+      android:text="@string/value_not_available"
+      android:textAppearance="@style/largeValueText"
+      android:textAlignment="gravity"
+      android:gravity="right"
+      android:lines="1"/>
 
-    <TextView
-        android:id="@+id/headingLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/headingView"
-        android:layout_toRightOf="@id/headingView"
-        android:text="@string/heading"
-        android:textAppearance="@style/largeValueUnit"
-        android:labelFor="@id/headingView" />
+  <TextView
+      android:id="@+id/headingLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignTop="@id/headingView"
+      android:layout_toRightOf="@id/headingView"
+      android:text="@string/heading"
+      android:textAppearance="@style/largeValueUnit"
+      android:labelFor="@id/headingView"/>
 
-    <TextView
-        android:id="@+id/speedView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/powerLabel"
-        android:layout_toLeftOf="@+id/speedLabel"
-        android:gravity="right"
-        android:lines="1"
-        android:text="@string/value_not_available"
-        android:textAlignment="gravity"
-        android:textAppearance="@style/largeValueText"
-        android:textSize="100sp" />
+  <TextView
+      android:id="@+id/speedView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@id/powerLabel"
+      android:layout_toLeftOf="@+id/speedLabel"
+      android:gravity="right"
+      android:lines="1"
+      android:text="@string/value_not_available"
+      android:textAlignment="gravity"
+      android:textAppearance="@style/largeValueText"
+      android:textSize="100sp"/>
 
-    <TextView
-        android:id="@+id/speedLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/speedView"
-        android:layout_alignLeft="@id/headingLabel"
-        android:text="@string/speed"
-        android:textAppearance="@style/largeValueUnit"
-        android:labelFor="@id/speedView" />
+  <TextView
+      android:id="@+id/speedLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@id/speedView"
+      android:layout_alignLeft="@id/headingLabel"
+      android:text="@string/speed"
+      android:textAppearance="@style/largeValueUnit"
+      android:labelFor="@id/speedView"/>
 
-    <TextView
-        android:id="@+id/heightView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/heightLabel"
-        android:layout_alignBaseline="@id/heartLabel"
-        android:text="@string/value_not_available"
-        android:textAppearance="@style/largeValueText"
-        android:textAlignment="gravity"
-        android:gravity="right"
-        android:lines="1" />
+  <TextView
+      android:id="@+id/heightView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toLeftOf="@+id/heightLabel"
+      android:layout_alignBaseline="@id/heartLabel"
+      android:text="@string/value_not_available"
+      android:textAppearance="@style/largeValueText"
+      android:textAlignment="gravity"
+      android:gravity="right"
+      android:lines="1"/>
 
-    <TextView
-        android:id="@+id/heightLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/heightView"
-        android:layout_alignLeft="@id/speedLabel"
-        android:text="@string/height"
-        android:textAppearance="@style/largeValueUnit"
-        android:labelFor="@id/heightView" />
+  <TextView
+      android:id="@+id/heightLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBaseline="@id/heightView"
+      android:layout_alignLeft="@id/speedLabel"
+      android:text="@string/height"
+      android:textAppearance="@style/largeValueUnit"
+      android:labelFor="@id/heightView"/>
 
 </RelativeLayout>

@@ -1,6 +1,11 @@
 package org.dash.avionics;
 
-import java.util.Locale;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+import android.widget.TextView;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -20,149 +25,144 @@ import org.dash.avionics.data.MeasurementObserver;
 import org.dash.avionics.data.MeasurementType;
 import org.dash.avionics.sensors.SensorsService_;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.view.View;
-import android.widget.TextView;
+import java.util.Locale;
 
 @Fullscreen
 @EActivity(R.layout.activity_calibration)
 public class PropCalibrationActivity extends Activity implements
-		MeasurementListener {
+    MeasurementListener {
 
-	@ViewById
-	TextView knownSpeedView, propRpmView, calculatedSpeedView,
-			immediateRatioView, averageRatioView, usedRatioView;
+  @ViewById
+  TextView knownSpeedView, propRpmView, calculatedSpeedView,
+      immediateRatioView, averageRatioView, usedRatioView;
 
-	private MeasurementObserver observer;
+  private MeasurementObserver observer;
 
-	@Bean
-	CalibrationManager calibrationManager;
+  @Bean
+  CalibrationManager calibrationManager;
 
-	private CalibrationProfile calibration;
+  private CalibrationProfile calibration;
 
-	private RatioTracker propRatio;
+  private RatioTracker propRatio;
 
-	@Click
-	protected void useImmediateButton() {
-		calibration.setPropRatio(propRatio.getLastRatio());
-		updateRatios();
-	}
+  @Click
+  protected void useImmediateButton() {
+    calibration.setPropRatio(propRatio.getLastRatio());
+    updateRatios();
+  }
 
-	@Click
-	protected void useAverageButton() {
-		calibration.setPropRatio(propRatio.getMaxTimeAverage());
-		updateRatios();
-	}
+  @Click
+  protected void useAverageButton() {
+    calibration.setPropRatio(propRatio.getMaxTimeAverage());
+    updateRatios();
+  }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-		Intent intent = SensorsService_.intent(getApplicationContext()).get();
-		startService(intent);
+    Intent intent = SensorsService_.intent(getApplicationContext()).get();
+    startService(intent);
 
-		observer = new MeasurementObserver(new Handler(), getContentResolver(),
-				this);
-		propRatio = new RatioTracker(MeasurementType.SPEED, MeasurementType.PROP_RPM);
+    observer = new MeasurementObserver(new Handler(), getContentResolver(),
+        this);
+    propRatio = new RatioTracker(MeasurementType.SPEED, MeasurementType.PROP_RPM);
 
-		getActionBar().hide();
-	}
+    getActionBar().hide();
+  }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+  @Override
+  protected void onResume() {
+    super.onResume();
 
-		observer.start();
-		updateRatiosBackground();
-	}
+    observer.start();
+    updateRatiosBackground();
+  }
 
-	@Override
-	protected void onPause() {
-		BackgroundExecutor.cancelAll("watchdog", true);
-		observer.stop();
+  @Override
+  protected void onPause() {
+    BackgroundExecutor.cancelAll("watchdog", true);
+    observer.stop();
 
-		super.onPause();
-	}
+    super.onPause();
+  }
 
-	@AfterViews
-	protected void loadProfile() {
-		changeProfile(0);
-	}
+  @AfterViews
+  protected void loadProfile() {
+    changeProfile(0);
+  }
 
-	@Override
-	public void onNewMeasurement(Measurement measurement) {
-		TextView viewToUpdate = null;
-		switch (measurement.type) {
-		case PROP_RPM:
-			viewToUpdate = propRpmView;
-			propRatio.addDenominator(measurement);
-			break;
-		case CRANK_RPM:
-			viewToUpdate = knownSpeedView;
+  @Override
+  public void onNewMeasurement(Measurement measurement) {
+    TextView viewToUpdate = null;
+    switch (measurement.type) {
+      case PROP_RPM:
+        viewToUpdate = propRpmView;
+        propRatio.addDenominator(measurement);
+        break;
+      case CRANK_RPM:
+        viewToUpdate = knownSpeedView;
 
-			// Transform crank RPM into speed
-			measurement = new Measurement(MeasurementType.SPEED, measurement.value * calibration.getCrankSpeedRatio(), measurement.timestamp);
+        // Transform crank RPM into speed
+        measurement = new Measurement(MeasurementType.SPEED, measurement.value * calibration.getCrankSpeedRatio(), measurement.timestamp);
 
-			propRatio.addNumerator(measurement);
-			break;
-		default:
-			return;
-		}
+        propRatio.addNumerator(measurement);
+        break;
+      default:
+        return;
+    }
 
-		setValue(measurement.value, viewToUpdate);
+    setValue(measurement.value, viewToUpdate);
 
-		updateRatios();
-	}
+    updateRatios();
+  }
 
-	private void setValue(float value, TextView view) {
-		String valueStr = String.format(Locale.US, "%.3f", value);
-		view.setText(valueStr);
-	}
+  private void setValue(float value, TextView view) {
+    String valueStr = String.format(Locale.US, "%.3f", value);
+    view.setText(valueStr);
+  }
 
-	// TODO: Also add a watchdog like AvionicsActivity (move to service?)
-	@Background(id = "ratioUpdater", delay = 200)
-	protected void updateRatiosBackground() {
-		updateRatios();
-		updateRatiosBackground();
-	}
+  // TODO: Also add a watchdog like AvionicsActivity (move to service?)
+  @Background(id = "ratioUpdater", delay = 200)
+  protected void updateRatiosBackground() {
+    updateRatios();
+    updateRatiosBackground();
+  }
 
-	@UiThread
-	protected void updateRatios() {
-		float ratio = calibration.getPropRatio();
-		setValue(ratio, usedRatioView);
-		setValue(propRatio.getLastDenominator() * ratio, calculatedSpeedView);
-		setValue(propRatio.getLastRatio(), immediateRatioView);
-		setValue(propRatio.getMaxTimeAverage(), averageRatioView);
-	}
+  @UiThread
+  protected void updateRatios() {
+    float ratio = calibration.getPropRatio();
+    setValue(ratio, usedRatioView);
+    setValue(propRatio.getLastDenominator() * ratio, calculatedSpeedView);
+    setValue(propRatio.getLastRatio(), immediateRatioView);
+    setValue(propRatio.getMaxTimeAverage(), averageRatioView);
+  }
 
-	private int getProfileIndex(View button) {
-		int id = button.getId();
-		switch (id) {
-		case R.id.profile1Button:
-			return 0;
-		case R.id.profile2Button:
-			return 1;
-		case R.id.profile3Button:
-			return 2;
-		case R.id.profile4Button:
-			return 3;
-		default:
-			throw new IllegalArgumentException("Bad view with ID " + id);
-		}
-	}
+  private int getProfileIndex(View button) {
+    int id = button.getId();
+    switch (id) {
+      case R.id.profile1Button:
+        return 0;
+      case R.id.profile2Button:
+        return 1;
+      case R.id.profile3Button:
+        return 2;
+      case R.id.profile4Button:
+        return 3;
+      default:
+        throw new IllegalArgumentException("Bad view with ID " + id);
+    }
+  }
 
-	@Click({ R.id.profile1Button, R.id.profile2Button, R.id.profile3Button,
-			R.id.profile4Button })
-	protected void changeProfile(View clicked) {
-		int profileIdx = getProfileIndex(clicked);
-		changeProfile(profileIdx);
-	}
+  @Click({R.id.profile1Button, R.id.profile2Button, R.id.profile3Button,
+      R.id.profile4Button})
+  protected void changeProfile(View clicked) {
+    int profileIdx = getProfileIndex(clicked);
+    changeProfile(profileIdx);
+  }
 
-	private void changeProfile(int profileIdx) {
-		calibration = calibrationManager.loadPropProfile(profileIdx);
-		usedRatioView.setText(Float.toString(calibration.getPropRatio()));
-	}
+  private void changeProfile(int profileIdx) {
+    calibration = calibrationManager.loadPropProfile(profileIdx);
+    usedRatioView.setText(Float.toString(calibration.getPropRatio()));
+  }
 }
