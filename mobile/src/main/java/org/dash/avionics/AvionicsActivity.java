@@ -1,5 +1,6 @@
 package org.dash.avionics;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,31 +35,29 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Fullscreen
 @EActivity(R.layout.activity_avionics)
-public class AvionicsActivity extends Activity implements MeasurementListener, CruiseSpeedAlertListener {
+@SuppressLint("Registered")
+public class AvionicsActivity extends Activity
+    implements MeasurementListener, CruiseSpeedAlertListener {
   private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
   // ANT+ needs larger delays
   private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
-  private static final Map<MeasurementType, Long> MAX_DATA_AGES_MS = new HashMap<MeasurementType, Long>();
+  private static final Map<MeasurementType, Long> MAX_DATA_AGES_MS = new HashMap<>();
 
-  {
+  static {
     MAX_DATA_AGES_MS.put(MeasurementType.CRANK_RPM, DEFAULT_MAX_DATA_AGE_MS);
     MAX_DATA_AGES_MS.put(MeasurementType.HEADING, DEFAULT_MAX_DATA_AGE_MS);
     MAX_DATA_AGES_MS.put(MeasurementType.HEIGHT, DEFAULT_MAX_DATA_AGE_MS);
     MAX_DATA_AGES_MS.put(MeasurementType.SPEED, DEFAULT_MAX_DATA_AGE_MS);
 
     MAX_DATA_AGES_MS.put(MeasurementType.POWER, ANTPLUS_MAX_DATA_AGE_MS);
-    MAX_DATA_AGES_MS.put(MeasurementType.HEART_BEAT,
-        ANTPLUS_MAX_DATA_AGE_MS);
+    MAX_DATA_AGES_MS.put(MeasurementType.HEART_BEAT, ANTPLUS_MAX_DATA_AGE_MS);
   }
 
   @ViewById
-  protected TextView rpmView, powerView, heartView, headingView, speedView,
-      heightView;
+  protected TextView rpmView, powerView, heartView, headingView, speedView, heightView;
 
-  private Map<MeasurementType, TextView> viewsByType = new HashMap<MeasurementType, TextView>(
-      10);
-  private Map<MeasurementType, Long> lastUpdateByType = new ConcurrentHashMap<MeasurementType, Long>(
-      10);
+  private Map<MeasurementType, TextView> viewsByType = new HashMap<>(10);
+  private Map<MeasurementType, Long> lastUpdateByType = new ConcurrentHashMap<>(10);
 
   private MeasurementObserver observer;
 
@@ -78,6 +77,7 @@ public class AvionicsActivity extends Activity implements MeasurementListener, C
         this);
     speedAlerter = new CruiseSpeedAlerter(this);
 
+    //noinspection ConstantConditions
     getActionBar().hide();
   }
 
@@ -111,6 +111,7 @@ public class AvionicsActivity extends Activity implements MeasurementListener, C
     super.onPause();
   }
 
+  @SuppressWarnings("InfiniteRecursion")
   @Background(id = "watchdog", delay = 500)
   protected void runWatchdog() {
     long now = System.currentTimeMillis();

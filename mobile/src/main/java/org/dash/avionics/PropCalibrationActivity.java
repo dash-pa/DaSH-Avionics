@@ -1,5 +1,6 @@
 package org.dash.avionics;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import java.util.Locale;
 
 @Fullscreen
 @EActivity(R.layout.activity_calibration)
+@SuppressLint("Registered")
 public class PropCalibrationActivity extends Activity implements
     MeasurementListener {
 
@@ -68,6 +70,7 @@ public class PropCalibrationActivity extends Activity implements
         this);
     propRatio = new RatioTracker(MeasurementType.SPEED, MeasurementType.PROP_RPM);
 
+    //noinspection ConstantConditions
     getActionBar().hide();
   }
 
@@ -94,7 +97,7 @@ public class PropCalibrationActivity extends Activity implements
 
   @Override
   public void onNewMeasurement(Measurement measurement) {
-    TextView viewToUpdate = null;
+    TextView viewToUpdate;
     switch (measurement.type) {
       case PROP_RPM:
         viewToUpdate = propRpmView;
@@ -123,6 +126,7 @@ public class PropCalibrationActivity extends Activity implements
   }
 
   // TODO: Also add a watchdog like AvionicsActivity (move to service?)
+  @SuppressWarnings("InfiniteRecursion")
   @Background(id = "ratioUpdater", delay = 200)
   protected void updateRatiosBackground() {
     updateRatios();

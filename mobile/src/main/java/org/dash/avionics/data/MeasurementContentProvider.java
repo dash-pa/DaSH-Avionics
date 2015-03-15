@@ -1,5 +1,6 @@
 package org.dash.avionics.data;
 
+import android.annotation.SuppressLint;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -13,6 +14,7 @@ import android.util.Log;
 import org.androidannotations.annotations.EProvider;
 
 @EProvider
+@SuppressLint("Registered")
 public class MeasurementContentProvider extends ContentProvider {
 
   public enum UrlType {

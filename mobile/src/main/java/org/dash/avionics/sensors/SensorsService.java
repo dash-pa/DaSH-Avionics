@@ -1,5 +1,6 @@
 package org.dash.avionics.sensors;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -15,6 +16,7 @@ import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
 import org.dash.avionics.sensors.fake.FakeSensorManager;
 import org.dash.avionics.sensors.viiiiva.ViiiivaSensorManager;
 
+@SuppressLint("Registered")
 @EService
 public class SensorsService extends Service implements SensorListener {
   private static final boolean USE_FAKE_DATA = false;

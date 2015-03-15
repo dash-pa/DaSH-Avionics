@@ -13,7 +13,7 @@ import java.util.Random;
 @EBean
 public class FakeSensorManager implements SensorManager {
 
-  private static final MeasurementType TYPES_TO_GENERATE[] = {
+  private static final MeasurementType[] TYPES_TO_GENERATE = {
       MeasurementType.PROP_RPM, MeasurementType.CRANK_RPM};
 
   private final Random random = new Random();
@@ -32,10 +32,11 @@ public class FakeSensorManager implements SensorManager {
     this.updater = null;
   }
 
+  @SuppressWarnings("InfiniteRecursion")
   @Background(id = "data", delay = 250)
   public void generateFakeData() {
     MeasurementType type = TYPES_TO_GENERATE[random.nextInt(TYPES_TO_GENERATE.length)];
-    float value = random.nextFloat() * 100f;
+    float value = random.nextFloat() * 100;
     Measurement measurement = new Measurement(type, value);
     updater.onNewMeasurement(measurement);
 

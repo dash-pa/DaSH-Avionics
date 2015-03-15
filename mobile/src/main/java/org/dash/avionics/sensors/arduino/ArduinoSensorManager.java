@@ -34,6 +34,7 @@ public class ArduinoSensorManager implements SensorManager {
         Log.e("Arduino", "Failed to initialize", e);
         disconnectFromDevice();
         try {
+          //noinspection BusyWait
           Thread.sleep(500);
         } catch (InterruptedException ie) {
           // Do nothing.
@@ -109,7 +110,7 @@ public class ArduinoSensorManager implements SensorManager {
     BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
     Set<BluetoothDevice> pairedDevices = BTAdapter.getBondedDevices();
     for (BluetoothDevice device : pairedDevices) {
-      if (device.getName().equals("HC-06")) {
+      if ("HC-06".equals(device.getName())) {
         return device;
       }
     }
@@ -142,7 +143,8 @@ public class ArduinoSensorManager implements SensorManager {
       char chr = (char) arduinoOutput.read();
       if (chr == '\r') {
         continue;
-      } else if (chr == '\n') {
+      }
+      if (chr == '\n') {
         break;
       }
 
@@ -177,9 +179,10 @@ public class ArduinoSensorManager implements SensorManager {
   }
 
   private MeasurementType parseLineType(String typeStr) {
-    if (typeStr.equals("RPM")) {
+    if ("RPM".equals(typeStr)) {
       return MeasurementType.PROP_RPM;
-    } else if (typeStr.equals("ALT")) {
+    }
+    if ("ALT".equals(typeStr)) {
       return MeasurementType.HEIGHT;
     }
     return null;

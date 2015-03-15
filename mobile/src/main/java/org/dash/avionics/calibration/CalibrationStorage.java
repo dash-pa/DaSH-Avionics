@@ -5,6 +5,7 @@ import org.androidannotations.annotations.sharedpreferences.DefaultInt;
 import org.androidannotations.annotations.sharedpreferences.SharedPref;
 import org.dash.avionics.alerts.CruiseSpeedCalculator;
 
+@SuppressWarnings("InterfaceNeverImplemented")
 @SharedPref(SharedPref.Scope.UNIQUE)
 interface CalibrationStorage {
 

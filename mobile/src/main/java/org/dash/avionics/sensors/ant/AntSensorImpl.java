@@ -35,7 +35,10 @@ import java.math.BigDecimal;
 import java.util.EnumSet;
 
 @EBean
-class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, IDeviceStateChangeReceiver, ICalculatedCadenceReceiver, ICalculatedPowerReceiver, IHeartRateDataReceiver, IBatteryStatusReceiver, ICalculatedCrankCadenceReceiver, IInstantaneousCadenceReceiver {
+class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback,
+    IDeviceStateChangeReceiver, ICalculatedCadenceReceiver, ICalculatedPowerReceiver,
+    IHeartRateDataReceiver, IBatteryStatusReceiver, ICalculatedCrankCadenceReceiver,
+    IInstantaneousCadenceReceiver {
   private final Context context;
   private static final EnumSet<DeviceType> RELEVANT_DEVICE_TYPES =
       EnumSet.of(DeviceType.HEARTRATE, DeviceType.BIKE_POWER,
@@ -44,10 +47,7 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
   // Device search state.
   private MultiDeviceSearch deviceSearch;
 
-  // Device connection state.
-  private AntPlusBikeCadencePcc cadencePcc;
   private AntPlusBikePowerPcc powerPcc;
-  private AntPlusHeartRatePcc heartRatePcc;
   private PccReleaseHandle<AntPlusBikeCadencePcc> cadenceReleaseHandle;
   private PccReleaseHandle<AntPlusHeartRatePcc> heartRateReleaseHandle;
   private PccReleaseHandle<AntPlusBikePowerPcc> powerReleaseHandle;
@@ -140,7 +140,7 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
   }
 
   protected void connectCadence(int antDeviceNumber, DeviceType type) {
-    boolean isSpeedCadence = type.equals(DeviceType.BIKE_SPDCAD);
+    boolean isSpeedCadence = (type == DeviceType.BIKE_SPDCAD);
     cadenceReleaseHandle = AntPlusBikeCadencePcc.requestAccess(context,
         antDeviceNumber, 0, isSpeedCadence, cadencePccReceiver, this);
   }
@@ -169,9 +169,8 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
         return;
       }
 
-      cadencePcc = result;
       powerPcc.subscribeBatteryStatusEvent(AntSensorImpl.this);
-      cadencePcc.subscribeCalculatedCadenceEvent(AntSensorImpl.this);
+      result.subscribeCalculatedCadenceEvent(AntSensorImpl.this);
     }
   };
 
@@ -201,8 +200,7 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback, 
         return;
       }
 
-      heartRatePcc = result;
-      heartRatePcc.subscribeHeartRateDataEvent(AntSensorImpl.this);
+      result.subscribeHeartRateDataEvent(AntSensorImpl.this);
     }
   };
 

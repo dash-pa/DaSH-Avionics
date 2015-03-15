@@ -19,7 +19,7 @@ public interface MeasurementStorageColumns extends BaseColumns {
           VALUE_TYPE + " INTEGER NOT NULL, " +
           VALUE + " REAL NOT NULL);";
 
-  public static final String FULL_PROJECTION[] = {
+  public static final String[] FULL_PROJECTION = {
       _ID, VALUE_TIMESTAMP, VALUE_TYPE, VALUE,
   };
 

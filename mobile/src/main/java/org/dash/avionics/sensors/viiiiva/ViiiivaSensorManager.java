@@ -173,8 +173,10 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
       errStr.append(serviceName);
       errStr.append("\n  Available descriptors: ");
       for (BluetoothGattDescriptor desc : descriptors) {
-        errStr.append(desc.getUuid());
-        errStr.append(", ");
+        if (desc != null) {
+          errStr.append(desc.getUuid());
+          errStr.append(", ");
+        }
       }
 
       Log.w("Viiiiva", errStr.toString());

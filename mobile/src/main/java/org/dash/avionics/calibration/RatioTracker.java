@@ -3,6 +3,7 @@ package org.dash.avionics.calibration;
 import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementType;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,8 +14,8 @@ public class RatioTracker {
   private static final long MAX_CLEANUP_INTERVAL_MS = 1000;
 
   private final MeasurementType numeratorType, denominatorType;
-  private List<Measurement> numerators = new LinkedList<Measurement>();
-  private List<Measurement> denominators = new LinkedList<Measurement>();
+  private List<Measurement> numerators = new LinkedList<>();
+  private List<Measurement> denominators = new LinkedList<>();
   private long lastCleanupTime;
 
   public RatioTracker(MeasurementType numeratorType,
@@ -66,7 +67,7 @@ public class RatioTracker {
     return numeratorAvg / denominatorAvg;
   }
 
-  private float recentSum(List<Measurement> measurements, long periodMs, long now) {
+  private float recentSum(Iterable<Measurement> measurements, long periodMs, long now) {
     float sum = 0.0f;
     for (Measurement m : measurements) {
       if (now - m.timestamp <= periodMs) {
@@ -91,9 +92,9 @@ public class RatioTracker {
     }
   }
 
-  private void removeOld(List<Measurement> from, long now) {
+  private void removeOld(Collection<Measurement> from, long now) {
     for (Iterator<Measurement> it = from.iterator(); it.hasNext(); ) {
-      Measurement m = (Measurement) it.next();
+      Measurement m = it.next();
       if (now - m.timestamp > MAX_AGE) {
         it.remove();
       }

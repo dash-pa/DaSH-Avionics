@@ -5,12 +5,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 
-import java.util.EnumMap;
+import java.util.Map;
 
 public class CruiseSpeedCalculator {
   public static final float HEAVY_PILOT_WEIGHT_KG = 90.0f;
   public static final float MEDIUM_PILOT_WEIGHT_KG = 72.6f;
   public static final float LIGHT_PILOT_WEIGHT_KG = 58.6f;
+
+  private CruiseSpeedCalculator() { }
 
   public enum Aircraft {
     V5,
@@ -40,7 +42,7 @@ public class CruiseSpeedCalculator {
 
   }
 
-  private static final EnumMap<Aircraft, RangeMap<Float, LinearSpeedInterpolation>> REFERENCE_SPEEDS;
+  private static final Map<Aircraft, RangeMap<Float, LinearSpeedInterpolation>> REFERENCE_SPEEDS;
 
   static {
     REFERENCE_SPEEDS = Maps.newEnumMap(Aircraft.class);
@@ -52,6 +54,10 @@ public class CruiseSpeedCalculator {
   public static float getCruiseAirspeed(Aircraft acft, float pilotWeightKg) {
     RangeMap<Float, LinearSpeedInterpolation> speedRanges = REFERENCE_SPEEDS.get(acft);
     LinearSpeedInterpolation speedRange = speedRanges.get(pilotWeightKg);
-    return speedRange.getSpeed(pilotWeightKg);
+    if (speedRange != null) {
+      return speedRange.getSpeed(pilotWeightKg);
+    } else {
+      return Float.NaN;
+    }
   }
 }
