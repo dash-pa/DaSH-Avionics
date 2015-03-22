@@ -15,7 +15,7 @@ public class PFD extends Container {
 
     float instrumentGap = (float) Math.floor(width / 75);
     float altitudeTapeWidth = 0.125f * width;
-    float speedTapeWidth = 0.125f * width;
+    float speedTapeWidth = 0.1f * width;
     float climbRateTapeWidth = 0.05f * width;
     float airballWidth =
         getWidth() - speedTapeWidth - altitudeTapeWidth - climbRateTapeWidth

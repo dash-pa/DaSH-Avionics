@@ -17,7 +17,7 @@ public class FakeSensorManager implements SensorManager {
       MeasurementType.PROP_RPM, MeasurementType.CRANK_RPM,
       MeasurementType.HEIGHT, MeasurementType.SPEED};
   public static final int FAKE_DATA_DELAY = 100;
-  public static final int MAX_VALUE = 20;
+  public static final int MAX_VALUE = 100;
 
   private final Random random = new Random();
   private SensorListener updater;

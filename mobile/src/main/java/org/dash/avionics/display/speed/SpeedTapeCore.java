@@ -14,8 +14,6 @@ public class SpeedTapeCore extends Widget {
 
   public interface Model {
     float getSpeed();
-    float getVs0();  // Bottom of white arc
-    float getVfe();  // Top of white arc
     float getVs1();  // Bottom of green arc
     float getVno();  // Top of green / bottom of yellow arc
     float getVne();  // Top of yellow / bottom of red arc
@@ -23,7 +21,6 @@ public class SpeedTapeCore extends Widget {
 
   // The below constants, while they may seem silly ;), are useful for
   // tweaking exact RGB values if necessary
-  private static final int WHITE_ARC_COLOR = Color.WHITE;
   private static final int GREEN_ARC_COLOR = Color.GREEN;
   private static final int YELLOW_ARC_COLOR = Color.YELLOW;
   private static final int RED_ARC_COLOR = Color.RED;
@@ -41,7 +38,6 @@ public class SpeedTapeCore extends Widget {
   private final float mTextRightBoundaryFromRight;
   private final float mVArcThickness;
   private final Paint mTextPaint = new Paint();
-  private final Paint mWhiteArcPaint = new Paint();
   private final Paint mGreenArcPaint = new Paint();
   private final Paint mYellowArcPaint = new Paint();
   private final Paint mRedArcPaint = new Paint();
@@ -58,11 +54,11 @@ public class SpeedTapeCore extends Widget {
 
     mVArcThickness = (float) Math.floor(w / 12);
     mVArcRightBoundaryFromRight = 2f * mConfig.mThinLineThickness;
-    mTapePixelsPerKnot = (float) Math.floor(w / 10);
-    mTickMarkFivesLength = (float) Math.floor(3 * mVArcThickness);
-    mTickMarkTensLength = (float) Math.floor(3.25 * mVArcThickness);
-    mTextSize = (float) Math.floor(w / 2.5);
-    mTextRightBoundaryFromRight = (float) Math.floor(3.75 * mVArcThickness);
+    mTapePixelsPerKnot = (float) Math.floor(w * 1.5);
+    mTickMarkFivesLength = (float) Math.floor(2 * mVArcThickness);
+    mTickMarkTensLength = (float) Math.floor(2.25 * mVArcThickness);
+    mTextSize = (float) Math.floor(w / 1.5);
+    mTextRightBoundaryFromRight = (float) Math.floor(2.75 * mVArcThickness);
 
     Typeface tf = Typeface.createFromAsset(assets, mConfig.mTextTypeface);
 
@@ -72,37 +68,22 @@ public class SpeedTapeCore extends Widget {
     mTextPaint.setTextAlign(Align.RIGHT);
     mTextPaint.setAntiAlias(true);
 
-    mWhiteArcPaint.setColor(WHITE_ARC_COLOR);
     mGreenArcPaint.setColor(GREEN_ARC_COLOR);
     mYellowArcPaint.setColor(YELLOW_ARC_COLOR);
     mRedArcPaint.setColor(RED_ARC_COLOR);
   }
 
-  float speedToCanvasPosition(float speed) {
-    return getHeight() / 2 + (speed - mModel.getSpeed()) * mTapePixelsPerKnot;
-  }
-
-  private void drawSpeed(Canvas canvas, int speed5) {
-    if (speed5 < 0) { return; }
-
-    int speed = speed5 * 5;
-    float y = speedToCanvasPosition(speed);
-    boolean isTens = ((speed % 10f) == 0);
-
-    if (isTens) {
-      canvas.drawText(
-          "" + speed,
-          getWidth() - mTextRightBoundaryFromRight, y + mTextSize * TEXT_BASELINE_TO_CENTER_FACTOR,
-          mTextPaint);
-      canvas.drawRect(
-          getWidth() - mTickMarkTensLength, y - mConfig.mThickLineThickness / 2,
-          getWidth(), y + mConfig.mThickLineThickness / 2,
-          mConfig.mLinePaint);
-    } else {
-      canvas.drawRect(
-          getWidth() - mTickMarkFivesLength, y - mConfig.mThinLineThickness / 2,
-          getWidth(), y + mConfig.mThinLineThickness / 2,
-          mConfig.mLinePaint);
+  @Override
+  protected void drawContents(Canvas canvas) {
+    drawScaleLine(canvas);
+    drawVArcs(canvas);
+    float midPointKnots = getHeight() / 2 / mTapePixelsPerKnot;
+    int speed25AtTop = (int)
+        Math.floor((mModel.getSpeed() - midPointKnots) / .25) - 1;
+    int speed25AtBottom = (int)
+        Math.ceil((mModel.getSpeed() + midPointKnots) / .25) + 1;
+    for (int i = speed25AtTop; i <= speed25AtBottom; i++) {
+      drawSpeed(canvas, i * .25f);
     }
   }
 
@@ -115,10 +96,6 @@ public class SpeedTapeCore extends Widget {
   }
 
   private void drawVArcs(Canvas canvas) {
-    canvas.drawRect(
-        getWidth() - mVArcRightBoundaryFromRight - 2 * mVArcThickness, speedToCanvasPosition(mModel.getVs0()),
-        getWidth() - mVArcRightBoundaryFromRight - mVArcThickness, speedToCanvasPosition(mModel.getVfe()),
-        mWhiteArcPaint);
     canvas.drawRect(
         getWidth() - mVArcRightBoundaryFromRight - mVArcThickness, speedToCanvasPosition(mModel.getVs1()),
         getWidth() - mVArcRightBoundaryFromRight, speedToCanvasPosition(mModel.getVno()),
@@ -133,18 +110,30 @@ public class SpeedTapeCore extends Widget {
         mRedArcPaint);
   }
 
-  @Override
-  protected void drawContents(Canvas canvas) {
-    drawScaleLine(canvas);
-    drawVArcs(canvas);
-    int speed5AtTop = (int)
-            Math.floor((mModel.getSpeed() - getHeight() / 2 / mTapePixelsPerKnot) / 5)
-            - 1;
-    int speed5AtBottom = (int)
-            Math.ceil((mModel.getSpeed() + getHeight() / 2 / mTapePixelsPerKnot) / 5)
-            + 1;
-    for (int i = speed5AtTop; i <= speed5AtBottom; i++) {
-      drawSpeed(canvas, i);
+  private void drawSpeed(Canvas canvas, float speed) {
+    if (speed < 0) { return; }
+
+    float y = speedToCanvasPosition(speed);
+    boolean isTens = ((int)speed) == speed;
+
+    if (isTens) {
+      canvas.drawText(
+          String.format("%.0f", speed),
+          getWidth() - mTextRightBoundaryFromRight, y + mTextSize * TEXT_BASELINE_TO_CENTER_FACTOR,
+          mTextPaint);
+      canvas.drawRect(
+          getWidth() - mTickMarkTensLength, y - mConfig.mThickLineThickness / 2,
+          getWidth(), y + mConfig.mThickLineThickness / 2,
+          mConfig.mLinePaint);
+    } else {
+      canvas.drawRect(
+          getWidth() - mTickMarkFivesLength, y - mConfig.mThinLineThickness / 2,
+          getWidth(), y + mConfig.mThinLineThickness / 2,
+          mConfig.mLinePaint);
     }
+  }
+
+  float speedToCanvasPosition(float speed) {
+    return getHeight() / 2 + (speed - mModel.getSpeed()) * mTapePixelsPerKnot;
   }
 }
