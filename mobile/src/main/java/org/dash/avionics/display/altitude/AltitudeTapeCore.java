@@ -2,6 +2,7 @@ package org.dash.avionics.display.altitude;
 
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Typeface;
@@ -10,6 +11,10 @@ import org.dash.avionics.display.DisplayConfiguration;
 import org.dash.avionics.display.widget.Widget;
 
 public class AltitudeTapeCore extends Widget {
+  private static final int YELLOW_ARC_COLOR = Color.YELLOW;
+  private static final int RED_ARC_COLOR = Color.RED;
+  private static final float ALERT_ALTITUDE = 2.0f;
+  private static final float WARNING_ALTITUDE = 5.0f;
 
   public interface Model {
     float getAltitude();
@@ -19,7 +24,11 @@ public class AltitudeTapeCore extends Widget {
   private final Model mModel;
   private final Paint mTextTensPaint = new Paint();
   private final Paint mTextWholePaint = new Paint();
+  private final Paint mYellowArcPaint = new Paint();
+  private final Paint mRedArcPaint = new Paint();
 
+  private final float mArcBoundaryFromLeft;
+  private final float mArcThickness;
   private final float mTapePixelsPerFoot;
   private final float mTextTensSize;
   private final float mTextWholeSize;
@@ -44,7 +53,7 @@ public class AltitudeTapeCore extends Widget {
     mTextTensSize = (float) Math.floor(w / 3.25);
     mTextWholeSize = (float) Math.floor(w / 4.0);
 
-    mTickMarkFifthLength = (float) Math.floor(w / 10);
+    mTickMarkFifthLength = (float) Math.floor(w / 8.5);
     mTickMarkWholeLength = (float) Math.floor(mTickMarkFifthLength * 1.5);
     mTickMarkTensLength = (float) Math.floor(mTickMarkFifthLength * 2);
 
@@ -52,8 +61,11 @@ public class AltitudeTapeCore extends Widget {
     mTensEmphasisLineDistanceFromLeft = (float) Math.floor(mTickMarkFifthLength * 2.5);
 
     mTextTensRightBoundary = (float) Math.floor(
-        mTensEmphasisLineDistanceFromLeft + mTextTensSize * 1.125);
+        mTensEmphasisLineDistanceFromLeft + mTextTensSize * 1.0);
     mTextWholeLeftBoundary = mTextTensRightBoundary + (float) Math.floor(mTextTensSize / 10);
+
+    mArcBoundaryFromLeft = mConfig.mThinLineThickness * 2.0f;
+    mArcThickness = mTickMarkFifthLength - 2.0f * mConfig.mThinLineThickness;
 
     Typeface tf = Typeface.createFromAsset(assets, mConfig.mTextTypeface);
 
@@ -68,11 +80,15 @@ public class AltitudeTapeCore extends Widget {
     mTextWholePaint.setTextSize(mTextWholeSize);
     mTextWholePaint.setTextAlign(Align.LEFT);
     mTextWholePaint.setAntiAlias(true);
+
+    mYellowArcPaint.setColor(YELLOW_ARC_COLOR);
+    mRedArcPaint.setColor(RED_ARC_COLOR);
   }
 
   @Override
   protected void drawContents(Canvas canvas) {
     drawScaleLine(canvas);
+    drawArcs(canvas);
 
     // Loop through 0.2m increments above and below the midpoint.
     float midpointFeet = (getHeight() / 2f) / mTapePixelsPerFoot;
@@ -81,6 +97,22 @@ public class AltitudeTapeCore extends Widget {
     for (int i = alt02AtBottom; i <= alt02AtTop; i++) {
       drawAltitude(canvas, i * 0.2f);
     }
+  }
+
+  private void drawArcs(Canvas canvas) {
+    canvas.drawRect(
+        mArcBoundaryFromLeft,
+        altitudeToCanvasPosition(WARNING_ALTITUDE),
+        mArcBoundaryFromLeft + mArcThickness,
+        altitudeToCanvasPosition(ALERT_ALTITUDE),
+        mYellowArcPaint);
+    canvas.drawRect(
+        mArcBoundaryFromLeft,
+        altitudeToCanvasPosition(ALERT_ALTITUDE),
+        mArcBoundaryFromLeft + mArcThickness,
+        altitudeToCanvasPosition(0.0f),
+        mRedArcPaint);
+
   }
 
   private void drawScaleLine(Canvas canvas) {
