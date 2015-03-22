@@ -17,19 +17,19 @@ public class AltitudeTapeCore extends Widget {
 
   private final DisplayConfiguration mConfig;
   private final Model mModel;
-  private final Paint mTextThousandsPaint = new Paint();
-  private final Paint mTextHundredsPaint = new Paint();
+  private final Paint mTextTensPaint = new Paint();
+  private final Paint mTextWholePaint = new Paint();
 
   private final float mTapePixelsPerFoot;
-  private final float mTextThousandsSize;
-  private final float mTextHundredsSize;
-  private final float mTickMarkTwentiesLength;
-  private final float mTickMarkHundredsLength;
-  private final float mTickMarkThousandsLength;
-  private final float mThousandsEmphasisLineDistanceFromText;
-  private final float mThousandsEmphasisLineDistanceFromLeft;
-  private final float mTextThousandsRightBoundary;
-  private final float mTextHundredsLeftBoundary;
+  private final float mTextTensSize;
+  private final float mTextWholeSize;
+  private final float mTickMarkFifthLength;
+  private final float mTickMarkWholeLength;
+  private final float mTickMarkTensLength;
+  private final float mTensEmphasisLineDistanceFromText;
+  private final float mTensEmphasisLineDistanceFromLeft;
+  private final float mTextTensRightBoundary;
+  private final float mTextWholeLeftBoundary;
 
   public AltitudeTapeCore(
       DisplayConfiguration config, AssetManager assets,
@@ -39,85 +39,47 @@ public class AltitudeTapeCore extends Widget {
     mConfig = config;
     mModel = model;
 
-    mTapePixelsPerFoot = (float) Math.floor(w / 100);
+    mTapePixelsPerFoot = (float) Math.floor(w);
 
-    mTextThousandsSize = (float) Math.floor(w / 3.25);
-    mTextHundredsSize = (float) Math.floor(w / 4.5);
+    mTextTensSize = (float) Math.floor(w / 3.25);
+    mTextWholeSize = (float) Math.floor(w / 4.0);
 
-    mTickMarkTwentiesLength = (float) Math.floor(w / 10);
-    mTickMarkHundredsLength = (float) Math.floor(mTickMarkTwentiesLength * 1.5);
-    mTickMarkThousandsLength = (float) Math.floor(mTickMarkTwentiesLength * 2);
+    mTickMarkFifthLength = (float) Math.floor(w / 10);
+    mTickMarkWholeLength = (float) Math.floor(mTickMarkFifthLength * 1.5);
+    mTickMarkTensLength = (float) Math.floor(mTickMarkFifthLength * 2);
 
-    mThousandsEmphasisLineDistanceFromText = (float) Math.floor(mTextThousandsSize / 10);
-    mThousandsEmphasisLineDistanceFromLeft = (float) Math.floor(mTickMarkTwentiesLength * 2.5);
+    mTensEmphasisLineDistanceFromText = (float) Math.floor(mTextTensSize / 10);
+    mTensEmphasisLineDistanceFromLeft = (float) Math.floor(mTickMarkFifthLength * 2.5);
 
-    mTextThousandsRightBoundary = (float) Math.floor(
-        mThousandsEmphasisLineDistanceFromLeft + mTextThousandsSize * 1.125);
-    mTextHundredsLeftBoundary = mTextThousandsRightBoundary + (float) Math.floor(mTextThousandsSize / 10);
+    mTextTensRightBoundary = (float) Math.floor(
+        mTensEmphasisLineDistanceFromLeft + mTextTensSize * 1.125);
+    mTextWholeLeftBoundary = mTextTensRightBoundary + (float) Math.floor(mTextTensSize / 10);
 
     Typeface tf = Typeface.createFromAsset(assets, mConfig.mTextTypeface);
 
-    mTextThousandsPaint.setColor(mConfig.mTextColor);
-    mTextThousandsPaint.setTypeface(tf);
-    mTextThousandsPaint.setTextSize(mTextThousandsSize);
-    mTextThousandsPaint.setTextAlign(Align.RIGHT);
-    mTextThousandsPaint.setAntiAlias(true);
+    mTextTensPaint.setColor(mConfig.mTextColor);
+    mTextTensPaint.setTypeface(tf);
+    mTextTensPaint.setTextSize(mTextTensSize);
+    mTextTensPaint.setTextAlign(Align.RIGHT);
+    mTextTensPaint.setAntiAlias(true);
 
-    mTextHundredsPaint.setColor(mConfig.mTextColor);
-    mTextHundredsPaint.setTypeface(tf);
-    mTextHundredsPaint.setTextSize(mTextHundredsSize);
-    mTextHundredsPaint.setTextAlign(Align.LEFT);
-    mTextHundredsPaint.setAntiAlias(true);
+    mTextWholePaint.setColor(mConfig.mTextColor);
+    mTextWholePaint.setTypeface(tf);
+    mTextWholePaint.setTextSize(mTextWholeSize);
+    mTextWholePaint.setTextAlign(Align.LEFT);
+    mTextWholePaint.setAntiAlias(true);
   }
 
-  float altitudeToCanvasPosition(float alt) {
-    return (getHeight() / 2f) - (alt - mModel.getAltitude()) * mTapePixelsPerFoot;
-  }
+  @Override
+  protected void drawContents(Canvas canvas) {
+    drawScaleLine(canvas);
 
-  private void drawAltitude(Canvas canvas, int alt20) {
-    if (alt20 < 0) { return; }
-
-    float altitude = alt20 * 20f;
-    float y = altitudeToCanvasPosition(altitude);
-    boolean isHundreds = ((altitude % 100f) == 0);
-    boolean isThousands = ((altitude % 1000f) == 0);
-
-    if (isThousands || isHundreds) {
-      int thousands = (int) (altitude / 1000);
-      int hundreds = (int) Math.floor((altitude - (thousands * 1000)) / 100) * 100;
-      String thousandsString = thousands == 0 ? "" : "" + thousands;
-      String hundredsString = hundreds == 0 ? "000" : "" + hundreds;
-      canvas.drawText(thousandsString, mTextThousandsRightBoundary, y + 0.35f * mTextThousandsSize, mTextThousandsPaint);
-      canvas.drawText(hundredsString, mTextHundredsLeftBoundary, y + 0.35f * mTextHundredsSize, mTextHundredsPaint);
-
-      if (isThousands) {
-        canvas.drawRect(
-            0, y - mConfig.mVeryThickLineThickness / 2,
-            mTickMarkThousandsLength, y + mConfig.mVeryThickLineThickness / 2,
-            mConfig.mLinePaint);
-        canvas.drawRect(
-            mThousandsEmphasisLineDistanceFromLeft,
-            y - mTextThousandsSize / 2 - mThousandsEmphasisLineDistanceFromText - mConfig.mThinLineThickness,
-            getWidth(),
-            y - mTextThousandsSize / 2 - mThousandsEmphasisLineDistanceFromText,
-            mConfig.mLinePaint);
-        canvas.drawRect(
-            mThousandsEmphasisLineDistanceFromLeft,
-            y + mTextThousandsSize / 2 + mThousandsEmphasisLineDistanceFromText,
-            getWidth(),
-            y + mTextThousandsSize / 2 + mThousandsEmphasisLineDistanceFromText + mConfig.mThinLineThickness,
-            mConfig.mLinePaint);
-      } else if (isHundreds) {
-        canvas.drawRect(
-            0, y - mConfig.mThickLineThickness / 2,
-            mTickMarkHundredsLength, y + mConfig.mThickLineThickness / 2,
-            mConfig.mLinePaint);
-      }
-    } else {
-      canvas.drawRect(
-          0, y - mConfig.mThinLineThickness / 2,
-          mTickMarkTwentiesLength, y + mConfig.mThinLineThickness / 2,
-          mConfig.mLinePaint);
+    // Loop through 0.2m increments above and below the midpoint.
+    float midpointFeet = (getHeight() / 2f) / mTapePixelsPerFoot;
+    int alt02AtTop = (int) Math.ceil((mModel.getAltitude() + midpointFeet) / 0.2) + 1;
+    int alt02AtBottom = (int) Math.floor((mModel.getAltitude() - midpointFeet) / 0.2) - 1;
+    for (int i = alt02AtBottom; i <= alt02AtTop; i++) {
+      drawAltitude(canvas, i * 0.2f);
     }
   }
 
@@ -126,13 +88,56 @@ public class AltitudeTapeCore extends Widget {
     canvas.drawRect(0, 0, mConfig.mThinLineThickness, yMax + mConfig.mVeryThickLineThickness / 2, mConfig.mLinePaint);
   }
 
-  @Override
-  protected void drawContents(Canvas canvas) {
-    drawScaleLine(canvas);
-    int alt20AtTop = (int) Math.ceil((mModel.getAltitude() + (getHeight() / 2f) * mTapePixelsPerFoot) / 20) + 1;
-    int alt20AtBottom = (int) Math.floor((mModel.getAltitude() - (getHeight() / 2f) * mTapePixelsPerFoot) / 20) - 1;
-    for (int i = alt20AtBottom; i <= alt20AtTop; i++) {
-      drawAltitude(canvas, i);
+  private void drawAltitude(Canvas canvas, float altitude) {
+    if (altitude < 0) { return; }
+
+    boolean isWhole = ((int)altitude) == altitude;
+    boolean isTens = ((altitude % 10f) == 0);
+
+    float y = altitudeToCanvasPosition(altitude);
+    if (isTens || isWhole) {
+      int tens = (int) Math.floor(altitude / 10);
+      int whole = ((int) Math.floor(altitude)) % 10;
+
+      String tensString = tens == 0 ? "" : "" + tens;
+      String wholeString = whole + ".0";
+      canvas.drawText(tensString, mTextTensRightBoundary, y + 0.35f * mTextTensSize,
+          mTextTensPaint);
+      canvas.drawText(wholeString, mTextWholeLeftBoundary, y + 0.35f * mTextWholeSize,
+          mTextWholePaint);
+
+      if (isTens) {
+        canvas.drawRect(
+            0, y - mConfig.mVeryThickLineThickness / 2,
+            mTickMarkTensLength, y + mConfig.mVeryThickLineThickness / 2,
+            mConfig.mLinePaint);
+        canvas.drawRect(
+            mTensEmphasisLineDistanceFromLeft,
+            y - mTextTensSize / 2 - mTensEmphasisLineDistanceFromText - mConfig.mThinLineThickness,
+            getWidth(),
+            y - mTextTensSize / 2 - mTensEmphasisLineDistanceFromText,
+            mConfig.mLinePaint);
+        canvas.drawRect(
+            mTensEmphasisLineDistanceFromLeft,
+            y + mTextTensSize / 2 + mTensEmphasisLineDistanceFromText,
+            getWidth(),
+            y + mTextTensSize / 2 + mTensEmphasisLineDistanceFromText + mConfig.mThinLineThickness,
+            mConfig.mLinePaint);
+      } else if (isWhole) {
+        canvas.drawRect(
+            0, y - mConfig.mThickLineThickness / 2,
+            mTickMarkWholeLength, y + mConfig.mThickLineThickness / 2,
+            mConfig.mLinePaint);
+      }
+    } else {
+      canvas.drawRect(
+          0, y - mConfig.mThinLineThickness / 2,
+          mTickMarkFifthLength, y + mConfig.mThinLineThickness / 2,
+          mConfig.mLinePaint);
     }
+  }
+
+  private float altitudeToCanvasPosition(float alt) {
+    return (getHeight() / 2f) - (alt - mModel.getAltitude()) * mTapePixelsPerFoot;
   }
 }

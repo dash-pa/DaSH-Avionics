@@ -16,6 +16,8 @@ public class FakeSensorManager implements SensorManager {
   private static final MeasurementType[] TYPES_TO_GENERATE = {
       MeasurementType.PROP_RPM, MeasurementType.CRANK_RPM,
       MeasurementType.HEIGHT, MeasurementType.SPEED};
+  public static final int FAKE_DATA_DELAY = 250;
+  public static final int MAX_VALUE = 200;
 
   private final Random random = new Random();
   private SensorListener updater;
@@ -34,10 +36,10 @@ public class FakeSensorManager implements SensorManager {
   }
 
   @SuppressWarnings("InfiniteRecursion")
-  @Background(id = "data", delay = 250)
+  @Background(id = "data", delay = FAKE_DATA_DELAY)
   public void generateFakeData() {
     MeasurementType type = TYPES_TO_GENERATE[random.nextInt(TYPES_TO_GENERATE.length)];
-    float value = random.nextFloat() * 100;
+    float value = random.nextFloat() * MAX_VALUE;
     Measurement measurement = new Measurement(type, value);
     updater.onNewMeasurement(measurement);
 
