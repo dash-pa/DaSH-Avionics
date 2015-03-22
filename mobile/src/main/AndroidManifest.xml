@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.dash.avionics">
+<manifest
+    package="org.dash.avionics"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
   <uses-permission android:name="android.permission.BLUETOOTH"/>
   <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-  <uses-feature android:name="android.hardware.bluetooth_le"  android:required="true" />
+
+  <uses-feature
+      android:name="android.hardware.bluetooth_le"
+      android:required="true"/>
 
   <application
       android:allowBackup="true"
@@ -12,21 +16,33 @@
       android:label="@string/app_name"
       android:theme="@style/AppTheme">
     <activity
-        android:name="org.dash.avionics.AvionicsActivity_"
+        android:name=".AvionicsActivity_"
         android:configChanges="orientation|keyboardHidden|screenSize"
         android:immersive="true"
         android:label="@string/app_name"
         android:screenOrientation="landscape"
         android:theme="@style/FullscreenTheme">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
+      <!--<intent-filter>-->
+      <!--<action android:name="android.intent.action.MAIN" />-->
 
-        <category android:name="android.intent.category.LAUNCHER"/>
+      <!--<category android:name="android.intent.category.LAUNCHER" />-->
+      <!--</intent-filter>-->
+    </activity>
+    <activity
+        android:name=".display.PFDActivity_"
+        android:configChanges="orientation|keyboardHidden|screenSize"
+        android:immersive="true"
+        android:screenOrientation="landscape"
+        android:label="@string/title_activity_pfd"
+        android:theme="@style/FullscreenTheme">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
 
     <activity
-        android:name="org.dash.avionics.PropCalibrationActivity_"
+        android:name=".PropCalibrationActivity_"
         android:configChanges="orientation|keyboardHidden|screenSize"
         android:immersive="true"
         android:label="@string/app_name"
@@ -39,6 +55,7 @@
         android:name=".data.MeasurementContentProvider_"
         android:authorities="org.dash.avionics"
         android:exported="true"/>
+
   </application>
 
 </manifest>

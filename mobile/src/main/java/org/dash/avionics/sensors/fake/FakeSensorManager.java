@@ -14,7 +14,8 @@ import java.util.Random;
 public class FakeSensorManager implements SensorManager {
 
   private static final MeasurementType[] TYPES_TO_GENERATE = {
-      MeasurementType.PROP_RPM, MeasurementType.CRANK_RPM};
+      MeasurementType.PROP_RPM, MeasurementType.CRANK_RPM,
+      MeasurementType.HEIGHT, MeasurementType.SPEED};
 
   private final Random random = new Random();
   private SensorListener updater;

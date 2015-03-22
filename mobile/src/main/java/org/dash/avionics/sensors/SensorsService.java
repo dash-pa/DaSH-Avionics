@@ -19,8 +19,8 @@ import org.dash.avionics.sensors.viiiiva.ViiiivaSensorManager;
 @SuppressLint("Registered")
 @EService
 public class SensorsService extends Service implements SensorListener {
-  private static final boolean USE_FAKE_DATA = false;
-  private static final boolean USE_VIIIIVA = true;
+  private static final boolean USE_FAKE_DATA = true;
+  private static final boolean USE_VIIIIVA = false;
   private static final boolean USE_ARDUINO = false;
   private static final boolean USE_ANT = false;
 

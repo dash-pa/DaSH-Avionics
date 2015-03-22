@@ -92,6 +92,10 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
 
   @Override
   public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+    if (device == null || device.getName() == null) {
+      return;
+    }
+
     Log.d("Viiiiva", "BTLE device: " + device.getName() + " " + device.getAddress());
     if (device.getName().startsWith("Viiiiva")) {
       //noinspection deprecation
