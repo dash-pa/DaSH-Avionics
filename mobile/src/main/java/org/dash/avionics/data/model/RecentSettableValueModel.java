@@ -1,4 +1,4 @@
-package org.dash.avionics.display.model;
+package org.dash.avionics.data.model;
 
 /**
  * Created by rdamazio on 3/15/15.

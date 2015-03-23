@@ -38,7 +38,6 @@ public class PFDActivity extends Activity {
 
     model = new PFDModel();
     observer = new MeasurementObserver(new Handler(), getContentResolver(), model);
-    observer.start();
   }
 
   @AfterViews

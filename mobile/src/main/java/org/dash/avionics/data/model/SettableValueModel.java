@@ -1,4 +1,4 @@
-package org.dash.avionics.display.model;
+package org.dash.avionics.data.model;
 
 /**
  * Value model which can be explicitly set.

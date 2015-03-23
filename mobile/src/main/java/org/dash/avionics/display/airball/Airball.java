@@ -10,7 +10,7 @@ import org.dash.avionics.display.widget.Container;
 import org.dash.avionics.display.widget.TiledImage;
 import org.dash.avionics.display.widget.Widget;
 import org.schmivits.airball.airdata.Aircraft;
-import org.dash.avionics.display.model.ValueModel;
+import org.dash.avionics.data.model.ValueModel;
 
 public class Airball extends Container {
 

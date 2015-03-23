@@ -1,14 +1,17 @@
 package org.dash.avionics.display;
 
+import android.util.Log;
+
 import com.google.common.collect.Sets;
 
 import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementListener;
+import org.dash.avionics.data.model.DerivativeValueModel;
+import org.dash.avionics.data.model.RecentSettableValueModel;
+import org.dash.avionics.data.model.SettableValueModel;
+import org.dash.avionics.data.model.ValueModel;
 import org.dash.avionics.display.altitude.AltitudeTape;
 import org.dash.avionics.display.climbrate.ClimbRateTape;
-import org.dash.avionics.display.model.RecentSettableValueModel;
-import org.dash.avionics.display.model.SettableValueModel;
-import org.dash.avionics.display.model.ValueModel;
 import org.dash.avionics.display.speed.SpeedTape;
 import org.schmivits.airball.airdata.Aircraft;
 
@@ -23,8 +26,8 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   // ANT+ needs larger delays
   private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
 
-  private final SettableValueModel<Float> climbRateModel =
-      new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
+  private final DerivativeValueModel climbRateModel =
+      new DerivativeValueModel(DEFAULT_MAX_DATA_AGE_MS);
   private final SettableValueModel<Float> speedModel =
       new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
   private final SettableValueModel<Float> altitudeModel =
@@ -62,6 +65,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
         break;
       case HEIGHT:
         altitudeModel.setValue(measurement.value);
+        climbRateModel.addValue(measurement.value);
         break;
     }
 

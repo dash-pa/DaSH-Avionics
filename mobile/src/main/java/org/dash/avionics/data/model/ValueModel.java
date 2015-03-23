@@ -1,4 +1,4 @@
-package org.dash.avionics.display.model;
+package org.dash.avionics.data.model;
 
 public interface ValueModel <T> extends Cloneable {
   T getValue();

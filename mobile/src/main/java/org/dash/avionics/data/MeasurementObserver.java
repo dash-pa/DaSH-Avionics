@@ -5,6 +5,7 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
+import android.util.Log;
 
 public class MeasurementObserver extends ContentObserver {
 
@@ -19,6 +20,7 @@ public class MeasurementObserver extends ContentObserver {
   }
 
   public void start() {
+    Log.i("Observer", "Starting");
     resolver.registerContentObserver(MeasurementStorageColumns.MEASUREMENTS_URI, true, this);
   }
 
