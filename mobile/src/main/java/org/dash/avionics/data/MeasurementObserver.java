@@ -5,12 +5,14 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
-import android.util.Log;
+
+import com.google.common.base.Preconditions;
 
 public class MeasurementObserver extends ContentObserver {
 
   private final MeasurementListener listener;
   private final ContentResolver resolver;
+  private boolean started;
 
   public MeasurementObserver(Handler handler, ContentResolver resolver, MeasurementListener listener) {
     super(handler);
@@ -20,12 +22,19 @@ public class MeasurementObserver extends ContentObserver {
   }
 
   public void start() {
-    Log.i("Observer", "Starting");
-    resolver.registerContentObserver(MeasurementStorageColumns.MEASUREMENTS_URI, true, this);
+    synchronized (this) {
+      Preconditions.checkState(!started);
+      resolver.registerContentObserver(MeasurementStorageColumns.MEASUREMENTS_URI, true, this);
+      started = true;
+    }
   }
 
   public void stop() {
-    resolver.unregisterContentObserver(this);
+    synchronized (this) {
+      Preconditions.checkState(started);
+      resolver.unregisterContentObserver(this);
+      started = false;
+    }
   }
 
   @Override
