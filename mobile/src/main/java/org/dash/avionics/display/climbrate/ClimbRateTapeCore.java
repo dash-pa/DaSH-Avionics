@@ -15,35 +15,35 @@ import org.dash.avionics.display.widget.Widget;
 
 public class ClimbRateTapeCore extends Container {
 
-    public interface Model {
-        float getClimbRate();
-    }
+  public interface Model {
+    float getClimbRate();
+  }
 
-    private static final int INDICATOR_COLOR = Color.argb(255, 204, 102, 255);
+  private static final int INDICATOR_COLOR = Color.argb(255, 204, 102, 255);
 
-    private final Model mModel;
-    private final DisplayConfiguration mConfig;
-    private final float mIndicatorThickness;
-    private final Paint mIndicatorPaint;
-    private final Typeface mTypeface;
-    private final float mTapePixelsPerFpm;
+  private final Model mModel;
+  private final DisplayConfiguration mConfig;
+  private final float mIndicatorThickness;
+  private final Paint mIndicatorPaint;
+  private final Typeface mTypeface;
+  private final float mTapePixelsPerFpm;
 
-    public ClimbRateTapeCore(DisplayConfiguration config, Resources res, AssetManager assets,
-            float x, float y, float w, float h, Model model) {
-        moveTo(x, y);
-        sizeTo(w, h);
+  public ClimbRateTapeCore(DisplayConfiguration config, Resources res, AssetManager assets,
+                           float x, float y, float w, float h, Model model) {
+    moveTo(x, y);
+    sizeTo(w, h);
 
-        mModel = model;
-        mConfig = config;
-        mIndicatorThickness = (float) Math.floor(w * 0.45);
-        mIndicatorPaint = new Paint();
-        mIndicatorPaint.setColor(INDICATOR_COLOR);
-        mTypeface = Typeface.createFromAsset(assets, config.mTextTypeface);
+    mModel = model;
+    mConfig = config;
+    mIndicatorThickness = (float) Math.floor(w * 0.45);
+    mIndicatorPaint = new Paint();
+    mIndicatorPaint.setColor(INDICATOR_COLOR);
+    mTypeface = Typeface.createFromAsset(assets, config.mTextTypeface);
 
-        mTapePixelsPerFpm = (float) 0.9 * (getHeight() / 2) / 2000;
+    mTapePixelsPerFpm = (float) 0.9 * (getHeight() / 2) / 2000;
 
-        addConstantItems(res);
-    }
+    addConstantItems(res);
+  }
 
   private void addConstantItems(Resources res) {
     float mTickMarkLength1000 = (float) Math.floor(getWidth() * 0.55);
@@ -103,7 +103,7 @@ public class ClimbRateTapeCore extends Container {
     super.drawContents(canvas);
   }
 
-    private float getYCoordinate(float value) {
-        return getHeight() / 2f - value * mTapePixelsPerFpm;
-    }
+  private float getYCoordinate(float value) {
+    return getHeight() / 2f - value * mTapePixelsPerFpm;
+  }
 }
