@@ -14,9 +14,11 @@ public class SpeedTapeCore extends Widget {
 
   public interface Model {
     float getSpeed();
+    float getVs0();
     float getVs1();  // Bottom of green arc
     float getVno();  // Top of green / bottom of yellow arc
     float getVne();  // Top of yellow / bottom of red arc
+
   }
 
   // The below constants, while they may seem silly ;), are useful for
@@ -96,6 +98,14 @@ public class SpeedTapeCore extends Widget {
   }
 
   private void drawVArcs(Canvas canvas) {
+    canvas.drawRect(
+        getWidth() - mVArcRightBoundaryFromRight - mVArcThickness, speedToCanvasPosition(0),
+        getWidth() - mVArcRightBoundaryFromRight, speedToCanvasPosition(mModel.getVs0()),
+        mRedArcPaint);
+    canvas.drawRect(
+        getWidth() - mVArcRightBoundaryFromRight - mVArcThickness, speedToCanvasPosition(mModel.getVs0()),
+        getWidth() - mVArcRightBoundaryFromRight, speedToCanvasPosition(mModel.getVs1()),
+        mYellowArcPaint);
     canvas.drawRect(
         getWidth() - mVArcRightBoundaryFromRight - mVArcThickness, speedToCanvasPosition(mModel.getVs1()),
         getWidth() - mVArcRightBoundaryFromRight, speedToCanvasPosition(mModel.getVno()),

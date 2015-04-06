@@ -107,6 +107,12 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
     final float targetSpeed = CruiseSpeedCalculator.getCruiseAirspeedFromSettings(settings);
     final float speedMargin = settings.getMaxSpeedDelta().get();
     aircraftModel.setValue(new Aircraft() {
+      // TODO: If we have more precise Vne and Vs calculations, use them.
+      @Override
+      public float getVs0() {
+        return targetSpeed - speedMargin * 2;
+      }
+
       @Override
       public float getVs1() {
         return targetSpeed - speedMargin;

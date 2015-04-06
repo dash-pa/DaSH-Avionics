@@ -54,6 +54,12 @@ public class SpeedTape extends Container {
           }
 
           @Override
+          public float getVs0() {
+            return model.getAircraft().isValid() ? model.getAircraft().getValue()
+                .getVs0() : 0f;
+          }
+
+          @Override
           public float getVs1() {
             return model.getAircraft().isValid() ? model.getAircraft().getValue()
                 .getVs1() : 0f;
