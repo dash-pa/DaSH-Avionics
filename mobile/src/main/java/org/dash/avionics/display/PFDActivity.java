@@ -3,31 +3,29 @@ package org.dash.avionics.display;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Fullscreen;
+import org.androidannotations.annotations.LongClick;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.dash.avionics.R;
-import org.dash.avionics.data.MeasurementObserver;
-import org.dash.avionics.display.util.SystemUiHider;
+import org.dash.avionics.aircraft.AircraftSettingsActivity_;
 import org.dash.avionics.sensors.SensorsService_;
 
 /**
- * An example full-screen activity that shows and hides the system UI (i.e. status bar and
- * navigation/system bar) with user interaction.
- *
- * @see SystemUiHider
+ * Primary Flight Display.
  */
 @EActivity(R.layout.activity_pfd)
+@Fullscreen
 public class PFDActivity extends Activity {
   @ViewById
   protected PFDView pfdView;
 
   private Intent serviceIntent;
-  private PFDModel model;
-  private MeasurementObserver observer;
+  @Bean PFDModel model;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +33,6 @@ public class PFDActivity extends Activity {
 
     serviceIntent = SensorsService_.intent(getApplicationContext()).get();
     startService(serviceIntent);
-
-    model = new PFDModel();
-    observer = new MeasurementObserver(new Handler(), getContentResolver(), model);
   }
 
   @AfterViews
@@ -59,12 +54,12 @@ public class PFDActivity extends Activity {
   protected void onResume() {
     super.onResume();
 
-    observer.start();
+    model.start();
   }
 
   @Override
   protected void onPause() {
-    observer.stop();
+    model.stop();
 
     super.onPause();
   }
@@ -80,5 +75,10 @@ public class PFDActivity extends Activity {
     stopService(serviceIntent);
 
     super.onDestroy();
+  }
+
+  @LongClick(R.id.pfdView)
+  protected void onLongClickI() {
+    AircraftSettingsActivity_.intent(this).start();
   }
 }

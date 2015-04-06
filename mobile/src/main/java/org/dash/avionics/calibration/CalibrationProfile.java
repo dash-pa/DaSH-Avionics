@@ -2,7 +2,7 @@ package org.dash.avionics.calibration;
 
 import org.androidannotations.api.sharedpreferences.FloatPrefField;
 import org.androidannotations.api.sharedpreferences.IntPrefField;
-import org.dash.avionics.alerts.CruiseSpeedCalculator.Aircraft;
+import org.dash.avionics.aircraft.AircraftType;
 
 public class CalibrationProfile {
 
@@ -18,11 +18,11 @@ public class CalibrationProfile {
     this.pilotWeight = pilotWeight;
   }
 
-  public Aircraft getActiveAircraft() {
-    return Aircraft.values()[activeAircraft.get()];
+  public AircraftType getActiveAircraft() {
+    return AircraftType.values()[activeAircraft.get()];
   }
 
-  public void setActiveAircraft(Aircraft acft) {
+  public void setActiveAircraft(AircraftType acft) {
     activeAircraft.put(acft.ordinal());
   }
 

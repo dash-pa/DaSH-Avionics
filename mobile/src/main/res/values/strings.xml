@@ -39,7 +39,27 @@
 
   <string name="action_settings">Settings</string>
 
-  <string name="title_activity_pfd">PFDActivity</string>
-  <string name="dummy_button">Dummy Button</string>
-  <string name="dummy_content">DUMMY\nCONTENT</string>
+  <string name="title_activity_pfd">DaSH PFD</string>
+
+  <!-- Settings -->
+  <string name="title_activity_aircraft_settings">Aircraft settings</string>
+  <string name="settings_pilot_weight">Pilot weight (kg)</string>
+  <string name="settings_alert_speed_delta">Speed error to alert at (km/h)</string>
+  <string name="settings_no_cruise_speed">"Select an aircraft first</string>
+
+  <string name="settings_key_aircraft_type">aircraft_type</string>
+  <string name="settings_key_speed_delta">speed_delta</string>
+  <string name="settings_key_pilot_weight">pilot_weight</string>
+  <string name="settings_key_cruise_speed">cruise_speed</string>
+
+  <string-array name="settings_aircraft_type_names">
+    <item>V5</item>
+    <item>V6</item>
+    <item>V6 extended wings</item>
+  </string-array>
+  <string-array name="settings_aircraft_types">
+    <item>V5</item>
+    <item>V6</item>
+    <item>V6_EXTENDED_WINGS</item>
+  </string-array>
 </resources>

@@ -3,7 +3,7 @@ package org.dash.avionics.calibration;
 import org.androidannotations.annotations.sharedpreferences.DefaultFloat;
 import org.androidannotations.annotations.sharedpreferences.DefaultInt;
 import org.androidannotations.annotations.sharedpreferences.SharedPref;
-import org.dash.avionics.alerts.CruiseSpeedCalculator;
+import org.dash.avionics.aircraft.CruiseSpeedCalculator;
 
 @SuppressWarnings("InterfaceNeverImplemented")
 @SharedPref(SharedPref.Scope.UNIQUE)

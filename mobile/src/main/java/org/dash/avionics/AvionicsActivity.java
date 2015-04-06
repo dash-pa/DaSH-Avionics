@@ -18,8 +18,8 @@ import org.androidannotations.annotations.Fullscreen;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.api.BackgroundExecutor;
-import org.dash.avionics.alerts.CruiseSpeedAlerter;
-import org.dash.avionics.alerts.CruiseSpeedAlerter.CruiseSpeedAlertListener;
+import org.dash.avionics.aircraft.CruiseSpeedAlerter;
+import org.dash.avionics.aircraft.CruiseSpeedAlerter.CruiseSpeedAlertListener;
 import org.dash.avionics.calibration.CalibrationManager;
 import org.dash.avionics.calibration.CalibrationProfile;
 import org.dash.avionics.data.Measurement;
@@ -76,7 +76,7 @@ public class AvionicsActivity extends Activity
 
     observer = new MeasurementObserver(new Handler(), getContentResolver(),
         this);
-    speedAlerter = new CruiseSpeedAlerter(this);
+    speedAlerter = new CruiseSpeedAlerter();
 
     //noinspection ConstantConditions
     getActionBar().hide();
@@ -98,7 +98,7 @@ public class AvionicsActivity extends Activity
 
     // Assumes that the profile doesn't change without going somewhere else to change it.
     calibration = calibrationManager.loadActiveProfile();
-    speedAlerter.setCalibration(calibration);
+//    speedAlerter.setCalibration(calibration);
 
     observer.start();
     runWatchdog();
@@ -181,7 +181,7 @@ public class AvionicsActivity extends Activity
 
   private void updateAlerters(Measurement update) {
     if (update.type == MeasurementType.SPEED) {
-      speedAlerter.updateCurrentSpeed(update.value);
+//      speedAlerter.updateCurrentSpeed(update.value);
     }
   }
 
