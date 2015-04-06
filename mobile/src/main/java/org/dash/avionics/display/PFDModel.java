@@ -16,9 +16,9 @@ import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementListener;
 import org.dash.avionics.data.MeasurementObserver;
 import org.dash.avionics.data.model.DerivativeValueModel;
+import org.dash.avionics.data.model.MissionAircraftModel;
 import org.dash.avionics.data.model.RecentSettableValueModel;
 import org.dash.avionics.data.model.SettableValueModel;
-import org.dash.avionics.data.model.TargetSpeedAircraftModel;
 import org.dash.avionics.data.model.ValueModel;
 import org.dash.avionics.display.altitude.AltitudeTape;
 import org.dash.avionics.display.climbrate.ClimbRateTape;
@@ -107,9 +107,12 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   }
 
   private void updateAircraftModel() {
-    final float targetSpeed = CruiseSpeedCalculator.getCruiseAirspeedFromSettings(settings);
-    final float speedMargin = settings.getMaxSpeedDelta().get();
-    aircraftModel.setValue(new TargetSpeedAircraftModel(targetSpeed, speedMargin));
+    float targetSpeed = CruiseSpeedCalculator.getCruiseAirspeedFromSettings(settings);
+    float speedMargin = settings.getMaxSpeedDelta().get();
+    float targetHeight = settings.getTargetHeight().get();
+    float heightMargin = settings.getMaxHeightDelta().get();
+    aircraftModel.setValue(new MissionAircraftModel(targetSpeed, speedMargin,
+        targetHeight, heightMargin));
     notifyUpdateListeners();
   }
 

@@ -11,4 +11,12 @@ public interface AircraftModel {
   float getVno();
 
   float getVne();
+
+  float getMinHeight();
+
+  float getLowHeight();
+
+  float getHighHeight();
+
+  float getMaxHeight();
 }

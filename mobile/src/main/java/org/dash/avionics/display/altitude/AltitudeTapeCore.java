@@ -11,19 +11,23 @@ import org.dash.avionics.display.DisplayConfiguration;
 import org.dash.avionics.display.widget.Widget;
 
 public class AltitudeTapeCore extends Widget {
+  private static final int GREEN_ARC_COLOR = Color.GREEN;
   private static final int YELLOW_ARC_COLOR = Color.YELLOW;
   private static final int RED_ARC_COLOR = Color.RED;
-  private static final float ALERT_ALTITUDE = 2.0f;
-  private static final float WARNING_ALTITUDE = 5.0f;
 
   public interface Model {
     float getAltitude();
+    float getLowAlertAltitude();
+    float getLowWarningAltitude();
+    float getHighWarningAltitude();
+    float getHighAlertAltitude();
   }
 
   private final DisplayConfiguration mConfig;
   private final Model mModel;
   private final Paint mTextTensPaint = new Paint();
   private final Paint mTextWholePaint = new Paint();
+  private final Paint mGreenArcPaint = new Paint();
   private final Paint mYellowArcPaint = new Paint();
   private final Paint mRedArcPaint = new Paint();
 
@@ -81,6 +85,7 @@ public class AltitudeTapeCore extends Widget {
     mTextWholePaint.setTextAlign(Align.LEFT);
     mTextWholePaint.setAntiAlias(true);
 
+    mGreenArcPaint.setColor(GREEN_ARC_COLOR);
     mYellowArcPaint.setColor(YELLOW_ARC_COLOR);
     mRedArcPaint.setColor(RED_ARC_COLOR);
   }
@@ -102,13 +107,31 @@ public class AltitudeTapeCore extends Widget {
   private void drawArcs(Canvas canvas) {
     canvas.drawRect(
         mArcBoundaryFromLeft,
-        altitudeToCanvasPosition(WARNING_ALTITUDE),
+        0.0f,
         mArcBoundaryFromLeft + mArcThickness,
-        altitudeToCanvasPosition(ALERT_ALTITUDE),
+        altitudeToCanvasPosition(mModel.getHighAlertAltitude()),
+        mRedArcPaint);
+    canvas.drawRect(
+        mArcBoundaryFromLeft,
+        altitudeToCanvasPosition(mModel.getHighAlertAltitude()),
+        mArcBoundaryFromLeft + mArcThickness,
+        altitudeToCanvasPosition(mModel.getHighWarningAltitude()),
         mYellowArcPaint);
     canvas.drawRect(
         mArcBoundaryFromLeft,
-        altitudeToCanvasPosition(ALERT_ALTITUDE),
+        altitudeToCanvasPosition(mModel.getHighWarningAltitude()),
+        mArcBoundaryFromLeft + mArcThickness,
+        altitudeToCanvasPosition(mModel.getLowWarningAltitude()),
+        mGreenArcPaint);
+    canvas.drawRect(
+        mArcBoundaryFromLeft,
+        altitudeToCanvasPosition(mModel.getLowWarningAltitude()),
+        mArcBoundaryFromLeft + mArcThickness,
+        altitudeToCanvasPosition(mModel.getLowAlertAltitude()),
+        mYellowArcPaint);
+    canvas.drawRect(
+        mArcBoundaryFromLeft,
+        altitudeToCanvasPosition(mModel.getLowAlertAltitude()),
         mArcBoundaryFromLeft + mArcThickness,
         altitudeToCanvasPosition(0.0f),
         mRedArcPaint);
