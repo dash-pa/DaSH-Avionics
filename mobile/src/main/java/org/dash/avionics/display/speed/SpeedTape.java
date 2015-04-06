@@ -13,14 +13,14 @@ import org.dash.avionics.display.widget.FilledPolygon;
 import org.dash.avionics.display.widget.Rectangle;
 import org.dash.avionics.display.widget.TiledImage;
 import org.dash.avionics.display.widget.Widget;
-import org.schmivits.airball.airdata.Aircraft;
+import org.dash.avionics.data.model.AircraftModel;
 
 public class SpeedTape extends Container {
 
   public interface Model {
     ValueModel<Float> getSpeed();
 
-    ValueModel<Aircraft> getAircraft();
+    ValueModel<AircraftModel> getAircraft();
   }
 
   private final Model mModel;

@@ -18,11 +18,12 @@ import org.dash.avionics.data.MeasurementObserver;
 import org.dash.avionics.data.model.DerivativeValueModel;
 import org.dash.avionics.data.model.RecentSettableValueModel;
 import org.dash.avionics.data.model.SettableValueModel;
+import org.dash.avionics.data.model.TargetSpeedAircraftModel;
 import org.dash.avionics.data.model.ValueModel;
 import org.dash.avionics.display.altitude.AltitudeTape;
 import org.dash.avionics.display.climbrate.ClimbRateTape;
 import org.dash.avionics.display.speed.SpeedTape;
-import org.schmivits.airball.airdata.Aircraft;
+import org.dash.avionics.data.model.AircraftModel;
 
 import java.util.Set;
 
@@ -42,7 +43,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
       new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
   private final SettableValueModel<Float> altitudeModel =
       new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
-  private final SettableValueModel<Aircraft> aircraftModel = new SettableValueModel<>();
+  private final SettableValueModel<AircraftModel> aircraftModel = new SettableValueModel<>();
 
   private final Set<Runnable> updateListeners = Sets.newConcurrentHashSet();
   @RootContext Context context;
@@ -74,7 +75,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   }
 
   @Override
-  public ValueModel<Aircraft> getAircraft() {
+  public ValueModel<AircraftModel> getAircraft() {
     return aircraftModel;
   }
 
@@ -93,6 +94,8 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
         altitudeModel.setValue(measurement.value);
         climbRateModel.addValue(measurement.value);
         break;
+      default:
+        return;
     }
 
     notifyUpdateListeners();
@@ -106,28 +109,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   private void updateAircraftModel() {
     final float targetSpeed = CruiseSpeedCalculator.getCruiseAirspeedFromSettings(settings);
     final float speedMargin = settings.getMaxSpeedDelta().get();
-    aircraftModel.setValue(new Aircraft() {
-      // TODO: If we have more precise Vne and Vs calculations, use them.
-      @Override
-      public float getVs0() {
-        return targetSpeed - speedMargin * 2;
-      }
-
-      @Override
-      public float getVs1() {
-        return targetSpeed - speedMargin;
-      }
-
-      @Override
-      public float getVno() {
-        return targetSpeed + speedMargin;
-      }
-
-      @Override
-      public float getVne() {
-        return targetSpeed + speedMargin * 2;
-      }
-    });
+    aircraftModel.setValue(new TargetSpeedAircraftModel(targetSpeed, speedMargin));
     notifyUpdateListeners();
   }
 
@@ -144,4 +126,5 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
       listener.run();
     }
   }
+
 }
