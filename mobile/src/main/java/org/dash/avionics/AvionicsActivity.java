@@ -18,8 +18,7 @@ import org.androidannotations.annotations.Fullscreen;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.api.BackgroundExecutor;
-import org.dash.avionics.aircraft.CruiseSpeedAlerter;
-import org.dash.avionics.aircraft.CruiseSpeedAlerter.CruiseSpeedAlertListener;
+import org.dash.avionics.alerts.MeasurementAlerter;
 import org.dash.avionics.calibration.CalibrationManager;
 import org.dash.avionics.calibration.CalibrationProfile;
 import org.dash.avionics.data.Measurement;
@@ -37,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @EActivity(R.layout.activity_avionics)
 @SuppressLint("Registered")
 public class AvionicsActivity extends Activity
-    implements MeasurementListener, CruiseSpeedAlertListener {
+    implements MeasurementListener {
   private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
   // ANT+ needs larger delays
   private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
@@ -64,7 +63,7 @@ public class AvionicsActivity extends Activity
   @Bean
   protected CalibrationManager calibrationManager;
   private CalibrationProfile calibration;
-  private CruiseSpeedAlerter speedAlerter;
+  private MeasurementAlerter speedAlerter;
   private Intent serviceIntent;
 
   @Override
@@ -76,7 +75,7 @@ public class AvionicsActivity extends Activity
 
     observer = new MeasurementObserver(new Handler(), getContentResolver(),
         this);
-    speedAlerter = new CruiseSpeedAlerter();
+    speedAlerter = new MeasurementAlerter();
 
     //noinspection ConstantConditions
     getActionBar().hide();
@@ -167,7 +166,7 @@ public class AvionicsActivity extends Activity
     lastUpdateByType.put(update.type, System.currentTimeMillis());
     setValue(update);
 
-    updateAlerters(update);
+//    updateAlerters(update);
     updateDerivedValues(update);
   }
 
@@ -179,26 +178,26 @@ public class AvionicsActivity extends Activity
     }
   }
 
-  private void updateAlerters(Measurement update) {
-    if (update.type == MeasurementType.SPEED) {
+//  private void updateAlerters(Measurement update) {
+//    if (update.type == MeasurementType.SPEED) {
 //      speedAlerter.updateCurrentSpeed(update.value);
-    }
-  }
-
-  @Override
-  public void onLowSpeed() {
-    speedView.setTextColor(getResources().getColor(R.color.alert));
-  }
-
-  @Override
-  public void onHighSpeed() {
-    speedView.setTextColor(getResources().getColor(R.color.alert));
-  }
-
-  @Override
-  public void onStoppedAlerting() {
-    speedView.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
-  }
+//    }
+//  }
+//
+//  @Override
+//  public void onLowSpeed() {
+//    speedView.setTextColor(getResources().getColor(R.color.alert));
+//  }
+//
+//  @Override
+//  public void onHighSpeed() {
+//    speedView.setTextColor(getResources().getColor(R.color.alert));
+//  }
+//
+//  @Override
+//  public void onNormalSpeed() {
+//    speedView.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
+//  }
 
   @Override
   public void onWindowFocusChanged(boolean hasFocus) {

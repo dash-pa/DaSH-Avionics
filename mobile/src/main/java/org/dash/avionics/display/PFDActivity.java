@@ -13,8 +13,8 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.dash.avionics.R;
 import org.dash.avionics.aircraft.AircraftSettingsActivity_;
-import org.dash.avionics.aircraft.CruiseSpeedAlertSounds;
-import org.dash.avionics.aircraft.CruiseSpeedAlerter;
+import org.dash.avionics.alerts.MeasurementAlertSounds;
+import org.dash.avionics.alerts.MeasurementAlerter;
 import org.dash.avionics.sensors.SensorsService_;
 
 /**
@@ -28,8 +28,10 @@ public class PFDActivity extends Activity {
 
   private Intent serviceIntent;
   @Bean PFDModel model;
-  @Bean CruiseSpeedAlerter speedAlerter;
-  @Bean CruiseSpeedAlertSounds speedAlertSounds;
+  @Bean
+  MeasurementAlerter speedAlerter;
+  @Bean
+  MeasurementAlertSounds speedAlertSounds;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +62,13 @@ public class PFDActivity extends Activity {
 
     model.start();
     speedAlertSounds.start();
-    speedAlerter.start(speedAlertSounds);
+    speedAlerter.registerListener(speedAlertSounds);
+    speedAlerter.start();
   }
 
   @Override
   protected void onPause() {
+    speedAlerter.unregisterListener(speedAlertSounds);
     speedAlerter.stop();
     speedAlertSounds.stop();
     model.stop();
