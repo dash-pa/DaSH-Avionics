@@ -46,11 +46,15 @@
   <string name="settings_pilot_weight">Pilot weight (kg)</string>
   <string name="settings_alert_speed_delta">Speed error to alert at (km/h)</string>
   <string name="settings_no_cruise_speed">"Select an aircraft first</string>
+  <string name="settings_target_height">Target height (m)</string>
+  <string name="settings_alert_height_delta">Height error to alert at (m)</string>
 
   <string name="settings_key_aircraft_type">aircraft_type</string>
   <string name="settings_key_speed_delta">speed_delta</string>
   <string name="settings_key_pilot_weight">pilot_weight</string>
   <string name="settings_key_cruise_speed">cruise_speed</string>
+  <string name="settings_key_target_height">height_delta</string>
+  <string name="settings_key_height_delta">alert_height_delta</string>
 
   <string-array name="settings_aircraft_type_names">
     <item>V5</item>

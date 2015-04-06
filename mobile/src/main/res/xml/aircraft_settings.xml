@@ -23,4 +23,14 @@
       android:enabled="false"
       android:title="Target cruise speed"/>
 
+  <EditTextPreference
+      android:key="@string/settings_key_target_height"
+      android:numeric="decimal"
+      android:title="@string/settings_target_height"/>
+  <EditTextPreference
+      android:key="@string/settings_key_height_delta"
+      android:numeric="decimal"
+      android:title="@string/settings_alert_height_delta"/>
+
+
 </PreferenceScreen>
