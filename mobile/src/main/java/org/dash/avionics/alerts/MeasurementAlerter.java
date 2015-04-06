@@ -30,6 +30,9 @@ import java.util.Set;
 @EBean
 public class MeasurementAlerter
     implements MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener {
+  // Only start "unknown" sound alerts after 2s.
+  private static final long MAX_DATA_STALENESS_MS = 2000;
+
   private static class AlertTypeMapping {
     private AlertTypeMapping(AlertType low, AlertType normal, AlertType high, AlertType unknown) {
       this.low = low;
@@ -50,6 +53,8 @@ public class MeasurementAlerter
 
   private final List<AlertListener> listeners = Lists.newArrayList();
   private final Map<MeasurementType, Range<Float>> expectedRanges =
+      Maps.newEnumMap(MeasurementType.class);
+  private Map<MeasurementType, Long> lastUpdateByType =
       Maps.newEnumMap(MeasurementType.class);
   private final Set<AlertType> activeAlerts = Sets.newHashSet();
 
@@ -81,6 +86,12 @@ public class MeasurementAlerter
   public void start() {
     activeAlerts.clear();
 
+    // Assume no initial staleness.
+    long now = System.currentTimeMillis();
+    for (MeasurementType type : MeasurementType.values()) {
+      lastUpdateByType.put(type, now);
+    }
+
     PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(this);
     updateSettings();
     this.observer = new MeasurementObserver(new Handler(), context.getContentResolver(), this);
@@ -110,21 +121,45 @@ public class MeasurementAlerter
 
   @Override
   public synchronized void onNewMeasurement(Measurement measurement) {
+    synchronized (lastUpdateByType) {
+      lastUpdateByType.put(measurement.type, System.currentTimeMillis());
+    }
+    updateAlert(measurement.type, measurement.value);
+  }
+
+  @Background(id = "alert_watchdog", delay = 500)
+  void periodicAlertUpdate() {
+    long now = System.currentTimeMillis();
+    synchronized (lastUpdateByType) {
+      for (Map.Entry<MeasurementType, Long> entry : lastUpdateByType.entrySet()) {
+        if (now - entry.getValue() > MAX_DATA_STALENESS_MS) {
+          updateAlert(entry.getKey(), null);
+        }
+      }
+    }
+
+    periodicAlertUpdate();
+  }
+
+  private void updateAlert(MeasurementType type, Float value) {
+    // TODO: Don't start alerting until the measurement gets to the normal range a first time.
     Range<Float> expectedRange;
     synchronized (expectedRanges) {
-      expectedRange = expectedRanges.get(measurement.type);
+      expectedRange = expectedRanges.get(type);
     }
     if (expectedRange == null) {
       return;
     }
+    AlertTypeMapping mapping = ALERT_MAPPING.get(type);
 
-    float value = measurement.value;
-
-    // TODO: Don't start alerting until the measurement gets to the normal range a first time.
-    AlertTypeMapping mapping = ALERT_MAPPING.get(measurement.type);
     synchronized (activeAlerts) {
       Set<AlertType> newActiveAlerts = Sets.newHashSet(activeAlerts);
-      if (expectedRange.contains(value)) {
+      if (value == null) {
+        newActiveAlerts.remove(mapping.low);
+        newActiveAlerts.remove(mapping.normal);
+        newActiveAlerts.remove(mapping.high);
+        newActiveAlerts.add(mapping.unknown);
+      } else if (expectedRange.contains(value)) {
         newActiveAlerts.remove(mapping.low);
         newActiveAlerts.add(mapping.normal);
         newActiveAlerts.remove(mapping.high);
@@ -155,11 +190,5 @@ public class MeasurementAlerter
         }
       }
     }
-  }
-
-  @Background(id = "alert_watchdog", delay = 500)
-  void periodicAlertUpdate() {
-
-    periodicAlertUpdate();
   }
 }
