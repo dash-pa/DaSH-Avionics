@@ -36,15 +36,12 @@ public class CruiseSpeedAlerter
     void onStoppedAlerting();
   }
 
-  public CruiseSpeedAlerter() {
-    this.observer = new MeasurementObserver(new Handler(), context.getContentResolver(), this);
-  }
-
   public void start(CruiseSpeedAlertListener listener) {
     this.listener = listener;
 
     PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(this);
     updateSettings();
+    this.observer = new MeasurementObserver(new Handler(), context.getContentResolver(), this);
     observer.start();
   }
 
