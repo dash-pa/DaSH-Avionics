@@ -56,6 +56,7 @@ public class MeasurementAlerter
       Maps.newEnumMap(MeasurementType.class);
   private Map<MeasurementType, Long> lastUpdateByType =
       Maps.newEnumMap(MeasurementType.class);
+  private final Set<MeasurementType> hadNormalReadings = Sets.newHashSet();
   private final Set<AlertType> activeAlerts = Sets.newHashSet();
 
   @RootContext
@@ -142,7 +143,6 @@ public class MeasurementAlerter
   }
 
   private void updateAlert(MeasurementType type, Float value) {
-    // TODO: Don't start alerting until the measurement gets to the normal range a first time.
     Range<Float> expectedRange;
     synchronized (expectedRanges) {
       expectedRange = expectedRanges.get(type);
@@ -151,6 +151,17 @@ public class MeasurementAlerter
       return;
     }
     AlertTypeMapping mapping = ALERT_MAPPING.get(type);
+
+    if (!hadNormalReadings.contains(type)) {
+      // Don't alert about unknown or abnormal values until the first time a normal value is seen.
+      // This accounts for edge conditions such as takeoff (low speed, low altitude) which then
+      // transition into the normal regime (cruise).
+      if (value == null || !expectedRange.contains(value)) {
+        return;
+      }
+
+      hadNormalReadings.add(type);
+    }
 
     synchronized (activeAlerts) {
       Set<AlertType> newActiveAlerts = Sets.newHashSet(activeAlerts);
