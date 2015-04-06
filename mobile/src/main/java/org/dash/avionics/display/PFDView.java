@@ -23,7 +23,7 @@ public class PFDView extends SurfaceView {
   private PFD widget;
 
   private class FrameRateCounter {
-    private static final int REPORTING_INTERVAL = 100;
+    private static final int REPORTING_INTERVAL = 500;
     private int mCount;
     private long mTime;
 
@@ -32,7 +32,7 @@ public class PFDView extends SurfaceView {
       mTime += time;
       if (mCount == REPORTING_INTERVAL) {
         double frameRate = (double) mCount / (double) mTime * 1000.0;
-        Log.v(PFDView.class.getName(), "Frame rate = " + frameRate);
+        Log.v(PFDView.class.getName(), "Max frame rate = " + frameRate);
         mCount = 0;
         mTime = 0L;
       }
