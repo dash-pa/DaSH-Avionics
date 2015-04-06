@@ -22,7 +22,7 @@ import org.dash.avionics.sensors.SensorsService_;
 @Fullscreen
 public class PFDActivity extends Activity {
   @ViewById
-  protected PFDView pfdView;
+  protected PFDView_ pfdView;
 
   private Intent serviceIntent;
   @Bean PFDModel model;

@@ -41,7 +41,9 @@ public class FakeSensorManager implements SensorManager {
     MeasurementType type = TYPES_TO_GENERATE[random.nextInt(TYPES_TO_GENERATE.length)];
     float value = random.nextFloat() * MAX_VALUE;
     Measurement measurement = new Measurement(type, value);
-    updater.onNewMeasurement(measurement);
+    if (updater != null) {
+      updater.onNewMeasurement(measurement);
+    }
 
     // Go again after the delay.
     generateFakeData();

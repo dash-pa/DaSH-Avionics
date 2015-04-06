@@ -1,7 +1,5 @@
 package org.dash.avionics.data.model;
 
-import android.util.Log;
-
 /**
  * Derivative over time (in seconds).
  */
@@ -23,7 +21,6 @@ public class DerivativeValueModel implements ValueModel<Float> {
       previousValue = currentValue;
       currentValue = value;
       currentValueTime = now();
-//      Log.v("Deriv", "Adding value " + value + " at " + currentValueTime);
     }
   }
 
@@ -32,8 +29,6 @@ public class DerivativeValueModel implements ValueModel<Float> {
     synchronized (this) {
       float deltaT = (currentValueTime - previousValueTime) / 1000.0f;
       float derivative = (currentValue - previousValue) / deltaT;
-//      Log.v("Deriv", "Derivative="+derivative+"; cur=" + currentValue + "; prev=" + previousValue
-//          + "; curT=" + currentValueTime + "; prevT=" + previousValueTime);
       return derivative;
     }
   }
@@ -58,5 +53,4 @@ public class DerivativeValueModel implements ValueModel<Float> {
   protected long now() {
     return System.currentTimeMillis();
   }
-
 }

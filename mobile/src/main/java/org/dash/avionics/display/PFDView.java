@@ -13,9 +13,14 @@ import android.view.ViewTreeObserver;
 
 import com.google.common.base.Preconditions;
 
-import org.dash.avionics.display.widget.Widget;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.EView;
+import org.androidannotations.api.BackgroundExecutor;
 
+@EView
 public class PFDView extends SurfaceView {
+
+  private PFD widget;
 
   private class FrameRateCounter {
     private static final int REPORTING_INTERVAL = 100;
@@ -64,19 +69,12 @@ public class PFDView extends SurfaceView {
   private void initialize() {
     Preconditions.checkState(mModel != null);
 
-    final Widget widget = new PFD(getResources(), getContext().getAssets(), mModel,
+    widget = new PFD(getResources(), getContext().getAssets(), mModel,
         getWidth(), getHeight());
     final Runnable drawCallback = new Runnable() {
       @Override
       public void run() {
-        Canvas canvas = getHolder().lockCanvas();
-        if (canvas != null) {
-          canvas.drawColor(Color.BLACK);
-          long start = System.currentTimeMillis();
-          widget.draw(canvas);
-          mFrameRateCounter.addRenderingTime(System.currentTimeMillis() - start);
-          getHolder().unlockCanvasAndPost(canvas);
-        }
+        draw();
       }
     };
 
@@ -88,17 +86,39 @@ public class PFDView extends SurfaceView {
       @Override
       public void surfaceCreated(SurfaceHolder holder) {
         // Force a first draw (likely only with invalid data).
-        drawCallback.run();
+        draw();
 
         // Subscribe to future data updates.
         mModel.addUpdateListener(drawCallback);
+
+        periodicRedraw();
       }
 
       @Override
       public void surfaceDestroyed(SurfaceHolder holder) {
         Log.v("PFDView", "Surface destroyed");
+        BackgroundExecutor.cancelAll("watchdog", true);
         mModel.removeUpdateListener(drawCallback);
       }
     });
+  }
+
+  private synchronized void draw() {
+    Canvas canvas = getHolder().lockCanvas();
+    if (canvas != null) {
+      canvas.drawColor(Color.BLACK);
+      long start = System.currentTimeMillis();
+      widget.draw(canvas);
+      mFrameRateCounter.addRenderingTime(System.currentTimeMillis() - start);
+      getHolder().unlockCanvasAndPost(canvas);
+    }
+  }
+
+  @SuppressWarnings("InfiniteRecursion")
+  @Background(id = "watchdog", delay = 200)
+  void periodicRedraw() {
+    // Ensure a redraw even if we get no data.
+    draw();
+    periodicRedraw();
   }
 }

@@ -6,7 +6,7 @@
              android:keepScreenOn="true"
              tools:context="org.dash.avionics.display.PFDActivity">
 
-  <org.dash.avionics.display.PFDView
+  <org.dash.avionics.display.PFDView_
       android:id="@+id/pfdView"
       android:layout_width="match_parent"
       android:layout_height="match_parent" />

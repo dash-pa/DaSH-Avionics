@@ -33,7 +33,7 @@ import java.util.Set;
 @EBean
 public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateTape.Model,
     MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener {
-  private static final long DEFAULT_MAX_DATA_AGE_MS = 20 * 1000;
+  private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
   // ANT+ needs larger delays
   private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
 
