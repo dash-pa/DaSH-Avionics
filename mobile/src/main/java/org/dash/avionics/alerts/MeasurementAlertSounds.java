@@ -64,6 +64,11 @@ public class MeasurementAlertSounds implements MeasurementAlerter.AlertListener 
       loadSound(AlertType.LOW_SPEED, R.raw.slow, 100, -1);
       loadSound(AlertType.HIGH_SPEED, R.raw.fast, 50, -1);
       loadSound(AlertType.UNKNOWN_SPEED, R.raw.speed, 1, 5);
+
+      // Only repeat low height 5 times so we're not too annoying during landing.
+      loadSound(AlertType.LOW_HEIGHT, R.raw.low, 90, 5);
+      loadSound(AlertType.HIGH_HEIGHT, R.raw.high, 30, -1);
+      loadSound(AlertType.UNKNOWN_HEIGHT, R.raw.height, 1, 5);
     }
   }
 

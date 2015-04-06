@@ -117,6 +117,11 @@ public class MeasurementAlerter
       float speedMargin = settings.getMaxSpeedDelta().get();
       expectedRanges.put(MeasurementType.SPEED,
           Range.closed(targetSpeed - speedMargin, targetSpeed + speedMargin));
+
+      float targetHeight = settings.getTargetHeight().get();
+      float heightMargin = settings.getMaxHeightDelta().get();
+      expectedRanges.put(MeasurementType.HEIGHT,
+          Range.closed(targetHeight - heightMargin, targetHeight + heightMargin));
     }
   }
 
