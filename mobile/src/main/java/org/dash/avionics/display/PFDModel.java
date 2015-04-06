@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.google.common.collect.Sets;
 
@@ -33,7 +32,7 @@ import java.util.Set;
 @EBean
 public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateTape.Model,
     MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener {
-  private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
+  private static final long DEFAULT_MAX_DATA_AGE_MS = 20 * 1000;
   // ANT+ needs larger delays
   private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
 
@@ -43,8 +42,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
       new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
   private final SettableValueModel<Float> altitudeModel =
       new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
-  private final SettableValueModel<Aircraft> aircraftModel =
-      new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
+  private final SettableValueModel<Aircraft> aircraftModel = new SettableValueModel<>();
 
   private final Set<Runnable> updateListeners = Sets.newConcurrentHashSet();
   @RootContext Context context;
@@ -97,9 +95,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
         break;
     }
 
-    for (Runnable listener : updateListeners) {
-      listener.run();
-    }
+    notifyUpdateListeners();
   }
 
   @Override
@@ -110,7 +106,6 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   private void updateAircraftModel() {
     final float targetSpeed = CruiseSpeedCalculator.getCruiseAirspeedFromSettings(settings);
     final float speedMargin = settings.getMaxSpeedDelta().get();
-    Log.d("PFDModel", "Target speed set to " + targetSpeed);
     aircraftModel.setValue(new Aircraft() {
       @Override
       public float getVs1() {
@@ -127,6 +122,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
         return targetSpeed + speedMargin * 2;
       }
     });
+    notifyUpdateListeners();
   }
 
   public void addUpdateListener(Runnable callback) {
@@ -135,5 +131,11 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
 
   public void removeUpdateListener(Runnable callback) {
     updateListeners.remove(callback);
+  }
+
+  private synchronized void notifyUpdateListeners() {
+    for (Runnable listener : updateListeners) {
+      listener.run();
+    }
   }
 }

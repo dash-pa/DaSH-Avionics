@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 
 import org.dash.avionics.R;
-import org.dash.avionics.display.DisplayConfiguration;
 import org.dash.avionics.data.model.ValueModel;
+import org.dash.avionics.display.DisplayConfiguration;
 import org.dash.avionics.display.widget.Container;
 import org.dash.avionics.display.widget.FilledPolygon;
 import org.dash.avionics.display.widget.Rectangle;
