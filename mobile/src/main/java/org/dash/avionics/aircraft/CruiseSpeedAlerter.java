@@ -38,6 +38,7 @@ public class CruiseSpeedAlerter
 
   public void start(CruiseSpeedAlertListener listener) {
     this.listener = listener;
+    this.alerting = false;
 
     PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(this);
     updateSettings();

@@ -23,24 +23,24 @@ public class CruiseSpeedAlertSounds implements CruiseSpeedAlerter.CruiseSpeedAle
   private int fastStreamId = -1;
 
   public void start() {
-    // TODO: Doesn't work after a stop()/start() (e.g. after going to preferences and back)
-    AudioAttributes audioAttributes = new AudioAttributes.Builder()
-        .setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)
-        .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
-        .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
-        .build();
-    soundPool = new SoundPool.Builder()
-        .setMaxStreams(1)
-        .setAudioAttributes(audioAttributes)
-        .build();
-    fastSoundId = soundPool.load(context, R.raw.fast, 1);
-    slowSoundId = soundPool.load(context, R.raw.slow, 2);
+    if (soundPool == null) {
+      AudioAttributes audioAttributes = new AudioAttributes.Builder()
+          .setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)
+          .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+          .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
+          .build();
+      soundPool = new SoundPool.Builder()
+          .setMaxStreams(1)
+          .setAudioAttributes(audioAttributes)
+          .build();
+      fastSoundId = soundPool.load(context, R.raw.fast, 1);
+      slowSoundId = soundPool.load(context, R.raw.slow, 2);
+    }
   }
 
   public void stop() {
     synchronized (soundPool) {
-      stopSlowSound();
-      stopFastSound();
+      stopAllSounds();
     }
   }
 
@@ -48,6 +48,8 @@ public class CruiseSpeedAlertSounds implements CruiseSpeedAlerter.CruiseSpeedAle
   public void onLowSpeed() {
     synchronized (soundPool) {
       stopFastSound();
+
+      audio.requestAudioFocus(null, AudioManager.STREAM_ALARM, AudioManager.AUDIOFOCUS_GAIN);
       slowStreamId = soundPool.play(slowSoundId, 1.0f, 1.0f, 2, -1, 1.0f);
     }
   }
@@ -56,6 +58,8 @@ public class CruiseSpeedAlertSounds implements CruiseSpeedAlerter.CruiseSpeedAle
   public void onHighSpeed() {
     synchronized (soundPool) {
       stopSlowSound();
+
+      audio.requestAudioFocus(null, AudioManager.STREAM_ALARM, AudioManager.AUDIOFOCUS_GAIN);
       fastStreamId = soundPool.play(fastSoundId, 1.0f, 1.0f, 2, -1, 1.0f);
     }
   }
@@ -63,8 +67,7 @@ public class CruiseSpeedAlertSounds implements CruiseSpeedAlerter.CruiseSpeedAle
   @Override
   public void onStoppedAlerting() {
     synchronized (soundPool) {
-      stopSlowSound();
-      stopFastSound();
+      stopAllSounds();
     }
   }
 
@@ -80,5 +83,11 @@ public class CruiseSpeedAlertSounds implements CruiseSpeedAlerter.CruiseSpeedAle
       soundPool.stop(slowStreamId);
       slowStreamId = -1;
     }
+  }
+
+  private void stopAllSounds() {
+    stopSlowSound();
+    stopFastSound();
+    audio.abandonAudioFocus(null);
   }
 }
