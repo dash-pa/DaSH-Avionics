@@ -33,14 +33,6 @@ public class PFDActivity extends Activity {
   @Bean
   MeasurementAlertSounds speedAlertSounds;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    serviceIntent = SensorsService_.intent(getApplicationContext()).get();
-    startService(serviceIntent);
-  }
-
   @AfterViews
   protected void setModel() {
     pfdView.setModel(model);
@@ -64,10 +56,15 @@ public class PFDActivity extends Activity {
     speedAlertSounds.start();
     speedAlerter.registerListener(speedAlertSounds);
     speedAlerter.start();
+
+    serviceIntent = SensorsService_.intent(getApplicationContext()).get();
+    startService(serviceIntent);
   }
 
   @Override
   protected void onPause() {
+    stopService(serviceIntent);
+
     speedAlerter.unregisterListener(speedAlertSounds);
     speedAlerter.stop();
     speedAlertSounds.stop();
@@ -80,13 +77,6 @@ public class PFDActivity extends Activity {
   protected void hideSystemUi() {
     //noinspection ConstantConditions
     getActionBar().hide();
-  }
-
-  @Override
-  protected void onDestroy() {
-    stopService(serviceIntent);
-
-    super.onDestroy();
   }
 
   @LongClick(R.id.pfdView)

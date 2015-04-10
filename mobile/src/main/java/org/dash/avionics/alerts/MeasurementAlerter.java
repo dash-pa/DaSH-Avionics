@@ -86,6 +86,7 @@ public class MeasurementAlerter
 
   public void start() {
     activeAlerts.clear();
+    hadNormalReadings.clear();
 
     // Assume no initial staleness.
     long now = System.currentTimeMillis();

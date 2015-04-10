@@ -43,11 +43,20 @@
 
   <!-- Settings -->
   <string name="title_activity_aircraft_settings">Aircraft settings</string>
+
+  <string name="settings_cat_mission">Mission settings</string>
+  <string name="settings_cat_sensors">Sensor settings</string>
+
   <string name="settings_pilot_weight">Pilot weight (kg)</string>
   <string name="settings_alert_speed_delta">Speed error to alert at (km/h)</string>
   <string name="settings_no_cruise_speed">"Select an aircraft first</string>
   <string name="settings_target_height">Target height (m)</string>
   <string name="settings_alert_height_delta">Height error to alert at (m)</string>
+  <string name="settings_sensor_arduino">Enable Arduino</string>
+  <string name="settings_sensor_viiiiva">Enable Viiiiva</string>
+  <string name="settings_sensor_antplus">Enable ANT+</string>
+  <string name="settings_sensor_gps">Enable GPS</string>
+  <string name="settings_sensor_fake">Enable fake data</string>
 
   <string name="settings_key_aircraft_type">aircraft_type</string>
   <string name="settings_key_speed_delta">speed_delta</string>
@@ -55,6 +64,11 @@
   <string name="settings_key_cruise_speed">cruise_speed</string>
   <string name="settings_key_target_height">height_delta</string>
   <string name="settings_key_height_delta">alert_height_delta</string>
+  <string name="settings_key_sensor_arduino">sensors_enable_arduino</string>
+  <string name="settings_key_sensor_viiiiva">sensors_enable_viiiiva</string>
+  <string name="settings_key_sensor_antplus">sensors_enable_antplus</string>
+  <string name="settings_key_sensor_gps">sensors_enable_gps</string>
+  <string name="settings_key_sensor_fake">sensors_enable_fake</string>
 
   <string-array name="settings_aircraft_type_names">
     <item>V5</item>

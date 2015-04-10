@@ -1,36 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <ListPreference
-      android:entries="@array/settings_aircraft_type_names"
-      android:entryValues="@array/settings_aircraft_types"
-      android:key="@string/settings_key_aircraft_type"
-      android:title="Aircraft type"/>
+  <PreferenceCategory android:title="@string/settings_cat_mission">
 
-  <EditTextPreference
-      android:key="@string/settings_key_speed_delta"
-      android:numeric="decimal"
-      android:title="@string/settings_alert_speed_delta"/>
+    <ListPreference
+        android:entries="@array/settings_aircraft_type_names"
+        android:entryValues="@array/settings_aircraft_types"
+        android:key="@string/settings_key_aircraft_type"
+        android:title="Aircraft type"/>
 
-  <EditTextPreference
-      android:key="@string/settings_key_pilot_weight"
-      android:numeric="decimal"
-      android:title="@string/settings_pilot_weight"/>
+    <EditTextPreference
+        android:key="@string/settings_key_speed_delta"
+        android:numeric="decimal"
+        android:title="@string/settings_alert_speed_delta"/>
 
-  <Preference
-      android:key="@string/settings_key_cruise_speed"
-      android:persistent="false"
-      android:enabled="false"
-      android:title="Target cruise speed"/>
+    <EditTextPreference
+        android:key="@string/settings_key_pilot_weight"
+        android:numeric="decimal"
+        android:title="@string/settings_pilot_weight"/>
 
-  <EditTextPreference
-      android:key="@string/settings_key_target_height"
-      android:numeric="decimal"
-      android:title="@string/settings_target_height"/>
-  <EditTextPreference
-      android:key="@string/settings_key_height_delta"
-      android:numeric="decimal"
-      android:title="@string/settings_alert_height_delta"/>
+    <Preference
+        android:enabled="false"
+        android:key="@string/settings_key_cruise_speed"
+        android:persistent="false"
+        android:title="Target cruise speed"/>
 
+    <EditTextPreference
+        android:key="@string/settings_key_target_height"
+        android:numeric="decimal"
+        android:title="@string/settings_target_height"/>
+    <EditTextPreference
+        android:key="@string/settings_key_height_delta"
+        android:numeric="decimal"
+        android:title="@string/settings_alert_height_delta"/>
+
+  </PreferenceCategory>
+
+  <PreferenceCategory android:title="@string/settings_cat_sensors">
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/settings_key_sensor_arduino"
+        android:title="@string/settings_sensor_arduino"/>
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/settings_key_sensor_viiiiva"
+        android:title="@string/settings_sensor_viiiiva"/>
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/settings_key_sensor_antplus"
+        android:title="@string/settings_sensor_antplus"/>
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/settings_key_sensor_gps"
+        android:title="@string/settings_sensor_gps"/>
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/settings_key_sensor_fake"
+        android:title="@string/settings_sensor_fake"/>
+
+  </PreferenceCategory>
 
 </PreferenceScreen>
