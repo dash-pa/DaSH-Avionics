@@ -6,14 +6,17 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.PowerManager;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
+import org.androidannotations.annotations.SystemService;
 import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementStorageColumns;
 import org.dash.avionics.sensors.ant.AntSensorManager;
 import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
 import org.dash.avionics.sensors.fake.FakeSensorManager;
+import org.dash.avionics.sensors.gps.GpsSensorManager;
 import org.dash.avionics.sensors.viiiiva.ViiiivaSensorManager;
 
 @SuppressLint("Registered")
@@ -23,6 +26,7 @@ public class SensorsService extends Service implements SensorListener {
   private static final boolean USE_VIIIIVA = false;
   private static final boolean USE_ARDUINO = false;
   private static final boolean USE_ANT = false;
+  private static final boolean USE_GPS = true;
 
   /*
    * Managers for many types of sensors.
@@ -35,17 +39,27 @@ public class SensorsService extends Service implements SensorListener {
   protected FakeSensorManager fakeSensor;
   @Bean
   protected ViiiivaSensorManager vivaSensor;
+  @Bean
+  protected GpsSensorManager gpsSensor;
 
   private ContentResolver contentResolver;
+
+  @SystemService PowerManager powerManager;
+  private PowerManager.WakeLock wakeLock;
+
 
   @Override
   public void onCreate() {
     contentResolver = getContentResolver();
 
+    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "sensors");
+    wakeLock.acquire();
+
     if (USE_FAKE_DATA) fakeSensor.connect(this);
     if (USE_VIIIIVA) vivaSensor.connect(this);
     if (USE_ANT) antSensor.connect(this);
     if (USE_ARDUINO) arduinoSensor.connect(this);
+    if (USE_GPS) gpsSensor.connect(this);
   }
 
   @Override
@@ -54,6 +68,9 @@ public class SensorsService extends Service implements SensorListener {
     if (USE_VIIIIVA) vivaSensor.disconnect();
     if (USE_ANT) antSensor.disconnect();
     if (USE_ARDUINO) arduinoSensor.disconnect();
+    if (USE_GPS) gpsSensor.disconnect();
+
+    wakeLock.release();
   }
 
   @Override
