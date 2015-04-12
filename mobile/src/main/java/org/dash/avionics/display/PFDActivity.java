@@ -3,6 +3,7 @@ package org.dash.avionics.display;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -77,6 +78,8 @@ public class PFDActivity extends Activity {
   protected void hideSystemUi() {
     //noinspection ConstantConditions
     getActionBar().hide();
+
+    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
   }
 
   @LongClick(R.id.pfdView)
