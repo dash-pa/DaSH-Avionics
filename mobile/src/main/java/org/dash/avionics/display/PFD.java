@@ -5,21 +5,25 @@ import android.content.res.Resources;
 
 import org.dash.avionics.display.altitude.AltitudeTape;
 import org.dash.avionics.display.climbrate.ClimbRateTape;
+import org.dash.avionics.display.crank.CrankGauge;
 import org.dash.avionics.display.speed.SpeedTape;
 import org.dash.avionics.display.widget.Container;
 
 public class PFD extends Container {
   public PFD(Resources resources, AssetManager assets, PFDModel model,
-             final float width, final float height) {
+             float width, float height) {
     sizeTo(width, height);
 
     float instrumentGap = (float) Math.floor(width / 75);
     float altitudeTapeWidth = 0.125f * width;
     float speedTapeWidth = 0.1f * width;
     float climbRateTapeWidth = 0.05f * width;
+    float crankGaugeWidth = 0.2f * width;
     float airballWidth =
-        getWidth() - speedTapeWidth - altitudeTapeWidth - climbRateTapeWidth
-            - (3 * instrumentGap);
+        getWidth() - speedTapeWidth - altitudeTapeWidth - climbRateTapeWidth - crankGaugeWidth
+            - (4 * instrumentGap);
+
+    float crankGaugeHeight = .4f * height;
 
     DisplayConfiguration config = new DisplayConfiguration(width, height, resources, assets);
 
@@ -30,8 +34,16 @@ public class PFD extends Container {
         speedTapeWidth, getHeight(),
         model));
     x += speedTapeWidth + instrumentGap;
+
+    mChildren.add(new CrankGauge(
+        config, resources, assets,
+        x, 0f,
+        crankGaugeWidth, crankGaugeHeight, model));
+    x += crankGaugeWidth + instrumentGap;
+
     // Skip non-existant airball
     x += airballWidth + instrumentGap;
+
     mChildren.add(new AltitudeTape(
         config, resources, assets,
         x, 0f,
