@@ -1,4 +1,4 @@
-package org.dash.avionics.display.crank;
+package org.dash.avionics.display.prop;
 
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
@@ -9,13 +9,13 @@ import org.dash.avionics.display.DisplayConfiguration;
 import org.dash.avionics.display.widget.Widget;
 
 /**
- * Displays the crank RPM value.
+ * Displays the propeller RPM value.
  */
-class CrankRpm extends Widget {
+class PropRpm extends Widget {
   private final Paint textPaint;
   private final float textSize;
 
-  public CrankRpm(DisplayConfiguration config, AssetManager assets, float x, float y, float w, float h) {
+  public PropRpm(DisplayConfiguration config, AssetManager assets, float x, float y, float w, float h) {
     super(x, y, w, h);
 
     Typeface tf = Typeface.createFromAsset(assets, config.mTextTypeface);

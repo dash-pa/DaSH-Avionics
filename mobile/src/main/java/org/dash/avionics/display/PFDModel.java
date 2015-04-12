@@ -23,6 +23,7 @@ import org.dash.avionics.data.model.ValueModel;
 import org.dash.avionics.display.altitude.AltitudeTape;
 import org.dash.avionics.display.climbrate.ClimbRateTape;
 import org.dash.avionics.display.crank.CrankGauge;
+import org.dash.avionics.display.prop.PropGauge;
 import org.dash.avionics.display.speed.SpeedTape;
 import org.dash.avionics.data.model.AircraftModel;
 
@@ -33,7 +34,7 @@ import java.util.Set;
  */
 @EBean
 public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateTape.Model,
-    MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener, CrankGauge.Model {
+    MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener, CrankGauge.Model, PropGauge.Model {
   private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
   // ANT+ needs larger delays
   private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
@@ -47,6 +48,8 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   private final RecentSettableValueModel<Float> crankRpm =
       new RecentSettableValueModel<>(ANTPLUS_MAX_DATA_AGE_MS);
   private final RecentSettableValueModel<Float> crankPower =
+      new RecentSettableValueModel<>(ANTPLUS_MAX_DATA_AGE_MS);
+  private final RecentSettableValueModel<Float> propRpm =
       new RecentSettableValueModel<>(ANTPLUS_MAX_DATA_AGE_MS);
   private final SettableValueModel<AircraftModel> aircraftModel = new SettableValueModel<>();
 
@@ -95,8 +98,13 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   }
 
   @Override
-  public ValueModel<Float> getCrankpower() {
+  public ValueModel<Float> getCrankPower() {
     return crankPower;
+  }
+
+  @Override
+  public ValueModel<Float> getPropRpm() {
+    return propRpm;
   }
 
   @Override
@@ -114,6 +122,9 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
         break;
       case POWER:
         crankPower.setValue(measurement.value);
+        break;
+      case PROP_RPM:
+        propRpm.setValue(measurement.value);
         break;
       default:
         return;

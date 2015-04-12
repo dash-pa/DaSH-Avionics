@@ -3,9 +3,12 @@ package org.dash.avionics.display;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 
+import com.google.common.base.Preconditions;
+
 import org.dash.avionics.display.altitude.AltitudeTape;
 import org.dash.avionics.display.climbrate.ClimbRateTape;
 import org.dash.avionics.display.crank.CrankGauge;
+import org.dash.avionics.display.prop.PropGauge;
 import org.dash.avionics.display.speed.SpeedTape;
 import org.dash.avionics.display.widget.Container;
 
@@ -14,16 +17,19 @@ public class PFD extends Container {
              float width, float height) {
     sizeTo(width, height);
 
-    float instrumentGap = (float) Math.floor(width / 75);
+    float instrumentGap = (float) Math.floor(width / 65);
     float altitudeTapeWidth = 0.125f * width;
     float speedTapeWidth = 0.1f * width;
     float climbRateTapeWidth = 0.05f * width;
     float crankGaugeWidth = 0.2f * width;
+    float propGaugeWidth = 0.2f * width;
     float airballWidth =
-        getWidth() - speedTapeWidth - altitudeTapeWidth - climbRateTapeWidth - crankGaugeWidth
-            - (4 * instrumentGap);
+        getWidth() - speedTapeWidth - altitudeTapeWidth - climbRateTapeWidth - crankGaugeWidth -
+            propGaugeWidth - (5 * instrumentGap);
+    Preconditions.checkState(airballWidth > 0);
 
     float crankGaugeHeight = .4f * height;
+    float propGaugeHeight = .4f * height;
 
     DisplayConfiguration config = new DisplayConfiguration(width, height, resources, assets);
 
@@ -41,6 +47,12 @@ public class PFD extends Container {
         crankGaugeWidth, crankGaugeHeight, model));
     x += crankGaugeWidth + instrumentGap;
 
+    mChildren.add(new PropGauge(
+        config, resources, assets,
+        x, 0f,
+        propGaugeWidth, propGaugeHeight, model));
+    x += propGaugeWidth + instrumentGap;
+
     // Skip non-existant airball
     x += airballWidth + instrumentGap;
 
@@ -55,5 +67,7 @@ public class PFD extends Container {
         x, 0f,
         climbRateTapeWidth, getHeight(),
         model));
+
+    setDrawAllBounds(true);
   }
 }
