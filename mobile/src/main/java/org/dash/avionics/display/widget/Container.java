@@ -36,6 +36,7 @@ public class Container extends Widget {
   }
 
   public void setDrawAllBounds(boolean draw) {
+    setDrawBounds(draw);
     for (Widget w : mChildren) {
       w.setDrawBounds(draw);
     }
