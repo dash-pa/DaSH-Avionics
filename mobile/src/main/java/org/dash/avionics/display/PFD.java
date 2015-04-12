@@ -10,6 +10,7 @@ import org.dash.avionics.display.climbrate.ClimbRateTape;
 import org.dash.avionics.display.crank.CrankGauge;
 import org.dash.avionics.display.prop.PropGauge;
 import org.dash.avionics.display.speed.SpeedTape;
+import org.dash.avionics.display.vitals.VitalsDisplay;
 import org.dash.avionics.display.widget.Container;
 
 public class PFD extends Container {
@@ -23,13 +24,15 @@ public class PFD extends Container {
     float climbRateTapeWidth = 0.05f * width;
     float crankGaugeWidth = 0.2f * width;
     float propGaugeWidth = 0.2f * width;
+    float vitalsWidth = 0.2f * width;
     float airballWidth =
         getWidth() - speedTapeWidth - altitudeTapeWidth - climbRateTapeWidth - crankGaugeWidth -
-            propGaugeWidth - (5 * instrumentGap);
+            propGaugeWidth - vitalsWidth - (6 * instrumentGap);
     Preconditions.checkState(airballWidth > 0);
 
     float crankGaugeHeight = .4f * height;
     float propGaugeHeight = .4f * height;
+    float vitalsHeight = .4f * height;
 
     DisplayConfiguration config = new DisplayConfiguration(width, height, resources, assets);
 
@@ -53,6 +56,12 @@ public class PFD extends Container {
         propGaugeWidth, propGaugeHeight, model));
     x += propGaugeWidth + instrumentGap;
 
+    mChildren.add(new VitalsDisplay(
+        config, resources, assets,
+        x, 0f,
+        vitalsWidth, vitalsHeight, model));
+    x += vitalsWidth + instrumentGap;
+
     // Skip non-existant airball
     x += airballWidth + instrumentGap;
 
@@ -67,7 +76,5 @@ public class PFD extends Container {
         x, 0f,
         climbRateTapeWidth, getHeight(),
         model));
-
-    setDrawAllBounds(true);
   }
 }

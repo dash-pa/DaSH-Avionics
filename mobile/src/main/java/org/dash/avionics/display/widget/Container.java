@@ -35,8 +35,9 @@ public class Container extends Widget {
         (getHeight() - w.getHeight()) / 2f);
   }
 
-  public void setDrawAllBounds(boolean draw) {
-    setDrawBounds(draw);
+  @Override
+  public void setDrawBounds(boolean draw) {
+    super.setDrawBounds(draw);
     for (Widget w : mChildren) {
       w.setDrawBounds(draw);
     }

@@ -26,6 +26,7 @@ import org.dash.avionics.display.crank.CrankGauge;
 import org.dash.avionics.display.prop.PropGauge;
 import org.dash.avionics.display.speed.SpeedTape;
 import org.dash.avionics.data.model.AircraftModel;
+import org.dash.avionics.display.vitals.VitalsDisplay;
 
 import java.util.Set;
 
@@ -34,7 +35,7 @@ import java.util.Set;
  */
 @EBean
 public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateTape.Model,
-    MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener, CrankGauge.Model, PropGauge.Model {
+    MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener, CrankGauge.Model, PropGauge.Model, VitalsDisplay.Model {
   private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
   // ANT+ needs larger delays
   private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
@@ -50,6 +51,8 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   private final RecentSettableValueModel<Float> crankPower =
       new RecentSettableValueModel<>(ANTPLUS_MAX_DATA_AGE_MS);
   private final RecentSettableValueModel<Float> propRpm =
+      new RecentSettableValueModel<>(ANTPLUS_MAX_DATA_AGE_MS);
+  private final RecentSettableValueModel<Float> heartRate =
       new RecentSettableValueModel<>(ANTPLUS_MAX_DATA_AGE_MS);
   private final SettableValueModel<AircraftModel> aircraftModel = new SettableValueModel<>();
 
@@ -108,6 +111,11 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   }
 
   @Override
+  public ValueModel<Float> getHeartRate() {
+    return heartRate;
+  }
+
+  @Override
   public void onNewMeasurement(Measurement measurement) {
     switch (measurement.type) {
       case SPEED:
@@ -126,6 +134,8 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
       case PROP_RPM:
         propRpm.setValue(measurement.value);
         break;
+      case HEART_BEAT:
+        heartRate.setValue(measurement.value);
       default:
         return;
     }
