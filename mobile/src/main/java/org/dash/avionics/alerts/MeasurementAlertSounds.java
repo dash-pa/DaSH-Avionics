@@ -4,7 +4,6 @@ import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.util.Log;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -65,8 +64,8 @@ public class MeasurementAlertSounds implements MeasurementAlerter.AlertListener 
       loadSound(AlertType.HIGH_SPEED, R.raw.fast, 50, -1);
       loadSound(AlertType.UNKNOWN_SPEED, R.raw.speed, 1, 5);
 
-      // Only repeat low height 5 times so we're not too annoying during landing.
-      loadSound(AlertType.LOW_HEIGHT, R.raw.low, 90, 5);
+      // Only repeat low height 15 times so we're not too annoying during landing.
+      loadSound(AlertType.LOW_HEIGHT, R.raw.low, 90, 15);
       loadSound(AlertType.HIGH_HEIGHT, R.raw.high, 30, -1);
       loadSound(AlertType.UNKNOWN_HEIGHT, R.raw.height, 1, 5);
     }
@@ -79,7 +78,6 @@ public class MeasurementAlertSounds implements MeasurementAlerter.AlertListener 
 
   @Override
   public void onAlertsChanged(Set<AlertType> types) {
-    Log.d("Sounds", "New alerts=" + types);
     Sets.SetView<AlertType> removed = Sets.difference(activeStreamIds.keySet(), types);
     Sets.SetView<AlertType> added = Sets.difference(types, activeStreamIds.keySet());
 
