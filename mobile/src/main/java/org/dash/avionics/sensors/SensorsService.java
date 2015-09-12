@@ -17,6 +17,7 @@ import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementStorageColumns;
 import org.dash.avionics.sensors.ant.AntSensorManager;
 import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
+import org.dash.avionics.sensors.attitude.AttitudeSensorManager;
 import org.dash.avionics.sensors.fake.FakeSensorManager;
 import org.dash.avionics.sensors.gps.GpsSensorManager;
 import org.dash.avionics.sensors.viiiiva.ViiiivaSensorManager;
@@ -40,6 +41,8 @@ public class SensorsService extends Service implements SensorListener {
   protected ViiiivaSensorManager vivaSensor;
   @Bean
   protected GpsSensorManager gpsSensor;
+  @Bean
+  protected AttitudeSensorManager attitudeSensor;
 
   private ContentResolver contentResolver;
 
@@ -59,6 +62,7 @@ public class SensorsService extends Service implements SensorListener {
     if (preferences.isAntPlusEnabled().get()) antSensor.connect(this);
     if (preferences.isArduinoEnabled().get()) arduinoSensor.connect(this);
     if (preferences.isGpsEnabled().get()) gpsSensor.connect(this);
+    if (preferences.isAttitudeEnabled().get()) attitudeSensor.connect(this);
   }
 
   @Override
@@ -69,6 +73,7 @@ public class SensorsService extends Service implements SensorListener {
     if (preferences.isAntPlusEnabled().get()) antSensor.disconnect();
     if (preferences.isArduinoEnabled().get()) arduinoSensor.disconnect();
     if (preferences.isGpsEnabled().get()) gpsSensor.disconnect();
+    if (preferences.isAttitudeEnabled().get()) attitudeSensor.disconnect();
 
     wakeLock.release();
   }

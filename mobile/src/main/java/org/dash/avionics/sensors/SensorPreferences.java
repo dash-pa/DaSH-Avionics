@@ -19,6 +19,9 @@ public interface SensorPreferences {
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_gps)
   boolean isGpsEnabled();
 
+  @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_attitude)
+  boolean isAttitudeEnabled();
+
   @DefaultBoolean(value=true, keyRes = R.string.settings_key_sensor_fake)
   boolean isFakeDataEnabled();
 

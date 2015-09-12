@@ -10,6 +10,7 @@ import org.dash.avionics.display.climbrate.ClimbRateTape;
 import org.dash.avionics.display.crank.CrankGauge;
 import org.dash.avionics.display.prop.PropGauge;
 import org.dash.avionics.display.speed.SpeedTape;
+import org.dash.avionics.display.track.TrackDrawing;
 import org.dash.avionics.display.vitals.VitalsDisplay;
 import org.dash.avionics.display.widget.Container;
 
@@ -25,10 +26,10 @@ public class PFD extends Container {
     float crankGaugeWidth = 0.2f * width;
     float propGaugeWidth = 0.2f * width;
     float vitalsWidth = 0.2f * width;
-    float airballWidth =
-        getWidth() - speedTapeWidth - altitudeTapeWidth - climbRateTapeWidth - crankGaugeWidth -
-            propGaugeWidth - vitalsWidth - (6 * instrumentGap);
-    Preconditions.checkState(airballWidth > 0);
+    float trackWidth =
+        getWidth() - speedTapeWidth - altitudeTapeWidth - climbRateTapeWidth -
+            Math.max(crankGaugeWidth, propGaugeWidth) - vitalsWidth - (6 * instrumentGap);
+    Preconditions.checkState(trackWidth > 0);
 
     float crankGaugeHeight = .4f * height;
     float propGaugeHeight = .4f * height;
@@ -44,26 +45,30 @@ public class PFD extends Container {
         model));
     x += speedTapeWidth + instrumentGap;
 
-    mChildren.add(new CrankGauge(
-        config, resources, assets,
-        x, 0f,
-        crankGaugeWidth, crankGaugeHeight, model));
-    x += crankGaugeWidth + instrumentGap;
-
     mChildren.add(new PropGauge(
         config, resources, assets,
         x, 0f,
         propGaugeWidth, propGaugeHeight, model));
-    x += propGaugeWidth + instrumentGap;
+
+    mChildren.add(new CrankGauge(
+        config, resources, assets,
+        x, propGaugeHeight + instrumentGap,
+        crankGaugeWidth, crankGaugeHeight, model));
+
+    x += Math.max(crankGaugeWidth, propGaugeWidth) + instrumentGap;
+
+    // TODO: Track drawing should be the bottommost layer.
+    mChildren.add(new TrackDrawing(
+        config, resources, assets,
+        x, 0f,
+        trackWidth, height, model));
+    x += trackWidth + instrumentGap;
 
     mChildren.add(new VitalsDisplay(
         config, resources, assets,
         x, 0f,
         vitalsWidth, vitalsHeight, model));
     x += vitalsWidth + instrumentGap;
-
-    // Skip non-existant airball
-    x += airballWidth + instrumentGap;
 
     mChildren.add(new AltitudeTape(
         config, resources, assets,

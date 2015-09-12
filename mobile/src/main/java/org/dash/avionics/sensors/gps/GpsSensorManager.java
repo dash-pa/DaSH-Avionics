@@ -15,8 +15,8 @@ import org.dash.avionics.sensors.SensorManager;
 
 @EBean
 public class GpsSensorManager implements SensorManager, LocationListener {
-  private static final long GPS_MIN_TIME_MS = 2000L;
-  private static final float GPS_MIN_DISTANCE_M = 1.0f;
+  private static final long GPS_MIN_TIME_MS = 500L;
+  private static final float GPS_MIN_DISTANCE_M = .1f;
 
   @SystemService
   LocationManager locationManager;
@@ -39,15 +39,26 @@ public class GpsSensorManager implements SensorManager, LocationListener {
 
   @Override
   public void onLocationChanged(Location location) {
+//    Log.d("GpsSensors", "Loc: " + location);
     long when = location.getTime();
+    float latitude = (float) location.getLatitude();
+    float longitude = (float) location.getLongitude();
+    float altitude = (float) location.getAltitude();
+    float speed = (float) location.getSpeed();
+    float bearing = (float) location.getBearing();
+    while (bearing > 360.0f) bearing -= 360.0f;
+    while (bearing < 0.0f) bearing += 360.0f;
+
     updater.onNewMeasurement(
-        new Measurement(MeasurementType.GPS_LATITUDE, (float) location.getLatitude(), when));
+        new Measurement(MeasurementType.GPS_LATITUDE, latitude, when));
     updater.onNewMeasurement(
-        new Measurement(MeasurementType.GPS_LONGITUDE, (float) location.getLongitude(), when));
+        new Measurement(MeasurementType.GPS_LONGITUDE, longitude, when));
     updater.onNewMeasurement(
-        new Measurement(MeasurementType.GPS_ALTITUDE, (float) location.getAltitude(), when));
+        new Measurement(MeasurementType.GPS_ALTITUDE, altitude, when));
     updater.onNewMeasurement(
-        new Measurement(MeasurementType.GPS_SPEED, (float) location.getSpeed(), when));
+        new Measurement(MeasurementType.GPS_SPEED, speed, when));
+    updater.onNewMeasurement(
+        new Measurement(MeasurementType.GPS_BEARING, bearing, when));
   }
 
   @Override

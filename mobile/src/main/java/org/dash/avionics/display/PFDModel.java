@@ -2,9 +2,12 @@ package org.dash.avionics.display;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import org.androidannotations.annotations.EBean;
@@ -15,6 +18,7 @@ import org.dash.avionics.aircraft.CruiseSpeedCalculator;
 import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementListener;
 import org.dash.avionics.data.MeasurementObserver;
+import org.dash.avionics.data.model.AircraftModel;
 import org.dash.avionics.data.model.DerivativeValueModel;
 import org.dash.avionics.data.model.MissionAircraftModel;
 import org.dash.avionics.data.model.RecentSettableValueModel;
@@ -25,9 +29,10 @@ import org.dash.avionics.display.climbrate.ClimbRateTape;
 import org.dash.avionics.display.crank.CrankGauge;
 import org.dash.avionics.display.prop.PropGauge;
 import org.dash.avionics.display.speed.SpeedTape;
-import org.dash.avionics.data.model.AircraftModel;
+import org.dash.avionics.display.track.TrackDrawing;
 import org.dash.avionics.display.vitals.VitalsDisplay;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,16 +40,20 @@ import java.util.Set;
  */
 @EBean
 public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateTape.Model,
-    MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener, CrankGauge.Model, PropGauge.Model, VitalsDisplay.Model {
+    MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener, CrankGauge.Model,
+    PropGauge.Model, VitalsDisplay.Model, TrackDrawing.Model {
   private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
   // ANT+ needs larger delays
   private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
+  private static final long LOCATION_HISTORY_AGE_MS = 10 * 60 * 1000;
 
   private final DerivativeValueModel climbRateModel =
       new DerivativeValueModel(DEFAULT_MAX_DATA_AGE_MS);
   private final SettableValueModel<Float> speedModel =
       new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
   private final SettableValueModel<Float> altitudeModel =
+      new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
+  private final RecentSettableValueModel<Float> heading =
       new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
   private final RecentSettableValueModel<Float> crankRpm =
       new RecentSettableValueModel<>(ANTPLUS_MAX_DATA_AGE_MS);
@@ -96,6 +105,11 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   }
 
   @Override
+  public ValueModel<Float> getHeading() {
+    return heading;
+  }
+
+  @Override
   public ValueModel<Float> getCrankRpm() {
     return crankRpm;
   }
@@ -136,6 +150,15 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
         break;
       case HEART_BEAT:
         heartRate.setValue(measurement.value);
+      case GPS_ALTITUDE:
+      case GPS_LATITUDE:
+      case GPS_LONGITUDE:
+      case GPS_SPEED:
+      case GPS_BEARING:
+        updateGpsPosition(measurement);
+        break;
+      case HEADING:
+        heading.setValue(measurement.value);
       default:
         return;
     }
@@ -169,6 +192,81 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   private synchronized void notifyUpdateListeners() {
     for (Runnable listener : updateListeners) {
       listener.run();
+    }
+  }
+
+  private Long lastGpsTimestamp;
+  private Float lastGpsLatitude;
+  private Float lastGpsLongitude;
+  private Float lastGpsAltitude;
+  private Float lastGpsSpeed;
+  private Float lastGpsBearing;
+  private List<Location> locationHistory = Lists.newLinkedList();
+
+  private void updateGpsPosition(Measurement measurement) {
+    if (lastGpsTimestamp != null && measurement.timestamp != lastGpsTimestamp) {
+      lastGpsTimestamp = null;
+      lastGpsLatitude = null;
+      lastGpsLongitude = null;
+      lastGpsAltitude = null;
+      lastGpsSpeed = null;
+      lastGpsBearing = null;
+    }
+
+    lastGpsTimestamp = measurement.timestamp;
+
+    switch (measurement.type) {
+      case GPS_LATITUDE:
+        lastGpsLatitude = measurement.value;
+        break;
+      case GPS_LONGITUDE:
+        lastGpsLongitude = measurement.value;
+        break;
+      case GPS_ALTITUDE:
+        lastGpsAltitude = measurement.value;
+        break;
+      case GPS_SPEED:
+        lastGpsSpeed = measurement.value;
+        break;
+      case GPS_BEARING:
+        lastGpsBearing = measurement.value;
+        break;
+      default:
+        Log.w("PFDModel", "Unexpected GPS type: " + measurement.type);
+        return;
+    }
+
+    if (lastGpsLatitude != null && lastGpsLongitude != null && lastGpsAltitude != null &&
+        lastGpsSpeed != null && lastGpsBearing != null) {
+      Location loc = new Location("GPS");
+      loc.setTime(measurement.timestamp);
+      loc.setLatitude(lastGpsLatitude);
+      loc.setLongitude(lastGpsLongitude);
+      loc.setAltitude(lastGpsAltitude);
+      loc.setSpeed(lastGpsSpeed);
+      loc.setBearing(lastGpsBearing);
+
+      addLocationToHistory(loc);
+    }
+  }
+
+  private void addLocationToHistory(Location loc) {
+    long now = System.currentTimeMillis();
+    synchronized (locationHistory) {
+      locationHistory.add(loc);
+
+      // Clean up old locations.
+      while (!locationHistory.isEmpty() &&
+          now - locationHistory.get(0).getTime() > LOCATION_HISTORY_AGE_MS) {
+        locationHistory.remove(0);
+      }
+    }
+  }
+
+  @Override
+  public List<Location> getLocationHistory() {
+    synchronized (locationHistory) {
+      return Lists.newArrayList(locationHistory);
     }
   }
 }

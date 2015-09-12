@@ -59,6 +59,11 @@
         android:title="@string/settings_sensor_gps"/>
 
     <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/settings_key_sensor_attitude"
+        android:title="@string/settings_sensor_attitude"/>
+
+    <CheckBoxPreference
         android:defaultValue="true"
         android:key="@string/settings_key_sensor_fake"
         android:title="@string/settings_sensor_fake"/>

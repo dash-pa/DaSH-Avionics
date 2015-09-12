@@ -14,8 +14,7 @@ import java.util.Random;
 public class FakeSensorManager implements SensorManager {
 
   private static final MeasurementType[] TYPES_TO_GENERATE = {
-      MeasurementType.PROP_RPM, MeasurementType.CRANK_RPM,
-      MeasurementType.HEIGHT, MeasurementType.SPEED};
+      MeasurementType.HEADING};
   public static final int FAKE_DATA_DELAY = 100;
   public static final int MAX_VALUE = 100;
 
@@ -39,13 +38,34 @@ public class FakeSensorManager implements SensorManager {
   @Background(id = "data", delay = FAKE_DATA_DELAY)
   public void generateFakeData() {
     MeasurementType type = TYPES_TO_GENERATE[random.nextInt(TYPES_TO_GENERATE.length)];
-    float value = random.nextFloat() * MAX_VALUE;
-    Measurement measurement = new Measurement(type, value);
-    if (updater != null) {
-      updater.onNewMeasurement(measurement);
+
+    long now = System.currentTimeMillis();
+    switch (type) {
+      case GPS_LATITUDE:
+      case GPS_LONGITUDE:
+      case GPS_ALTITUDE:
+      case GPS_SPEED:
+        // GPS measurements need to be generated together.
+        generateFakeMeasurement(MeasurementType.GPS_LATITUDE, now);
+        generateFakeMeasurement(MeasurementType.GPS_LONGITUDE, now);
+        generateFakeMeasurement(MeasurementType.GPS_ALTITUDE, now);
+        generateFakeMeasurement(MeasurementType.GPS_SPEED, now);
+        generateFakeMeasurement(MeasurementType.GPS_BEARING, now);
+        break;
+      default:
+        generateFakeMeasurement(type, now);
+        break;
     }
 
     // Go again after the delay.
     generateFakeData();
+  }
+
+  private void generateFakeMeasurement(MeasurementType type, long when) {
+    float value = random.nextFloat() * MAX_VALUE;
+    Measurement measurement = new Measurement(type, value, when);
+    if (updater != null) {
+      updater.onNewMeasurement(measurement);
+    }
   }
 }
