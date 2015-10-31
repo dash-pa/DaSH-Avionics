@@ -39,7 +39,7 @@ public class VitalsDisplay extends Container {
     mChildren.add(icon);
     currentY += iconHeight + padding;
 
-    hr = new HeartRate(config, assets, 0.05f * w, currentY, 0.9f * w, hrHeight);
+    hr = new HeartRate(config, assets, 0.05f * w, currentY, 0.9f * w, hrHeight, model);
     mChildren.add(hr);
     currentY += hrHeight;
   }

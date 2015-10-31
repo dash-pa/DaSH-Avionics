@@ -40,7 +40,7 @@ public class PropGauge extends Container {
     mChildren.add(icon);
     currentY += iconHeight + padding;
 
-    rpm = new PropRpm(config, assets, currentX, currentY, 0.9f * w, rpmHeight);
+    rpm = new PropRpm(config, assets, currentX, currentY, 0.9f * w, rpmHeight, model);
     mChildren.add(rpm);
     currentY += rpmHeight;
   }

@@ -43,11 +43,11 @@ public class CrankGauge extends Container {
     mChildren.add(icon);
     currentY += iconHeight + padding;
 
-    rpm = new CrankRpm(config, assets, currentX, currentY, 0.9f * w, rpmHeight);
+    rpm = new CrankRpm(config, assets, currentX, currentY, 0.9f * w, rpmHeight, model);
     mChildren.add(rpm);
     currentY += rpmHeight;
 
-    power = new CrankPower(config, assets, currentX, currentY, 0.9f * w, powerHeight);
+    power = new CrankPower(config, assets, currentX, currentY, 0.9f * w, powerHeight, model);
     mChildren.add(power);
     currentY += powerHeight;
   }

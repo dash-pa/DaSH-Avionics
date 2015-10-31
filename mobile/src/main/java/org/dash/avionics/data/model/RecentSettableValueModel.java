@@ -15,11 +15,6 @@ public class RecentSettableValueModel<T> extends SettableValueModel<T> {
   }
 
   @Override
-  public void setValue(T value) {
-    super.setValue(value);
-  }
-
-  @Override
   public boolean isValid() {
     return super.isValid() && now() - getValueTime() < maxAge;
   }
