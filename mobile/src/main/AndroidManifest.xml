@@ -23,7 +23,7 @@
         android:configChanges="orientation|keyboardHidden|screenSize"
         android:immersive="true"
         android:label="@string/app_name"
-        android:screenOrientation="landscape"
+        android:screenOrientation="sensorLandscape"
         android:theme="@style/FullscreenTheme">
 
       <!-- <intent-filter> -->
@@ -38,7 +38,7 @@
         android:configChanges="orientation|keyboardHidden|screenSize"
         android:immersive="true"
         android:label="@string/title_activity_pfd"
-        android:screenOrientation="landscape"
+        android:screenOrientation="sensorLandscape"
         android:theme="@style/FullscreenTheme">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -51,7 +51,7 @@
         android:configChanges="orientation|keyboardHidden|screenSize"
         android:immersive="true"
         android:label="@string/app_name"
-        android:screenOrientation="landscape"
+        android:screenOrientation="sensorLandscape"
         android:theme="@style/FullscreenTheme"/>
 
     <service android:name=".sensors.SensorsService_"/>
