@@ -71,6 +71,13 @@
   <string name="settings_key_sensor_gps">sensors_enable_gps</string>
   <string name="settings_key_sensor_attitude">sensors_enable_attitude</string>
   <string name="settings_key_sensor_fake">sensors_enable_fake</string>
+  <string name="settings_cat_data">Data logging</string>
+  <string name="settings_data_dump">Dump logged data to file</string>
+  <string name="settings_data_erase">Delete ALL logged data</string>
+  <string name="settings_data_erase_summary">Deletes all logged data except dumped files</string>
+  <string name="settings_data_dump_summary">Dump all logged data to a file</string>
+  <string name="settings_action_erase_data">settings_action_erase_data</string>
+  <string name="settings_action_dump_data">settings_action_dump_data</string>
 
   <string-array name="settings_aircraft_type_names">
     <item>V5</item>
