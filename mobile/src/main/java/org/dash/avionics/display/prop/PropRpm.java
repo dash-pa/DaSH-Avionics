@@ -37,7 +37,7 @@ class PropRpm extends Widget {
   @Override
   protected void drawContents(Canvas canvas) {
     ValueModel<Float> value = model.getPropRpm();
-    String text = (value.isValid() ? value.getValue() : "XXX") + "rpm";
+    String text = (value.isValid() ? String.format("%3.0f", value.getValue()) : "XXX") + "rpm";
     canvas.drawText(text, getX() + 0.95f * getWidth(), textSize, textPaint);
   }
 }

@@ -150,6 +150,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
         break;
       case HEART_BEAT:
         heartRate.setValue(measurement.value);
+        break;
       case GPS_ALTITUDE:
       case GPS_LATITUDE:
       case GPS_LONGITUDE:
@@ -159,6 +160,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
         break;
       case HEADING:
         heading.setValue(measurement.value);
+        break;
       default:
         return;
     }

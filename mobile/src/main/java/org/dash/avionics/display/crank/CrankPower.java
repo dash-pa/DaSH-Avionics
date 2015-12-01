@@ -38,7 +38,7 @@ class CrankPower extends Widget {
   @Override
   protected void drawContents(Canvas canvas) {
     ValueModel<Float> value = model.getCrankPower();
-    String text = (value.isValid() ? value.getValue() : "XXX") + "W";
+    String text = (value.isValid() ? String.format("%3.0f", value.getValue()) : "XXX") + "W";
     canvas.drawText(text, getX() + 0.77f * getWidth(), textSize, textPaint);
   }
 }

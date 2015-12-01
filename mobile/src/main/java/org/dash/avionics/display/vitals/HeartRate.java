@@ -37,7 +37,7 @@ class HeartRate extends Widget {
   @Override
   protected void drawContents(Canvas canvas) {
     ValueModel<Float> value = model.getHeartRate();
-    String text = (value.isValid() ? value.getValue() : "XXX") + "bpm";
+    String text = (value.isValid() ? String.format("%3.0f", value.getValue()) : "XXX") + "bpm";
     canvas.drawText(text, getX() + 0.95f * getWidth(), textSize, textPaint);
   }
 }

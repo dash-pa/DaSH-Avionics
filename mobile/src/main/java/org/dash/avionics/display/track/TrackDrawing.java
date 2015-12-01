@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.hardware.GeomagneticField;
 import android.location.Location;
-import android.util.Log;
 
 import org.dash.avionics.data.model.ValueModel;
 import org.dash.avionics.display.DisplayConfiguration;
@@ -56,7 +55,7 @@ public class TrackDrawing extends Widget {
   protected void drawContents(Canvas canvas) {
     List<Location> locationHistory = model.getLocationHistory();
     if (locationHistory == null || locationHistory.isEmpty()) {
-      Log.d("Track", "No history");
+//      Log.d("Track", "No history");
       return;
     }
 
