@@ -70,4 +70,16 @@
 
   </PreferenceCategory>
 
+
+  <PreferenceCategory android:title="@string/settings_cat_data">
+    <Preference android:key="@string/settings_action_dump_data"
+        android:persistent="false"
+        android:summary="@string/settings_data_dump_summary"
+        android:title="@string/settings_data_dump"/>
+    <Preference android:key="@string/settings_action_erase_data"
+        android:persistent="false"
+        android:summary="@string/settings_data_erase_summary"
+        android:title="@string/settings_data_erase"/>
+  </PreferenceCategory>
+
 </PreferenceScreen>

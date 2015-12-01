@@ -4,10 +4,14 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.dash.avionics.R;
+import org.dash.avionics.data.DataDeleter;
+import org.dash.avionics.data.files.CsvDataDumper;
 
 @EFragment
 public class AircraftSettingsFragment extends PreferenceFragment
@@ -16,6 +20,13 @@ public class AircraftSettingsFragment extends PreferenceFragment
 
   @Pref
   AircraftSettings_ settings;
+
+  @Bean
+  CsvDataDumper dumper;
+
+  @Bean
+  DataDeleter deleter;
+
   private AircraftType currentAircraftType;
   private float currentPilotWeight;
 
@@ -64,6 +75,18 @@ public class AircraftSettingsFragment extends PreferenceFragment
 
     updateDerivedValues();
 
+    return true;
+  }
+
+  @Override
+  public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+    if (getString(R.string.settings_action_dump_data).equals(preference.getKey())) {
+      dumper.dumpAllData();
+    } else if (getString(R.string.settings_action_erase_data).equals(preference.getKey())) {
+      deleter.deleteAllData();
+    } else {
+      return super.onPreferenceTreeClick(preferenceScreen, preference);
+    }
     return true;
   }
 

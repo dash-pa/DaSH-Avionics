@@ -63,8 +63,13 @@ public class MeasurementContentProvider extends ContentProvider {
   }
 
   @Override
-  public int delete(Uri uri, String where, String[] selectionArgs) {
-    throw new UnsupportedOperationException("Not implemented");
+  public int delete(Uri uri, String where, String[] whereArgs) {
+    if (getUriType(uri) != UrlType.MEASUREMENTS) {
+      Log.e("Content", "Tried to delete from an unsupported URI: " + uri);
+      return 0;
+    }
+
+    return db.delete(MeasurementStorageColumns.MEASUREMENT_TABLE_NAME, where, whereArgs);
   }
 
   @Override

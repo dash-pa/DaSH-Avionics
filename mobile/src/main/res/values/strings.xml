@@ -78,6 +78,11 @@
   <string name="settings_data_dump_summary">Dump all logged data to a file</string>
   <string name="settings_action_erase_data">settings_action_erase_data</string>
   <string name="settings_action_dump_data">settings_action_dump_data</string>
+  <string name="dump_failed">Dump failed</string>
+  <string name="dump_success">Dump successful</string>
+  <string name="dump_progress_title">Data dump in progress</string>
+  <string name="dump_progress_message">%d entries written to file</string>
+  <string name="delete_success">All database entries have been deleted!</string>
 
   <string-array name="settings_aircraft_type_names">
     <item>V5</item>
