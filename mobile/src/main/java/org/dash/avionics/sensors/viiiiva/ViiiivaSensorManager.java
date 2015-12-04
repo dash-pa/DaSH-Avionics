@@ -32,8 +32,6 @@ import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT8;
 @EBean
 public class ViiiivaSensorManager extends BluetoothGattCallback
     implements SensorManager, BluetoothAdapter.LeScanCallback {
-  private boolean characteristicsEnabled;
-
   private enum WriteDescriptorStatus {
     FAILURE, DONE, WORKING
   }
@@ -52,12 +50,22 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
   private static final UUID POWER_CHARACTERISTIC =
       UUID.fromString("00002a63-0000-1000-8000-00805f9b34fb");
 
+  // https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_speed_and_cadence.xml
+  private static final UUID CADENCE_SERVICE_UUID =
+      UUID.fromString("00001816-0000-1000-8000-00805f9b34fb");
+  // https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.csc_measurement.xml
+  private static final UUID CADENCE_CHARACTERISTIC =
+      UUID.fromString("00002a5b-0000-1000-8000-00805f9b34fb");
+
+
   private final Context context;
   private final BluetoothAdapter btadapter;
   private SensorListener listener = null;
   private BluetoothGatt gatt = null;
   private WriteDescriptorStatus writeStatus = WriteDescriptorStatus.DONE;
   private final Object writeStatusLock = new Object();
+  private boolean characteristicsEnabled;
+  private Integer previousCrankEvent;
 
   public ViiiivaSensorManager(Context context) {
     this.context = context;
@@ -150,6 +158,7 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
     synchronized (writeStatusLock) {
       if (!characteristicsEnabled) {
         characteristicsEnabled = true;
+        previousCrankEvent = null;
         enableCharacteristics();
       }
     }
@@ -162,6 +171,10 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
 
     // enable power notifications
     enableCharacteristic(POW_SERVICE_UUID, POWER_CHARACTERISTIC, "power");
+
+    // enable cadence notifications
+    // TODO(Tony): Enable and test
+//    enableCharacteristic(CADENCE_SERVICE_UUID, CADENCE_CHARACTERISTIC, "cadence");
   }
 
   private void enableCharacteristic(UUID serviceUuid, UUID characteristicUuid, String serviceName) {
@@ -271,6 +284,8 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
       handleHeartData(characteristic);
     } else if (characteristic.getUuid().equals(POWER_CHARACTERISTIC)) {
       handlePowerData(characteristic);
+    } else if (characteristic.getUuid().equals(CADENCE_CHARACTERISTIC)) {
+      handleCadenceData(characteristic);
     } else {
       Log.w("Viiiiva", "Got unknown characteristic notification: " + characteristic.getUuid());
     }
@@ -300,7 +315,6 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
     listener.onNewMeasurement(new Measurement(MeasurementType.HEART_BEAT, heartRate));
   }
 
-  // parse power data from the characteristic and set the powerMeter variable
   // https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.cycling_power_measurement.xml
   private void handlePowerData(BluetoothGattCharacteristic characteristic) {
     // The properties for this characteristic are 16-bits long, as opposed to the heart rate's properties, which are 8-bits long
@@ -314,4 +328,32 @@ public class ViiiivaSensorManager extends BluetoothGattCallback
     listener.onNewMeasurement(new Measurement(MeasurementType.POWER, power));
   }
 
+  // parse cadence data from the characteristic
+  // https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.csc_measurement.xml
+  private void handleCadenceData(BluetoothGattCharacteristic characteristic) {
+    // Before the last crank event, we had:
+    // Offset 0 - flags (1 byte)
+    // Offset 1 - Cumulative wheel revolutions (4 bytes)
+    // Offset 5 - Last wheel event time (2 bytes)
+    // Offset 7 - Cumulative crank revolutions (2 bytes)
+    Integer lastCrankEvent = characteristic.getIntValue(FORMAT_UINT16, 9);
+    if (lastCrankEvent == null) {
+      Log.w("Viiiiva", "Invalid crank event time " + Arrays.toString(characteristic.getValue()));
+      return;
+    }
+
+    if (previousCrankEvent != null) {
+      if (previousCrankEvent > lastCrankEvent) {
+        // The time rolled over, go negative to get a sensible diff.
+        previousCrankEvent -= 0xFFFF;
+      }
+
+      float crankPeriodSeconds =
+          (lastCrankEvent.floatValue() - previousCrankEvent.floatValue()) / 1024.0f;
+      float crankFrequencyRpm = 60.0f / crankPeriodSeconds;
+
+      listener.onNewMeasurement(new Measurement(MeasurementType.CRANK_RPM, crankFrequencyRpm));
+    }
+    previousCrankEvent = lastCrankEvent;
+  }
 }
