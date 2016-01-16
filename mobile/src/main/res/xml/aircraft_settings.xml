@@ -10,6 +10,12 @@
         android:title="Aircraft type"/>
 
     <EditTextPreference
+        android:key="@string/settings_key_crank_prop_ratio"
+        android:numeric="decimal"
+        android:defaultValue="34"
+        android:title="@string/settings_crank_prop_ratio"/>
+
+    <EditTextPreference
         android:key="@string/settings_key_speed_delta"
         android:numeric="decimal"
         android:title="@string/settings_alert_speed_delta"/>
@@ -69,7 +75,6 @@
         android:title="@string/settings_sensor_fake"/>
 
   </PreferenceCategory>
-
 
   <PreferenceCategory android:title="@string/settings_cat_data">
     <Preference android:key="@string/settings_action_dump_data"

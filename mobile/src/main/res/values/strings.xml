@@ -60,6 +60,7 @@
   <string name="settings_sensor_fake">Enable fake data</string>
 
   <string name="settings_key_aircraft_type">aircraft_type</string>
+  <string name="settings_key_crank_prop_ratio">crank_to_prop_ratio</string>
   <string name="settings_key_speed_delta">speed_delta</string>
   <string name="settings_key_pilot_weight">pilot_weight</string>
   <string name="settings_key_cruise_speed">cruise_speed</string>
@@ -83,6 +84,7 @@
   <string name="dump_progress_title">Data dump in progress</string>
   <string name="dump_progress_message">%d entries written to file</string>
   <string name="delete_success">All database entries have been deleted!</string>
+  <string name="settings_crank_prop_ratio">Crank-to-propeller ratio (60:X)</string>
 
   <string-array name="settings_aircraft_type_names">
     <item>V5</item>
