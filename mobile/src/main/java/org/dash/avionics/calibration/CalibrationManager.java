@@ -10,6 +10,10 @@ public class CalibrationManager {
   @Pref
   protected CalibrationStorage_ storage;
 
+  private int lastPropIdx = -1;
+  private int lastPilotIdx = -1;
+  private CalibrationProfile lastProfile;
+
   public CalibrationProfile loadActiveProfile() {
     return loadProfile(storage.getActivePropProfile().get(), storage.getActivePilotProfile().get());
   }
@@ -23,8 +27,14 @@ public class CalibrationManager {
   }
 
   public CalibrationProfile loadProfile(int propIdx, int pilotIdx) {
+    if (propIdx == lastPropIdx && pilotIdx == lastPilotIdx) {
+      return lastProfile;
+    }
+
     storage.getActivePropProfile().put(propIdx);
     storage.getActivePilotProfile().put(pilotIdx);
+    lastPropIdx = propIdx;
+    lastPilotIdx = pilotIdx;
 
     FloatPrefField crankSpeedRatio = storage.crankSpeedRatio();
 
@@ -64,6 +74,7 @@ public class CalibrationManager {
     }
 
     IntPrefField aircraft = storage.getActiveAircraft();
-    return new CalibrationProfile(aircraft, propRatio, crankSpeedRatio, pilotWeight);
+    lastProfile = new CalibrationProfile(aircraft, propRatio, crankSpeedRatio, pilotWeight);
+    return lastProfile;
   }
 }

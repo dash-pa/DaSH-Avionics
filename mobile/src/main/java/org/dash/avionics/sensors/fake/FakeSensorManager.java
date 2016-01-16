@@ -14,7 +14,7 @@ import java.util.Random;
 public class FakeSensorManager implements SensorManager {
 
   private static final MeasurementType[] TYPES_TO_GENERATE = {MeasurementType.CRANK_RPM,
-      MeasurementType.PROP_RPM, MeasurementType.POWER, MeasurementType.HEART_BEAT,
+      MeasurementType.IMPELLER_RPM, MeasurementType.POWER, MeasurementType.HEART_BEAT,
       MeasurementType.HEADING, MeasurementType.SPEED, MeasurementType.HEIGHT};
   public static final int FAKE_DATA_DELAY = 100;
   public static final int MAX_VALUE = 100;

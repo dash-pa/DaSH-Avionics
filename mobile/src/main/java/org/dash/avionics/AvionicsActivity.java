@@ -46,7 +46,7 @@ public class AvionicsActivity extends Activity
     MAX_DATA_AGES_MS.put(MeasurementType.CRANK_RPM, DEFAULT_MAX_DATA_AGE_MS);
     MAX_DATA_AGES_MS.put(MeasurementType.HEADING, DEFAULT_MAX_DATA_AGE_MS);
     MAX_DATA_AGES_MS.put(MeasurementType.HEIGHT, DEFAULT_MAX_DATA_AGE_MS);
-    MAX_DATA_AGES_MS.put(MeasurementType.SPEED, DEFAULT_MAX_DATA_AGE_MS);
+//    MAX_DATA_AGES_MS.put(MeasurementType.SPEED, DEFAULT_MAX_DATA_AGE_MS);
 
     MAX_DATA_AGES_MS.put(MeasurementType.POWER, ANTPLUS_MAX_DATA_AGE_MS);
     MAX_DATA_AGES_MS.put(MeasurementType.HEART_BEAT, ANTPLUS_MAX_DATA_AGE_MS);
@@ -87,7 +87,7 @@ public class AvionicsActivity extends Activity
     viewsByType.put(MeasurementType.POWER, powerView);
     viewsByType.put(MeasurementType.HEART_BEAT, heartView);
     viewsByType.put(MeasurementType.HEADING, headingView);
-    viewsByType.put(MeasurementType.SPEED, speedView);
+//    viewsByType.put(MeasurementType.SPEED, speedView);
     viewsByType.put(MeasurementType.HEIGHT, heightView);
   }
 
@@ -171,10 +171,11 @@ public class AvionicsActivity extends Activity
   }
 
   private void updateDerivedValues(Measurement update) {
-    if (update.type == MeasurementType.PROP_RPM) {
+    if (update.type == MeasurementType.IMPELLER_RPM) {
+      Log.d("Bla", "Updating derived measurement");
       float speed = update.value * calibration.getPropRatio();
-      onNewMeasurement(new Measurement(MeasurementType.SPEED, speed,
-          update.timestamp));
+//      onNewMeasurement(new Measurement(MeasurementType.SPEED, speed,
+//          update.timestamp));
     }
   }
 

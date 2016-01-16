@@ -6,8 +6,10 @@ import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.api.BackgroundExecutor;
+import org.dash.avionics.calibration.CalibrationManager;
 import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementType;
 import org.dash.avionics.sensors.SensorListener;
@@ -22,6 +24,8 @@ import java.util.UUID;
 public class ArduinoSensorManager implements SensorManager {
   private InputStream arduinoOutput;
   private BluetoothSocket socket;
+
+  @Bean protected CalibrationManager calibrationManager;
 
   @Background(serial = "arduino-loop")
   @Override
@@ -175,12 +179,20 @@ public class ArduinoSensorManager implements SensorManager {
     String valueStr = line.substring(splitPos + 1);
     float value = parseLineValue(valueStr);
 
+    if (MeasurementType.SPEED == type) {
+      value = getCalibratedSpeed(value);
+    }
+
     return new Measurement(type, value);
+  }
+
+  private float getCalibratedSpeed(float impellerRpm) {
+    return impellerRpm * calibrationManager.loadActiveProfile().getPropRatio();
   }
 
   private MeasurementType parseLineType(String typeStr) {
     if ("RPM".equals(typeStr)) {
-      return MeasurementType.PROP_RPM;
+      return MeasurementType.SPEED;
     }
     if ("ALT".equals(typeStr)) {
       return MeasurementType.HEIGHT;

@@ -68,7 +68,7 @@ public class PropCalibrationActivity extends Activity implements
 
     observer = new MeasurementObserver(new Handler(), getContentResolver(),
         this);
-    propRatio = new RatioTracker(MeasurementType.SPEED, MeasurementType.PROP_RPM);
+    propRatio = new RatioTracker(MeasurementType.SPEED, MeasurementType.IMPELLER_RPM);
 
     //noinspection ConstantConditions
     getActionBar().hide();
@@ -99,7 +99,7 @@ public class PropCalibrationActivity extends Activity implements
   public void onNewMeasurement(Measurement measurement) {
     TextView viewToUpdate;
     switch (measurement.type) {
-      case PROP_RPM:
+      case IMPELLER_RPM:
         viewToUpdate = propRpmView;
         propRatio.addDenominator(measurement);
         break;
