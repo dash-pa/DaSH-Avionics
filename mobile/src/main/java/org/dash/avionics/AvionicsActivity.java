@@ -12,7 +12,6 @@ import android.widget.TextView;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Fullscreen;
 import org.androidannotations.annotations.UiThread;
@@ -173,7 +172,7 @@ public class AvionicsActivity extends Activity
   private void updateDerivedValues(Measurement update) {
     if (update.type == MeasurementType.IMPELLER_RPM) {
       Log.d("Bla", "Updating derived measurement");
-      float speed = update.value * calibration.getPropRatio();
+      float speed = update.value * calibration.getImpellerRatio();
 //      onNewMeasurement(new Measurement(MeasurementType.SPEED, speed,
 //          update.timestamp));
     }
@@ -212,8 +211,8 @@ public class AvionicsActivity extends Activity
     }
   }
 
-  @Click(R.id.speedView)
-  public void onSpeedClicked() {
-    PropCalibrationActivity_.intent(this).start();
-  }
+//  @Click(R.id.speedView)
+//  public void onSpeedClicked() {
+//    ImpellerCalibrationActivity_.intent(this).start();
+//  }
 }

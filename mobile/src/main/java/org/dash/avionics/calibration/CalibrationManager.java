@@ -10,51 +10,52 @@ public class CalibrationManager {
   @Pref
   protected CalibrationStorage_ storage;
 
-  private int lastPropIdx = -1;
+  private int lastImpellerIdx = -1;
   private int lastPilotIdx = -1;
   private CalibrationProfile lastProfile;
 
   public CalibrationProfile loadActiveProfile() {
-    return loadProfile(storage.getActivePropProfile().get(), storage.getActivePilotProfile().get());
+    return loadProfile(storage.getActiveImpellerProfile().get(), storage.getActivePilotProfile().get
+        ());
   }
 
   public CalibrationProfile loadPilotProfile(int pilotIdx) {
-    return loadProfile(storage.getActivePropProfile().get(), pilotIdx);
+    return loadProfile(storage.getActiveImpellerProfile().get(), pilotIdx);
   }
 
-  public CalibrationProfile loadPropProfile(int propIdx) {
-    return loadProfile(propIdx, storage.getActivePilotProfile().get());
+  public CalibrationProfile loadImpellerProfile(int impellerIdx) {
+    return loadProfile(impellerIdx, storage.getActivePilotProfile().get());
   }
 
-  public CalibrationProfile loadProfile(int propIdx, int pilotIdx) {
-    if (propIdx == lastPropIdx && pilotIdx == lastPilotIdx) {
+  public CalibrationProfile loadProfile(int impellerIdx, int pilotIdx) {
+    if (impellerIdx == lastImpellerIdx && pilotIdx == lastPilotIdx) {
       return lastProfile;
     }
 
-    storage.getActivePropProfile().put(propIdx);
+    storage.getActiveImpellerProfile().put(impellerIdx);
     storage.getActivePilotProfile().put(pilotIdx);
-    lastPropIdx = propIdx;
+    lastImpellerIdx = impellerIdx;
     lastPilotIdx = pilotIdx;
 
     FloatPrefField crankSpeedRatio = storage.crankSpeedRatio();
 
-    FloatPrefField propRatio;
-    switch (propIdx) {
+    FloatPrefField impellerRatio;
+    switch (impellerIdx) {
       case 0:
-        propRatio = storage.propSpeedFactor1();
+        impellerRatio = storage.impellerSpeedFactor1();
         break;
       case 1:
-        propRatio = storage.propSpeedFactor2();
+        impellerRatio = storage.impellerSpeedFactor2();
         break;
       case 2:
-        propRatio = storage.propSpeedFactor3();
+        impellerRatio = storage.impellerSpeedFactor3();
         break;
       case 3:
-        propRatio = storage.propSpeedFactor4();
+        impellerRatio = storage.impellerSpeedFactor4();
         break;
       default:
-        throw new IllegalArgumentException("Bad prop profile index: "
-            + propIdx);
+        throw new IllegalArgumentException("Bad impeller profile index: "
+            + impellerIdx);
     }
 
     FloatPrefField pilotWeight;
@@ -70,11 +71,11 @@ public class CalibrationManager {
         break;
       default:
         throw new IllegalArgumentException("Bad pilot profile index: "
-            + propIdx);
+            + pilotIdx);
     }
 
     IntPrefField aircraft = storage.getActiveAircraft();
-    lastProfile = new CalibrationProfile(aircraft, propRatio, crankSpeedRatio, pilotWeight);
+    lastProfile = new CalibrationProfile(aircraft, impellerRatio, crankSpeedRatio, pilotWeight);
     return lastProfile;
   }
 }

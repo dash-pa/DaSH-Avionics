@@ -21,4 +21,8 @@ public interface AircraftSettings {
 
   @DefaultFloat(value = 2.0f, keyRes = R.string.settings_key_height_delta)
   float getMaxHeightDelta();
+
+  @DefaultFloat(60f/34f)
+  float crankToPropellerRatio();
+
 }

@@ -31,11 +31,11 @@ import java.util.Locale;
 @Fullscreen
 @EActivity(R.layout.activity_calibration)
 @SuppressLint("Registered")
-public class PropCalibrationActivity extends Activity implements
+public class ImpellerCalibrationActivity extends Activity implements
     MeasurementListener {
 
   @ViewById
-  TextView knownSpeedView, propRpmView, calculatedSpeedView,
+  TextView knownSpeedView, impellerRpmView, calculatedSpeedView,
       immediateRatioView, averageRatioView, usedRatioView;
 
   private MeasurementObserver observer;
@@ -45,17 +45,17 @@ public class PropCalibrationActivity extends Activity implements
 
   private CalibrationProfile calibration;
 
-  private RatioTracker propRatio;
+  private RatioTracker impellerRatio;
 
   @Click
   protected void useImmediateButton() {
-    calibration.setPropRatio(propRatio.getLastRatio());
+    calibration.setImpellerRatio(impellerRatio.getLastRatio());
     updateRatios();
   }
 
   @Click
   protected void useAverageButton() {
-    calibration.setPropRatio(propRatio.getMaxTimeAverage());
+    calibration.setImpellerRatio(impellerRatio.getMaxTimeAverage());
     updateRatios();
   }
 
@@ -68,7 +68,7 @@ public class PropCalibrationActivity extends Activity implements
 
     observer = new MeasurementObserver(new Handler(), getContentResolver(),
         this);
-    propRatio = new RatioTracker(MeasurementType.SPEED, MeasurementType.IMPELLER_RPM);
+    impellerRatio = new RatioTracker(MeasurementType.SPEED, MeasurementType.IMPELLER_RPM);
 
     //noinspection ConstantConditions
     getActionBar().hide();
@@ -100,8 +100,8 @@ public class PropCalibrationActivity extends Activity implements
     TextView viewToUpdate;
     switch (measurement.type) {
       case IMPELLER_RPM:
-        viewToUpdate = propRpmView;
-        propRatio.addDenominator(measurement);
+        viewToUpdate = impellerRpmView;
+        impellerRatio.addDenominator(measurement);
         break;
       case CRANK_RPM:
         viewToUpdate = knownSpeedView;
@@ -109,7 +109,7 @@ public class PropCalibrationActivity extends Activity implements
         // Transform crank RPM into speed
         measurement = new Measurement(MeasurementType.SPEED, measurement.value * calibration.getCrankSpeedRatio(), measurement.timestamp);
 
-        propRatio.addNumerator(measurement);
+        impellerRatio.addNumerator(measurement);
         break;
       default:
         return;
@@ -135,11 +135,11 @@ public class PropCalibrationActivity extends Activity implements
 
   @UiThread
   protected void updateRatios() {
-    float ratio = calibration.getPropRatio();
+    float ratio = calibration.getImpellerRatio();
     setValue(ratio, usedRatioView);
-    setValue(propRatio.getLastDenominator() * ratio, calculatedSpeedView);
-    setValue(propRatio.getLastRatio(), immediateRatioView);
-    setValue(propRatio.getMaxTimeAverage(), averageRatioView);
+    setValue(impellerRatio.getLastDenominator() * ratio, calculatedSpeedView);
+    setValue(impellerRatio.getLastRatio(), immediateRatioView);
+    setValue(impellerRatio.getMaxTimeAverage(), averageRatioView);
   }
 
   private int getProfileIndex(View button) {
@@ -166,7 +166,7 @@ public class PropCalibrationActivity extends Activity implements
   }
 
   private void changeProfile(int profileIdx) {
-    calibration = calibrationManager.loadPropProfile(profileIdx);
-    usedRatioView.setText(Float.toString(calibration.getPropRatio()));
+    calibration = calibrationManager.loadImpellerProfile(profileIdx);
+    usedRatioView.setText(Float.toString(calibration.getImpellerRatio()));
   }
 }

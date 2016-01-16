@@ -27,7 +27,7 @@
   <!-- CALIBRATION -->
   <string name="calibration_known_speed">Known speed</string>
   <string name="calibration_calculated_speed">Calculated speed</string>
-  <string name="calibration_prop_rpm">Propeller RPM</string>
+  <string name="calibration_impeller_rpm">Impeller RPM</string>
   <string name="calibration_immediate_ratio">Instant ratio</string>
   <string name="calibration_5sec_ratio">5-sec average ratio</string>
   <string name="calibration_current_ratio">Used ratio</string>

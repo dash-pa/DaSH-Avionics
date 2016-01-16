@@ -48,7 +48,7 @@
       </intent-filter>
     </activity>
     <activity
-        android:name=".PropCalibrationActivity_"
+        android:name=".ImpellerCalibrationActivity_"
         android:configChanges="orientation|keyboardHidden|screenSize"
         android:immersive="true"
         android:label="@string/app_name"

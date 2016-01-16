@@ -13,19 +13,19 @@ interface CalibrationStorage {
   int getActiveAircraft();
 
   @DefaultInt(0)
-  int getActivePropProfile();
+  int getActiveImpellerProfile();
 
   @DefaultFloat(0.01375f)
-  float propSpeedFactor1();
+  float impellerSpeedFactor1();
 
   @DefaultFloat(0.01375f)
-  float propSpeedFactor2();
+  float impellerSpeedFactor2();
 
   @DefaultFloat(0.01375f)
-  float propSpeedFactor3();
+  float impellerSpeedFactor3();
 
   @DefaultFloat(0.01375f)
-  float propSpeedFactor4();
+  float impellerSpeedFactor4();
 
   // Circunference = 1.497m
   // Front gear = 34

@@ -7,13 +7,14 @@ import org.dash.avionics.aircraft.AircraftType;
 public class CalibrationProfile {
 
   private final IntPrefField activeAircraft;
-  private final FloatPrefField propRatio;
+  private final FloatPrefField impellerRatio;
   private final FloatPrefField crankSpeedRatio;
   private final FloatPrefField pilotWeight;
 
-  CalibrationProfile(IntPrefField activeAircraft, FloatPrefField propRatio, FloatPrefField crankSpeedRatio, FloatPrefField pilotWeight) {
+  CalibrationProfile(IntPrefField activeAircraft, FloatPrefField impellerRatio, FloatPrefField
+      crankSpeedRatio, FloatPrefField pilotWeight) {
     this.activeAircraft = activeAircraft;
-    this.propRatio = propRatio;
+    this.impellerRatio = impellerRatio;
     this.crankSpeedRatio = crankSpeedRatio;
     this.pilotWeight = pilotWeight;
   }
@@ -26,18 +27,17 @@ public class CalibrationProfile {
     activeAircraft.put(acft.ordinal());
   }
 
-  public float getPropRatio() {
-    return propRatio.get();
+  public float getImpellerRatio() {
+    return impellerRatio.get();
   }
 
-  public void setPropRatio(float value) {
-    propRatio.put(value);
+  public void setImpellerRatio(float value) {
+    impellerRatio.put(value);
   }
 
   public float getCrankSpeedRatio() {
     return crankSpeedRatio.get();
   }
-
   public void setCrankSpeedRatio(float value) {
     crankSpeedRatio.put(value);
   }

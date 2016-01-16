@@ -187,7 +187,7 @@ public class ArduinoSensorManager implements SensorManager {
   }
 
   private float getCalibratedSpeed(float impellerRpm) {
-    return impellerRpm * calibrationManager.loadActiveProfile().getPropRatio();
+    return impellerRpm * calibrationManager.loadActiveProfile().getImpellerRatio();
   }
 
   private MeasurementType parseLineType(String typeStr) {
