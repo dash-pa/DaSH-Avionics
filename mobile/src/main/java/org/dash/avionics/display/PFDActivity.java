@@ -7,6 +7,7 @@ import android.view.View;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Fullscreen;
 import org.androidannotations.annotations.LongClick;
@@ -85,5 +86,10 @@ public class PFDActivity extends Activity {
   @LongClick(R.id.pfdView)
   protected void onLongClickI() {
     AircraftSettingsActivity_.intent(this).start();
+  }
+
+  @Click(R.id.pfdView)
+  protected void onClickUI() {
+    pfdView.onPFDClicked();
   }
 }

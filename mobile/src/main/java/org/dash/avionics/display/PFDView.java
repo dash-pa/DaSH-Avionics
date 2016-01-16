@@ -121,4 +121,8 @@ public class PFDView extends SurfaceView {
     draw();
     periodicRedraw();
   }
+
+  public void onPFDClicked() {
+    widget.onPFDClicked();
+  }
 }
