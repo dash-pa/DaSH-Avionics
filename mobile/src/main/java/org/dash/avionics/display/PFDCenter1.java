@@ -43,7 +43,7 @@ public class PFDCenter1 extends Container {
     mChildren.add(new CrankGauge(
         config, resources, assets,
         x, propGaugeHeight + instrumentGap,
-        crankGaugeWidth, crankGaugeHeight, model));
+        crankGaugeWidth, crankGaugeHeight, false, model));
 
     x += Math.max(crankGaugeWidth, propGaugeWidth) + instrumentGap;
 
@@ -59,7 +59,5 @@ public class PFDCenter1 extends Container {
         x, 0f,
         vitalsWidth, vitalsHeight, model));
     x += vitalsWidth + instrumentGap;
-
-    setDrawBounds(true);
   }
 }

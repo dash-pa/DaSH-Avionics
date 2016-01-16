@@ -24,7 +24,7 @@ class CrankPower extends Widget {
 
     Typeface tf = Typeface.createFromAsset(assets, config.mTextTypeface);
 
-    textSize = .25f * w;
+    textSize = .2f * w;
 
     textPaint = new Paint();
     textPaint.setColor(config.mTextColor);
@@ -32,13 +32,12 @@ class CrankPower extends Widget {
     textPaint.setTextSize(textSize);
     textPaint.setTextAlign(Paint.Align.RIGHT);
     textPaint.setAntiAlias(true);
-
   }
 
   @Override
   protected void drawContents(Canvas canvas) {
     ValueModel<Float> value = model.getCrankPower();
     String text = (value.isValid() ? String.format("%3.0f", value.getValue()) : "XXX") + "W";
-    canvas.drawText(text, getX() + 0.77f * getWidth(), textSize, textPaint);
+    canvas.drawText(text, 0.77f * getWidth(), textSize, textPaint);
   }
 }

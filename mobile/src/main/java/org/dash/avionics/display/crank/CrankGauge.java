@@ -24,32 +24,53 @@ public class CrankGauge extends Container {
 
   public CrankGauge(
       DisplayConfiguration config, Resources res, AssetManager assets,
-      float x, float y, float w, float h,
+      float x, float y, float w, float h, boolean largeRpm,
       final Model model) {
     moveTo(x, y);
     sizeTo(w, h);
 
-    float padding = .05f * h;
-    float iconHeight = .4f * h;
-    float rpmHeight = .25f * h;
-    float powerHeight = .25f * h;
-    Preconditions.checkState(padding + iconHeight + rpmHeight + powerHeight <= h);
+    float padding;
+    float rpmHeight;
+    float iconHeight;
+    float iconWidth;
+    float powerHeight;
+    float powerWidth;
+    if (largeRpm) {
+      padding = .03f * h;
+      rpmHeight = .4f * h;
+      iconHeight = .24f * h;
+      iconWidth = .2f * w;
+      powerHeight = .12f * h;
+      powerWidth = 0.4f * w;
+    } else {
+      padding = .05f * h;
+      rpmHeight = .25f * h;
+      iconHeight = .4f * h;
+      iconWidth = .5f * w;
+      powerHeight = .25f * h;
+      powerWidth = 0.9f * w;
+    }
+    Preconditions.checkState(2 * padding + iconHeight + rpmHeight + powerHeight <= h);
 
-    float currentX = .05f * w;
     float currentY = padding;
     icon = new CrankIcon(config);
-    icon.moveTo(.25f * w, currentY);
-    icon.sizeTo(.5f * w, iconHeight);
+    icon.moveTo(centerX(w, iconWidth), currentY);
+    icon.sizeTo(iconWidth, iconHeight);
     mChildren.add(icon);
     currentY += iconHeight + padding;
 
-    rpm = new CrankRpm(config, assets, currentX, currentY, 0.9f * w, rpmHeight, model);
+    rpm = new CrankRpm(config, assets, centerX(w, 0.9f*w), currentY, 0.9f * w, rpmHeight, model);
     mChildren.add(rpm);
-    currentY += rpmHeight;
+    currentY += rpmHeight + padding;
 
-    power = new CrankPower(config, assets, currentX, currentY, 0.9f * w, powerHeight, model);
+    power = new CrankPower(config, assets, centerX(w, powerWidth), currentY, powerWidth, powerHeight,
+        model);
     mChildren.add(power);
     currentY += powerHeight;
+  }
+
+  private static float centerX(float totalWidth, float widgetWidth) {
+    return (.5f * totalWidth) - (widgetWidth / 2f);
   }
 }
 

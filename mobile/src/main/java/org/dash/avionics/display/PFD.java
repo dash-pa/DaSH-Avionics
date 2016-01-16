@@ -2,6 +2,7 @@ package org.dash.avionics.display;
 
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.util.Log;
 
 import com.google.common.collect.Lists;
 
@@ -15,6 +16,8 @@ import java.util.List;
 
 public class PFD extends Container {
   private final List<Widget> centers = Lists.newArrayList();
+  private final int centersIdx;
+  private int currentCenter;
 
   public PFD(Resources resources, AssetManager assets, PFDModel model,
              float width, float height) {
@@ -37,6 +40,9 @@ public class PFD extends Container {
     x += speedTapeWidth + instrumentGap;
 
     centers.add(new PFDCenter1(config, resources, assets, model, x, centerWidth, height));
+    centers.add(new PFDCenter2(config, resources, assets, model, x, centerWidth, height));
+    currentCenter = 0;
+    centersIdx = mChildren.size();
     mChildren.add(centers.get(0));
     x += centerWidth;
 
@@ -54,6 +60,8 @@ public class PFD extends Container {
   }
 
   public void onPFDClicked() {
-    // TODO: Switch center.
+    currentCenter = (currentCenter + 1) % centers.size();
+    Log.i("PFD", "Switching to center " + currentCenter);
+    mChildren.set(centersIdx, centers.get(currentCenter));
   }
 }
