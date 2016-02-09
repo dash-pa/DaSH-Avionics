@@ -132,7 +132,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   @Override
   public void onNewMeasurement(Measurement measurement) {
     switch (measurement.type) {
-      case SPEED:
+      case AIRSPEED:
         speedModel.setValue(measurement.value);
         break;
       case HEIGHT:

@@ -21,6 +21,7 @@ import org.dash.avionics.sensors.attitude.AttitudeSensorManager;
 import org.dash.avionics.sensors.fake.FakeSensorManager;
 import org.dash.avionics.sensors.gps.GpsSensorManager;
 import org.dash.avionics.sensors.viiiiva.ViiiivaSensorManager;
+import org.dash.avionics.sensors.weathermeter.WeatherMeterSensorManager;
 
 @SuppressLint("Registered")
 @EService
@@ -43,6 +44,8 @@ public class SensorsService extends Service implements SensorListener {
   protected GpsSensorManager gpsSensor;
   @Bean
   protected AttitudeSensorManager attitudeSensor;
+  @Bean
+  protected WeatherMeterSensorManager weatherMeterSensor;
 
   private ContentResolver contentResolver;
 
@@ -59,6 +62,7 @@ public class SensorsService extends Service implements SensorListener {
 
     if (preferences.isFakeDataEnabled().get()) fakeSensor.connect(this);
     if (preferences.isViiiivaEnabled().get()) vivaSensor.connect(this);
+    if (preferences.isWeatherMeterEnabled().get()) weatherMeterSensor.connect(this);
     if (preferences.isAntPlusEnabled().get()) antSensor.connect(this);
     if (preferences.isArduinoEnabled().get()) arduinoSensor.connect(this);
     if (preferences.isGpsEnabled().get()) gpsSensor.connect(this);
@@ -70,6 +74,7 @@ public class SensorsService extends Service implements SensorListener {
     Log.i("Sensors", "Stopping");
     if (preferences.isFakeDataEnabled().get()) fakeSensor.disconnect();
     if (preferences.isViiiivaEnabled().get()) vivaSensor.disconnect();
+    if (preferences.isWeatherMeterEnabled().get()) weatherMeterSensor.disconnect();
     if (preferences.isAntPlusEnabled().get()) antSensor.disconnect();
     if (preferences.isArduinoEnabled().get()) arduinoSensor.disconnect();
     if (preferences.isGpsEnabled().get()) gpsSensor.disconnect();
