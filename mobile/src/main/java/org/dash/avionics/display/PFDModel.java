@@ -141,7 +141,7 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
         break;
       case CRANK_RPM:
         crankRpm.setValue(measurement.value);
-        propRpm.setValue(measurement.value / 60f * settings.getCrankToPropellerRatio().get());
+        propRpm.setValue(measurement.value * 60f / settings.getCrankToPropellerRatio().get());
         break;
       case POWER:
         crankPower.setValue(measurement.value);
