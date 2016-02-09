@@ -13,7 +13,6 @@ import org.dash.avionics.display.widget.Container;
  * Crank gauge indicating power and rpm.
  */
 public class CrankGauge extends Container {
-  private final CrankIcon icon;
   private final CrankRpm rpm;
   private final CrankPower power;
 
@@ -31,35 +30,40 @@ public class CrankGauge extends Container {
 
     float padding;
     float rpmHeight;
-    float iconHeight;
-    float iconWidth;
     float powerHeight;
     float powerWidth;
+    float currentY = 0f;
+
     if (largeRpm) {
       padding = .03f * h;
-      rpmHeight = .4f * h;
-      iconHeight = .24f * h;
-      iconWidth = .2f * w;
+      rpmHeight = .8f * h;
       powerHeight = .12f * h;
-      powerWidth = 0.4f * w;
+      powerWidth = .4f * w;
+
+      currentY += padding;
     } else {
       padding = .05f * h;
       rpmHeight = .25f * h;
-      iconHeight = .4f * h;
-      iconWidth = .5f * w;
-      powerHeight = .25f * h;
+      powerHeight = .2f * h;
       powerWidth = 0.9f * w;
+
+      currentY += padding;
+
+      float iconHeight = .4f * h;
+      float iconWidth = .5f * w;
+
+      CrankIcon icon = new CrankIcon(config);
+      icon.moveTo(centerX(w, iconWidth), currentY);
+      icon.sizeTo(iconWidth, iconHeight);
+      mChildren.add(icon);
+      currentY += iconHeight + padding;
     }
-    Preconditions.checkState(2 * padding + iconHeight + rpmHeight + powerHeight <= h);
 
-    float currentY = padding;
-    icon = new CrankIcon(config);
-    icon.moveTo(centerX(w, iconWidth), currentY);
-    icon.sizeTo(iconWidth, iconHeight);
-    mChildren.add(icon);
-    currentY += iconHeight + padding;
+    float totalHeight = currentY + rpmHeight + padding + powerHeight;
+    Preconditions.checkState(totalHeight <= h, "height=" + totalHeight + "; max=" + h);
 
-    rpm = new CrankRpm(config, assets, centerX(w, 0.9f*w), currentY, 0.9f * w, rpmHeight, model);
+    rpm = new CrankRpm(config, assets, centerX(w, 0.9f*w), currentY, 0.9f * w, rpmHeight, largeRpm,
+        model);
     mChildren.add(rpm);
     currentY += rpmHeight + padding;
 

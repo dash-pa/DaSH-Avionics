@@ -17,14 +17,14 @@ class CrankRpm extends Widget {
   private final float textSize;
   private final CrankGauge.Model model;
 
-  public CrankRpm(DisplayConfiguration config, AssetManager assets, float x, float y, float w, float h, CrankGauge.Model model) {
+  public CrankRpm(DisplayConfiguration config, AssetManager assets, float x, float y, float w, float h, boolean large, CrankGauge.Model model) {
     super(x, y, w, h);
 
     this.model = model;
 
     Typeface tf = Typeface.createFromAsset(assets, config.mTextTypeface);
 
-    textSize = .25f * w;
+    textSize = large ? .4f * h : .25f * w;
 
     textPaint = new Paint();
     textPaint.setColor(config.mTextColor);
