@@ -68,7 +68,7 @@ public class ImpellerCalibrationActivity extends Activity implements
 
     observer = new MeasurementObserver(new Handler(), getContentResolver(),
         this);
-    impellerRatio = new RatioTracker(MeasurementType.SPEED, MeasurementType.IMPELLER_RPM);
+    impellerRatio = new RatioTracker(MeasurementType.IMPELLER_SPEED, MeasurementType.IMPELLER_RPM);
 
     //noinspection ConstantConditions
     getActionBar().hide();
@@ -107,7 +107,8 @@ public class ImpellerCalibrationActivity extends Activity implements
         viewToUpdate = knownSpeedView;
 
         // Transform crank RPM into speed
-        measurement = new Measurement(MeasurementType.SPEED, measurement.value * calibration.getCrankSpeedRatio(), measurement.timestamp);
+        measurement = new Measurement(MeasurementType.IMPELLER_SPEED, measurement.value *
+            calibration.getCrankSpeedRatio(), measurement.timestamp);
 
         impellerRatio.addNumerator(measurement);
         break;

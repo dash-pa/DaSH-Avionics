@@ -179,7 +179,7 @@ public class ArduinoSensorManager implements SensorManager {
     String valueStr = line.substring(splitPos + 1);
     float value = parseLineValue(valueStr);
 
-    if (MeasurementType.SPEED == type) {
+    if (MeasurementType.IMPELLER_SPEED == type) {
       value = getCalibratedSpeed(value);
     }
 
@@ -192,7 +192,7 @@ public class ArduinoSensorManager implements SensorManager {
 
   private MeasurementType parseLineType(String typeStr) {
     if ("RPM".equals(typeStr)) {
-      return MeasurementType.SPEED;
+      return MeasurementType.IMPELLER_SPEED;
     }
     if ("ALT".equals(typeStr)) {
       return MeasurementType.HEIGHT;

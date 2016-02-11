@@ -45,7 +45,7 @@ public class MeasurementAlerter
   }
   private static final Map<MeasurementType, AlertTypeMapping> ALERT_MAPPING =
       ImmutableMap.<MeasurementType, AlertTypeMapping>builder()
-          .put(MeasurementType.SPEED, new AlertTypeMapping(AlertType.LOW_SPEED,
+          .put(MeasurementType.AIRSPEED, new AlertTypeMapping(AlertType.LOW_SPEED,
               AlertType.NORMAL_SPEED, AlertType.HIGH_SPEED, AlertType.UNKNOWN_SPEED))
           .put(MeasurementType.HEIGHT, new AlertTypeMapping(AlertType.LOW_HEIGHT,
               AlertType.NORMAL_HEIGHT, AlertType.HIGH_HEIGHT, AlertType.UNKNOWN_HEIGHT))
@@ -116,7 +116,7 @@ public class MeasurementAlerter
     synchronized (expectedRanges) {
       float targetSpeed = CruiseSpeedCalculator.getCruiseAirspeedFromSettings(settings);
       float speedMargin = settings.getMaxSpeedDelta().get();
-      expectedRanges.put(MeasurementType.SPEED,
+      expectedRanges.put(MeasurementType.AIRSPEED,
           Range.closed(targetSpeed - speedMargin, targetSpeed + speedMargin));
 
       float targetHeight = settings.getTargetHeight().get();
