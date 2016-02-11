@@ -57,6 +57,7 @@ public class WeatherMeterSensorManager extends BTLESensorManager {
   /** Convert RPM to km/h. */
   private float rpms2kph(int rpm) {
     if (rpm < 60) return 0.0f;
-    return 0.003693942f * rpm + 2.90074752f;
+    // Determined empirically by measuring various known airspeeds then curve fitting.
+    return 0.003016216f * rpm + 1.232432f;
   }
 }
