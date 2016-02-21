@@ -65,7 +65,7 @@ public class PFDActivity extends Activity {
 
   @Override
   protected void onPause() {
-    stopService(serviceIntent);
+//    stopService(serviceIntent);
 
     speedAlerter.unregisterListener(speedAlertSounds);
     speedAlerter.stop();
