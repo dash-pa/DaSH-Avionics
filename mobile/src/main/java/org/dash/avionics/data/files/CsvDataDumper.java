@@ -19,9 +19,13 @@ import org.dash.avionics.data.MeasurementType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @EBean
 public class CsvDataDumper {
+  private static final SimpleDateFormat TIMESTAMP_FORMAT =
+      new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
   @RootContext
   Context context;
@@ -145,8 +149,8 @@ public class CsvDataDumper {
   }
 
   private String formatTimestamp(long time) {
-    // TODO
-    return Long.toString(time);
+    Date when = new Date(time);
+    return TIMESTAMP_FORMAT.format(when);
   }
 
   private FileOutputStream getOutputStream() throws IOException {
