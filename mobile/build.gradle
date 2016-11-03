@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+def AAVersion = '3.3.2'
+
+android {
+  compileSdkVersion 22
+  buildToolsVersion "22.0.0"
+
+  defaultConfig {
+    applicationId "org.dash.avionics"
+    minSdkVersion 22
+    targetSdkVersion 22
+    versionCode 1
+    versionName "1.0"
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+}
+
+dependencies {
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  wearApp project(':wear')
+  apt "org.androidannotations:androidannotations:$AAVersion"
+  compile 'com.google.android.gms:play-services:6.5.87'
+  compile 'com.google.guava:guava:18.0'
+  compile 'com.android.support:support-v4:22.0.0'
+}
+
+apt {
+  arguments {
+    resourcePackageName android.defaultConfig.applicationId
+    androidManifestFile variant.outputs[0].processResources.manifestFile
+  }
+}

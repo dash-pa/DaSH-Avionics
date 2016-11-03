@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="antpluginlib_3-0-0-RC1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/mobile/libs/antpluginlib_3-0-0-RC1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -3,7 +3,6 @@ mobile/build
 wear/build
 local.properties
 \.gitignore
-\.gradle
+^\.gradle
 \.idea/workspace.xml
-\.idea/libraries
 \.DS_Store
