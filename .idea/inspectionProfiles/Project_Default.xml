@@ -91,6 +91,7 @@
       </option>
       <option name="ignoreClassWithParameterization" value="false" />
       <option name="ignoreThrowables" value="true" />
+      <option name="commentsAreContent" value="true" />
     </inspection_tool>
     <inspection_tool class="EnumSwitchStatementWhichMissesCases" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="ignoreSwitchStatementsWithDefault" value="true" />
