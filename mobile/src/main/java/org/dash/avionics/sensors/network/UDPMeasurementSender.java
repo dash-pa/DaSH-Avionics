@@ -33,9 +33,9 @@ public class UDPMeasurementSender implements SensorListener {
       return;
     }
 
-    byte[] encoded = MeasurementCodec.serialize(Lists.newArrayList(measurement));
     String address = preferences.getUdpSendingAddress().get();
     try {
+      byte[] encoded = MeasurementCodec.serialize(Lists.newArrayList(measurement));
       socket.send(encoded, address);
     } catch (IOException e) {
       Log.e("Dash.UDP", "Failed to send packet", e);

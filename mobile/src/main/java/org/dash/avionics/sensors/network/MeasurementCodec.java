@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.security.DigestException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,18 +30,19 @@ public class MeasurementCodec {
   private static final int SIZE_TIMESTAMP = 8;
   private static final int SIZE_TYPE = 1;
   private static final int SIZE_VALUE = 4;
-  private static final int SIZE_FULL_MEASUREMENT = SIZE_TIMESTAMP + SIZE_TYPE + SIZE_VALUE;
   // Footer
-  private static final int MD5_SIZE = 16;
+  private static final int SIZE_MD5 = 16;
+
+  private static final int SIZE_FULL_MEASUREMENT = SIZE_TIMESTAMP + SIZE_TYPE + SIZE_VALUE;
 
   private static final int MAX_COUNT = 100;
   private static final int MIN_SIZE = SIZE_VERSION+SIZE_COUNT+SIZE_FULL_MEASUREMENT+MD5_SIZE;
   private static final int MAX_SIZE = SIZE_VERSION+SIZE_COUNT + MAX_COUNT*SIZE_FULL_MEASUREMENT
       + MD5_SIZE;
 
-  public static byte[] serialize(List<Measurement> measurements) {
     ByteBuffer buffer = ByteBuffer.allocate(MAX_SIZE);
     buffer.put(SERIALIZATION_VERSION);
+  public static byte[] serialize(List<Measurement> measurements) throws IOException {
     Preconditions.checkArgument(measurements.size() < MAX_COUNT,
         "Too many measurements to serialize: " + measurements.size());
     buffer.put((byte) measurements.size());  // Count
@@ -47,15 +51,23 @@ public class MeasurementCodec {
       buffer.putInt(m.type.ordinal());
       buffer.putFloat(m.value);
     }
-    // TODO: Output proper MD5
-    buffer.put(new byte[16]);
-    return Arrays.copyOf(buffer.array(), buffer.position());
+
+    int size = buffer.position();
+    byte[] result = new byte[size + SIZE_MD5];
+    buffer.rewind();
+    buffer.get(result);
+
+    appendMD5(result, size);
+    return result;
   }
 
   public static List<Measurement> deserialize(byte[] buf) throws IOException {
     if (buf.length < MIN_SIZE) {
       throw new StreamCorruptedException("Bad datagram size: " + buf.length);
     }
+
+    byte[] actualMD5 = new byte[SIZE_MD5];
+    calculateMD5(buf, buf.length - SIZE_MD5, actualMD5, 0);
 
     ByteBuffer buffer = ByteBuffer.wrap(buf);
     byte version = buffer.get();
@@ -79,7 +91,34 @@ public class MeasurementCodec {
 
       result.add(new Measurement(type, value, timestamp));
     }
-    // TODO: Validate MD5
+
+    byte[] reportedMD5 = new byte[SIZE_MD5];
+    buffer.get(reportedMD5);
+    if (!Arrays.equals(reportedMD5, actualMD5)) {
+      throw new StreamCorruptedException("MD5s don't match.");
+    }
     return result;
+  }
+
+  private static void appendMD5(byte[] contents, int length) throws IOException {
+    calculateMD5(contents, length, contents, length);
+  }
+
+  private static void calculateMD5(byte[] inContents, int inLength, byte[] outContents, int
+      outOffset) throws IOException {
+    MessageDigest md5;
+    try {
+      md5 = MessageDigest.getInstance("MD5");
+    } catch (NoSuchAlgorithmException e) {
+      throw new UnsupportedEncodingException("Failed to calculate MD5: " + e);
+    }
+    Preconditions.checkState(md5.getDigestLength() == SIZE_MD5);
+    Preconditions.checkArgument(outContents.length >= outOffset + md5.getDigestLength());
+    md5.update(inContents, 0, inLength);
+    try {
+      md5.digest(outContents, outOffset, md5.getDigestLength());
+    } catch (DigestException e) {
+      throw new UnsupportedEncodingException("Failed to calculate MD5: " + e);
+    }
   }
 }
