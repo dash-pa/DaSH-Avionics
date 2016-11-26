@@ -5,6 +5,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
@@ -12,6 +13,13 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.dash.avionics.R;
 import org.dash.avionics.data.DataDeleter;
 import org.dash.avionics.data.files.CsvDataDumper;
+import org.dash.avionics.sensors.SensorPreferences_;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Collections;
+import java.util.List;
 
 @EFragment
 public class AircraftSettingsFragment extends PreferenceFragment
@@ -20,6 +28,9 @@ public class AircraftSettingsFragment extends PreferenceFragment
 
   @Pref
   AircraftSettings_ settings;
+
+  @Pref
+  SensorPreferences_ sensorPreferences;
 
   @Bean
   CsvDataDumper dumper;
@@ -42,7 +53,38 @@ public class AircraftSettingsFragment extends PreferenceFragment
     bindPreferenceSummary(R.string.settings_key_speed_delta, settings.getMaxSpeedDelta().get());
     bindPreferenceSummary(R.string.settings_key_target_height, settings.getTargetHeight().get());
     bindPreferenceSummary(R.string.settings_key_height_delta, settings.getMaxHeightDelta().get());
+    bindPreferenceSummary(R.string.settings_key_send_udp_address,
+        sensorPreferences.getUdpSendingAddress().get());
 
+    updateIpAddresses();
+  }
+
+  private void updateIpAddresses() {
+    StringBuffer summaryBuffer = new StringBuffer();
+    try {
+      List<NetworkInterface> interfaces = Collections.list(NetworkInterface
+          .getNetworkInterfaces());
+      for (NetworkInterface iface : interfaces) {
+        List<InetAddress> addresses = Collections.list(iface.getInetAddresses());
+        for (InetAddress addr : addresses) {
+          if (!addr.isLoopbackAddress() &&
+              !addr.isLinkLocalAddress() &&
+              !addr.isMulticastAddress()) {
+            Log.d("IFACE", "Addr: " + addr.getHostAddress());
+            if (summaryBuffer.length() > 0) {
+              summaryBuffer.append('\n');
+            }
+            summaryBuffer.append(addr.getHostAddress());
+          }
+        }
+      }
+    } catch (SocketException e) {
+      Log.w("Preferences", "Unable to get IP addresses", e);
+      return;
+    }
+
+    Preference myIp = findPreference(R.string.settings_key_my_ip);
+    myIp.setSummary(summaryBuffer.toString());
   }
 
   private void bindPreferenceSummary(int resId, Object currentValue) {

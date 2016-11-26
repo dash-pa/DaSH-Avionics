@@ -81,11 +81,6 @@
         android:title="@string/settings_sensor_attitude"/>
 
     <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="@string/settings_key_sensor_udp"
-        android:title="@string/settings_sensor_udp"/>
-
-    <CheckBoxPreference
         android:defaultValue="true"
         android:key="@string/settings_key_sensor_fake"
         android:title="@string/settings_sensor_fake"/>
@@ -99,7 +94,12 @@
         android:selectable="false"
         android:key="@string/settings_key_my_ip"
         android:persistent="false"
-        android:title="My IP address"/>
+        android:title="@string/settings_my_ip"/>
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/settings_key_sensor_udp"
+        android:title="@string/settings_sensor_udp"/>
 
     <CheckBoxPreference
         android:defaultValue="false"

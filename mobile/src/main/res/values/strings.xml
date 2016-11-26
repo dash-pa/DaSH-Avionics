@@ -97,6 +97,7 @@
   <string name="settings_send_udp">Send telemetry</string>
   <string name="settings_telemetry">Telemetry</string>
   <string name="settings_send_udp_address">IP address to send telemetry to</string>
+  <string name="settings_my_ip">My IP addresses</string>
 
   <string-array name="settings_aircraft_type_names">
     <item>V5</item>
