@@ -26,7 +26,8 @@
         android:title="@string/settings_pilot_weight"/>
 
     <Preference
-        android:enabled="false"
+        android:enabled="true"
+        android:selectable="false"
         android:key="@string/settings_key_cruise_speed"
         android:persistent="false"
         android:title="Target cruise speed"/>
@@ -80,9 +81,37 @@
         android:title="@string/settings_sensor_attitude"/>
 
     <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/settings_key_sensor_udp"
+        android:title="@string/settings_sensor_udp"/>
+
+    <CheckBoxPreference
         android:defaultValue="true"
         android:key="@string/settings_key_sensor_fake"
         android:title="@string/settings_sensor_fake"/>
+
+  </PreferenceCategory>
+
+  <PreferenceCategory android:title="@string/settings_telemetry">
+
+    <Preference
+        android:enabled="true"
+        android:selectable="false"
+        android:key="@string/settings_key_my_ip"
+        android:persistent="false"
+        android:title="My IP address"/>
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/settings_key_send_udp"
+        android:title="@string/settings_send_udp"/>
+
+    <EditTextPreference
+        android:key="@string/settings_key_send_udp_address"
+        android:inputType="textShortMessage"
+        android:digits="01234567890abcdef.:"
+        android:singleLine="true"
+        android:title="@string/settings_send_udp_address"/>
 
   </PreferenceCategory>
 

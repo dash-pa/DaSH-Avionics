@@ -42,6 +42,7 @@ public class AircraftSettingsFragment extends PreferenceFragment
     bindPreferenceSummary(R.string.settings_key_speed_delta, settings.getMaxSpeedDelta().get());
     bindPreferenceSummary(R.string.settings_key_target_height, settings.getTargetHeight().get());
     bindPreferenceSummary(R.string.settings_key_height_delta, settings.getMaxHeightDelta().get());
+
   }
 
   private void bindPreferenceSummary(int resId, Object currentValue) {

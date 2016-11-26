@@ -31,6 +31,8 @@ import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
 import org.dash.avionics.sensors.attitude.AttitudeSensorManager;
 import org.dash.avionics.sensors.fake.FakeSensorManager;
 import org.dash.avionics.sensors.gps.GpsSensorManager;
+import org.dash.avionics.sensors.network.UDPMeasurementSender;
+import org.dash.avionics.sensors.network.UDPSensorManager;
 import org.dash.avionics.sensors.viiiiva.ViiiivaSensorManager;
 import org.dash.avionics.sensors.weathermeter.KingpostSensorManager;
 import org.dash.avionics.sensors.weathermeter.WeatherMeterSensorManager;
@@ -61,6 +63,10 @@ public class SensorsService extends Service implements SensorListener {
   protected AttitudeSensorManager attitudeSensor;
   @Bean
   protected WeatherMeterSensorManager weatherMeterSensor;
+  @Bean
+  protected UDPSensorManager udpSensor;
+  @Bean
+  protected UDPMeasurementSender udpSender;
   @Bean
   protected KingpostSensorManager weatherMeterSensorKingPost;
 
@@ -183,11 +189,14 @@ public class SensorsService extends Service implements SensorListener {
     if (preferences.isArduinoEnabled().get()) builder.add(arduinoSensor);
     if (preferences.isGpsEnabled().get()) builder.add(gpsSensor);
     if (preferences.isAttitudeEnabled().get()) builder.add(attitudeSensor);
+    if (preferences.isUdpReceivingEnabled().get()) builder.add(udpSensor);
     return builder.build();
   }
 
   @Override
   public void onNewMeasurement(Measurement update) {
+    udpSender.onNewMeasurement(update);
+
     ContentValues values = new ContentValues();
     values.put(MeasurementStorageColumns.VALUE_TYPE, update.type.ordinal());
     values.put(MeasurementStorageColumns.VALUE_TIMESTAMP, update.timestamp);

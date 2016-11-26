@@ -75,7 +75,11 @@
   <string name="settings_key_sensor_antplus">sensors_enable_antplus</string>
   <string name="settings_key_sensor_gps">sensors_enable_gps</string>
   <string name="settings_key_sensor_attitude">sensors_enable_attitude</string>
+  <string name="settings_key_sensor_udp">sensors_enable_udp</string>
   <string name="settings_key_sensor_fake">sensors_enable_fake</string>
+  <string name="settings_key_send_udp">send_udp</string>
+  <string name="settings_key_my_ip">my_ip</string>
+  <string name="settings_key_send_udp_address">send_udp_address</string>
   <string name="settings_cat_data">Data logging</string>
   <string name="settings_data_dump">Dump logged data to file</string>
   <string name="settings_data_erase">Delete ALL logged data</string>
@@ -89,6 +93,10 @@
   <string name="dump_progress_message">%d entries written to file</string>
   <string name="delete_success">All database entries have been deleted!</string>
   <string name="settings_crank_prop_ratio">Crank-to-propeller ratio (60:X)</string>
+  <string name="settings_sensor_udp">Receive telemetry</string>
+  <string name="settings_send_udp">Send telemetry</string>
+  <string name="settings_telemetry">Telemetry</string>
+  <string name="settings_send_udp_address">IP address to send telemetry to</string>
 
   <string-array name="settings_aircraft_type_names">
     <item>V5</item>

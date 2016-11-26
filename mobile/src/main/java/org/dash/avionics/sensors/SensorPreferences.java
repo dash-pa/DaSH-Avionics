@@ -1,6 +1,7 @@
 package org.dash.avionics.sensors;
 
 import org.androidannotations.annotations.sharedpreferences.DefaultBoolean;
+import org.androidannotations.annotations.sharedpreferences.DefaultString;
 import org.androidannotations.annotations.sharedpreferences.SharedPref;
 import org.dash.avionics.R;
 
@@ -27,6 +28,14 @@ public interface SensorPreferences {
 
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_attitude)
   boolean isAttitudeEnabled();
+
+  @DefaultBoolean(value=false, keyRes = R.string.settings_key_send_udp)
+  boolean isUdpSendingEnabled();
+  @DefaultString(value="", keyRes = R.string.settings_key_send_udp_address)
+  String getUdpSendingAddress();
+
+  @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_udp)
+  boolean isUdpReceivingEnabled();
 
   @DefaultBoolean(value=true, keyRes = R.string.settings_key_sensor_fake)
   boolean isFakeDataEnabled();
