@@ -61,6 +61,11 @@
 
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="@string/settings_key_sensor_kingpost"
+        android:title="@string/settings_sensor_kingpost"/>
+
+    <CheckBoxPreference
+        android:defaultValue="false"
         android:key="@string/settings_key_sensor_antplus"
         android:title="@string/settings_sensor_antplus"/>
 

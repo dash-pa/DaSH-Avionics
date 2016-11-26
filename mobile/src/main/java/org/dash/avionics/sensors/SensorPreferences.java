@@ -16,6 +16,9 @@ public interface SensorPreferences {
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_weathermeter)
   boolean isWeatherMeterEnabled();
 
+  @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_kingpost)
+  boolean isKingpostMeterEnabled();
+
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_antplus)
   boolean isAntPlusEnabled();
 
