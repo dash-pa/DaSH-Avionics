@@ -32,6 +32,7 @@ import org.dash.avionics.sensors.attitude.AttitudeSensorManager;
 import org.dash.avionics.sensors.fake.FakeSensorManager;
 import org.dash.avionics.sensors.gps.GpsSensorManager;
 import org.dash.avionics.sensors.viiiiva.ViiiivaSensorManager;
+import org.dash.avionics.sensors.weathermeter.KingpostSensorManager;
 import org.dash.avionics.sensors.weathermeter.WeatherMeterSensorManager;
 
 @SuppressLint("Registered")
@@ -60,6 +61,8 @@ public class SensorsService extends Service implements SensorListener {
   protected AttitudeSensorManager attitudeSensor;
   @Bean
   protected WeatherMeterSensorManager weatherMeterSensor;
+  @Bean
+  protected KingpostSensorManager weatherMeterSensorKingPost;
 
   private ContentResolver contentResolver;
 
@@ -175,6 +178,7 @@ public class SensorsService extends Service implements SensorListener {
     if (preferences.isFakeDataEnabled().get()) builder.add(fakeSensor);
     if (preferences.isViiiivaEnabled().get()) builder.add(vivaSensor);
     if (preferences.isWeatherMeterEnabled().get()) builder.add(weatherMeterSensor);
+    if (preferences.isKingpostMeterEnabled().get()) builder.add(weatherMeterSensorKingPost);
     if (preferences.isAntPlusEnabled().get()) builder.add(antSensor);
     if (preferences.isArduinoEnabled().get()) builder.add(arduinoSensor);
     if (preferences.isGpsEnabled().get()) builder.add(gpsSensor);

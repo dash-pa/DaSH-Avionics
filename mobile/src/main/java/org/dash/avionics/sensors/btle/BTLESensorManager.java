@@ -80,12 +80,23 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
       return;
     }
 
-    Log.d("BTLE", "BTLE device: " + device.getName() + " " + device.getAddress());
-    if (device.getName().startsWith(deviceNamePrefix)) {
+//    Log.d("BTLE", "BTLE device: " + device.getName() + ",  Address: " + device.getAddress());
+//    Log.d("BTLE", "Searching for device with prefix " + deviceNamePrefix);
+    if (device.getName().startsWith(deviceNamePrefix) && onDeviceFound(device)) {
       //noinspection deprecation
       btadapter.stopLeScan(this);
       gatt = device.connectGatt(context, false, this); // set this as the gatt handler
     }
+  }
+
+  /**
+   * Allows the Implementing SensorManager class to respond and possibly reject a found device
+   * based on properties beyond the device name.
+   * @param device
+   * @return boolean true if discovered device is acceptable.
+   */
+  protected boolean onDeviceFound(BluetoothDevice device) {
+    return true;
   }
 
   // sets isConnected and discovers services when connected
