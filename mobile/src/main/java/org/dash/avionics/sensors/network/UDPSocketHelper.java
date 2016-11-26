@@ -53,7 +53,7 @@ public class UDPSocketHelper {
       tryOpenSocket();
       socket.send(packet);
     }
-    Log.v("Dash.UDP", "Sent packet to " + lastPeerAddress + ":" + peerPort);
+//    Log.v("Dash.UDP", "Sent packet to " + lastPeerAddress + ":" + peerPort);
   }
 
   public byte[] receive() throws IOException {
@@ -66,7 +66,7 @@ public class UDPSocketHelper {
     if (packet.getPort() != peerPort) {
       Log.i("Dash.UDP", "Received datagram from unexpected port: " + packet.getPort());
     }
-    Log.v("Dash.UDP", "Received packet from " + packet.getSocketAddress());
+//    Log.v("Dash.UDP", "Received packet from " + packet.getSocketAddress());
     return Arrays.copyOf(packet.getData(), packet.getLength());
   }
 

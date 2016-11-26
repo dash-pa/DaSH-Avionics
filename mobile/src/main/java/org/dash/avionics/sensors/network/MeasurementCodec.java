@@ -34,22 +34,23 @@ public class MeasurementCodec {
   private static final int SIZE_MD5 = 16;
 
   private static final int SIZE_FULL_MEASUREMENT = SIZE_TIMESTAMP + SIZE_TYPE + SIZE_VALUE;
+  private static final int SIZE_OVERHEAD = SIZE_VERSION + SIZE_COUNT + SIZE_MD5;
 
   private static final int MAX_COUNT = 100;
-  private static final int MIN_SIZE = SIZE_VERSION+SIZE_COUNT+SIZE_FULL_MEASUREMENT+MD5_SIZE;
-  private static final int MAX_SIZE = SIZE_VERSION+SIZE_COUNT + MAX_COUNT*SIZE_FULL_MEASUREMENT
-      + MD5_SIZE;
+  private static final int MIN_SIZE = SIZE_OVERHEAD + SIZE_FULL_MEASUREMENT;
+  private static final int MAX_SIZE = SIZE_OVERHEAD + MAX_COUNT * SIZE_FULL_MEASUREMENT;
 
-    ByteBuffer buffer = ByteBuffer.allocate(MAX_SIZE);
-    buffer.put(SERIALIZATION_VERSION);
   public static byte[] serialize(List<Measurement> measurements) throws IOException {
     Preconditions.checkArgument(measurements.size() < MAX_COUNT,
         "Too many measurements to serialize: " + measurements.size());
-    buffer.put((byte) measurements.size());  // Count
+
+    ByteBuffer buffer = ByteBuffer.allocate(MAX_SIZE);
+    buffer.put(SERIALIZATION_VERSION)
+        .put((byte) measurements.size());  // Count
     for (Measurement m : measurements) {
-      buffer.putLong(m.timestamp);
-      buffer.putInt(m.type.ordinal());
-      buffer.putFloat(m.value);
+      buffer.putLong(m.timestamp)
+          .putInt(m.type.ordinal())
+          .putFloat(m.value);
     }
 
     int size = buffer.position();
@@ -75,8 +76,9 @@ public class MeasurementCodec {
       throw new UnsupportedEncodingException("Bad serialization version: " + Byte.toString(version));
     }
     byte count = buffer.get();
-    if (count < 1) {
-      throw new UnsupportedEncodingException("Bad batch size: " + Byte.toString(count));
+    if (count < 1 || buf.length != SIZE_OVERHEAD + count * SIZE_FULL_MEASUREMENT) {
+      throw new UnsupportedEncodingException("Bad batch size: " + count + " for buffer size " +
+          buf.length);
     }
 
     ArrayList<Measurement> result = Lists.newArrayListWithExpectedSize(count);
