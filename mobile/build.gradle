@@ -3,13 +3,13 @@ apply plugin: 'com.neenbedankt.android-apt'
 def AAVersion = '3.3.2'
 
 android {
-  compileSdkVersion 23
+  compileSdkVersion 22
   buildToolsVersion "22.0.0"
 
   defaultConfig {
     applicationId "org.dash.avionics"
-    minSdkVersion 23
-    targetSdkVersion 23
+    minSdkVersion 22
+    targetSdkVersion 22
     versionCode 1
     versionName "1.0"
   }
