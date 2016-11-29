@@ -49,7 +49,7 @@ public class MeasurementCodec {
         .put((byte) measurements.size());  // Count
     for (Measurement m : measurements) {
       buffer.putLong(m.timestamp)
-          .putInt(m.type.ordinal())
+          .put((byte) m.type.ordinal())
           .putFloat(m.value);
     }
 
@@ -84,7 +84,7 @@ public class MeasurementCodec {
     ArrayList<Measurement> result = Lists.newArrayListWithExpectedSize(count);
     for (int i = 0; i < count; i++) {
       long timestamp = buffer.getLong();
-      int typeOrdinal = buffer.getInt();
+      byte typeOrdinal = buffer.get();
       if (typeOrdinal >= MeasurementType.values().length) {
         throw new StreamCorruptedException("Bad measurement type: " + typeOrdinal);
       }
