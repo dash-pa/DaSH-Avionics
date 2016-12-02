@@ -46,8 +46,10 @@ public class AircraftSettingsFragment extends PreferenceFragment
     super.onCreate(savedInstanceState);
     addPreferencesFromResource(R.xml.aircraft_settings);
 
-    bindPreferenceSummary(R.string.settings_key_pilot_weight, settings.getPilotWeight().get());
-    bindPreferenceSummary(R.string.settings_key_aircraft_type, settings.getAircraftType().get());
+    currentPilotWeight = settings.getPilotWeight().get();
+    currentAircraftType = AircraftType.valueOf(settings.getAircraftType().get());
+    bindPreferenceSummary(R.string.settings_key_pilot_weight, currentPilotWeight);
+    bindPreferenceSummary(R.string.settings_key_aircraft_type, currentAircraftType);
     bindPreferenceSummary(R.string.settings_key_crank_prop_ratio,
         settings.getCrankToPropellerRatio().get());
     bindPreferenceSummary(R.string.settings_key_speed_delta, settings.getMaxSpeedDelta().get());
@@ -94,7 +96,11 @@ public class AircraftSettingsFragment extends PreferenceFragment
   }
 
   private Preference findPreference(int resId) {
-    return findPreference(getActivity().getString(resId));
+    return findPreference(getPreferenceKeyByResId(resId));
+  }
+
+  private CharSequence getPreferenceKeyByResId(int resId) {
+    return getActivity().getString(resId);
   }
 
   @Override
@@ -106,16 +112,19 @@ public class AircraftSettingsFragment extends PreferenceFragment
       // the preference's 'entries' list.
       ListPreference listPreference = (ListPreference) preference;
       int index = listPreference.findIndexOfValue(stringValue);
-
+      CharSequence enumValue = listPreference.getEntries()[index];
       // Set the summary to reflect the new value.
-      preference.setSummary(
-          index >= 0
-              ? listPreference.getEntries()[index]
-              : null);
+      preference.setSummary(index >= 0 ? enumValue : null);
+      if (preference.getKey() == getPreferenceKeyByResId(R.string.settings_key_aircraft_type)) {
+        currentAircraftType = AircraftType.valueOf(stringValue);
+      }
     } else {
       // For all other preferences, set the summary to the value's
       // simple string representation.
       preference.setSummary(stringValue);
+      if (preference.getKey() == getPreferenceKeyByResId(R.string.settings_key_pilot_weight)) {
+        currentPilotWeight = Float.valueOf(stringValue);
+      }
     }
 
     updateDerivedValues();
@@ -136,7 +145,7 @@ public class AircraftSettingsFragment extends PreferenceFragment
   }
 
   private void updateDerivedValues() {
-    float cruiseAirspeed = CruiseSpeedCalculator.getCruiseAirspeedFromSettings(settings);
+    float cruiseAirspeed = CruiseSpeedCalculator.getCruiseAirspeed(currentAircraftType, currentPilotWeight);
 
     findPreference(R.string.settings_key_cruise_speed).setSummary(
         String.format("%.1f", cruiseAirspeed));
