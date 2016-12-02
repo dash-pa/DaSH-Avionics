@@ -56,7 +56,7 @@
   <string name="settings_sensor_viiiiva">Enable Viiiiva</string>
   <string name="settings_sensor_weathermeter">Enable WeatherMeter</string>
   <string name="settings_sensor_kingpost">Enable Kingpost Meter</string>
-  <string name="settings_sensor_antplus">Enable ANT+</string>
+  <string name="settings_sensor_antplus">Enable Quarq</string>
   <string name="settings_sensor_gps">Enable GPS</string>
   <string name="settings_sensor_attitude">Enable attitude</string>
   <string name="settings_sensor_fake">Enable fake data</string>

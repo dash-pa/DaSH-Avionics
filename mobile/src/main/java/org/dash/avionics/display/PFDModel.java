@@ -28,6 +28,7 @@ import org.dash.avionics.display.altitude.AltitudeTape;
 import org.dash.avionics.display.climbrate.ClimbRateTape;
 import org.dash.avionics.display.crank.CrankGauge;
 import org.dash.avionics.display.prop.PropGauge;
+import org.dash.avionics.display.speed.SpeedGauge;
 import org.dash.avionics.display.speed.SpeedTape;
 import org.dash.avionics.display.track.TrackDrawing;
 import org.dash.avionics.display.vitals.VitalsDisplay;
@@ -41,7 +42,7 @@ import java.util.Set;
 @EBean
 public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateTape.Model,
     MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener, CrankGauge.Model,
-    PropGauge.Model, VitalsDisplay.Model, TrackDrawing.Model {
+    PropGauge.Model, VitalsDisplay.Model, TrackDrawing.Model, SpeedGauge.Model {
   private static final long DEFAULT_MAX_DATA_AGE_MS = 2 * 1000;
   // ANT+ needs larger delays
   private static final long ANTPLUS_MAX_DATA_AGE_MS = 5 * 1000;
@@ -51,6 +52,10 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
       new DerivativeValueModel(DEFAULT_MAX_DATA_AGE_MS);
   private final SettableValueModel<Float> speedModel =
       new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
+  private final SettableValueModel<Float> kpSpeedModel =
+      new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
+  private final SettableValueModel<Float> impSpeedModel =
+          new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
   private final SettableValueModel<Float> altitudeModel =
       new RecentSettableValueModel<>(DEFAULT_MAX_DATA_AGE_MS);
   private final RecentSettableValueModel<Float> heading =
@@ -95,6 +100,16 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
   }
 
   @Override
+  public ValueModel<Float> getKpSpeed() {
+    return kpSpeedModel;
+  }
+
+  @Override
+  public ValueModel<Float> getImpSpeed() {
+    return impSpeedModel;
+  }
+
+  @Override
   public ValueModel<AircraftModel> getAircraft() {
     return aircraftModel;
   }
@@ -134,6 +149,12 @@ public class PFDModel implements SpeedTape.Model, AltitudeTape.Model, ClimbRateT
     switch (measurement.type) {
       case AIRSPEED:
         speedModel.setValue(measurement.value);
+        break;
+      case KINGPOST_SPEED:
+        kpSpeedModel.setValue(measurement.value);
+        break;
+      case IMPELLER_SPEED:
+        impSpeedModel.setValue(measurement.value);
         break;
       case HEIGHT:
         altitudeModel.setValue(measurement.value);

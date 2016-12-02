@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 
 import org.dash.avionics.display.crank.CrankGauge;
 import org.dash.avionics.display.prop.PropGauge;
+import org.dash.avionics.display.speed.SpeedGauge;
 import org.dash.avionics.display.track.TrackDrawing;
 import org.dash.avionics.display.vitals.VitalsDisplay;
 import org.dash.avionics.display.widget.Container;
@@ -24,6 +25,7 @@ public class PFDCenter1 extends Container {
     float instrumentGap = (float) Math.floor(width / 60);
 
     float crankGaugeWidth = 0.25f * width;
+    float airSpeedWidth = 0.25f * width;
     float propGaugeWidth = 0.25f * width;
     float vitalsWidth = 0.25f * width;
     float trackWidth =
@@ -33,6 +35,7 @@ public class PFDCenter1 extends Container {
     float crankGaugeHeight = .4f * height;
     float propGaugeHeight = .4f * height;
     float vitalsHeight = .4f * height;
+    float airspeedHeight = .4f * height;
 
     x = 0f;
     mChildren.add(new PropGauge(
@@ -58,6 +61,10 @@ public class PFDCenter1 extends Container {
         config, resources, assets,
         x, 0f,
         vitalsWidth, vitalsHeight, model));
-    x += vitalsWidth + instrumentGap;
+
+    mChildren.add(new SpeedGauge(
+        config, resources, assets,
+        x, vitalsHeight + instrumentGap,
+        airSpeedWidth, airspeedHeight, model));
   }
 }
