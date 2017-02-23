@@ -135,12 +135,12 @@ public class SensorsService extends Service implements SensorListener {
 
   @Background
   protected void deferStop() {
+    stopSensors();
     stopSelf();
   }
 
   @Override
   public void onDestroy() {
-    Log.i("Sensors", "Stopping");
     stopSensors();
 
     wakeLock.release();
@@ -158,6 +158,7 @@ public class SensorsService extends Service implements SensorListener {
   }
 
   private void stopSensors() {
+    Log.i("Sensors", "Stopping");
     for (SensorManager sensor : startedSensors) {
       sensor.disconnect();
     }

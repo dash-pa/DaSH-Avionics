@@ -17,19 +17,22 @@ import java.io.IOException;
  */
 @EBean
 public class UDPMeasurementSender implements SensorListener {
-  private final UDPSocketHelper socket;
+  private UDPSocketHelper socket;
 
   @Pref
   SensorPreferences_ preferences;
 
-  public UDPMeasurementSender() {
-    socket = new UDPSocketHelper(0);  // Send *from* any port.
-  }
-
   @Override
   public void onNewMeasurement(Measurement measurement) {
     if (!preferences.isUdpSendingEnabled().get()) {
+      if (socket != null) {
+        socket.close();
+        socket = null;
+      }
       return;
+    }
+    if (socket == null) {
+      socket = new UDPSocketHelper(0);  // Send *from* any port.
     }
 
     String address = preferences.getUdpSendingAddress().get();

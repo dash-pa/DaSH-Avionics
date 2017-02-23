@@ -27,7 +27,7 @@ public class UDPSensorManager implements SensorManager {
     this.updater = updater;
     this.socket = new UDPSocketHelper(NetworkConstants.UDP_RECEIVE_PORT);
 
-    while (true) {
+    while (socket != null) {
       receiveUdpOnce();
     }
   }
@@ -57,5 +57,9 @@ public class UDPSensorManager implements SensorManager {
   @Override
   public void disconnect() {
     BackgroundExecutor.cancelAll("receive", true);
+    if (socket != null) {
+      socket.close();
+      socket = null;
+    }
   }
 }
