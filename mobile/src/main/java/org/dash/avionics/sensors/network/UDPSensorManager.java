@@ -25,8 +25,7 @@ public class UDPSensorManager implements SensorManager {
   @Override
   public void connect(SensorListener updater) {
     this.updater = updater;
-    this.socket = new UDPSocketHelper(NetworkConstants.UDP_RECEIVE_PORT,
-        NetworkConstants.UDP_SEND_PORT);
+    this.socket = new UDPSocketHelper(NetworkConstants.UDP_RECEIVE_PORT);
 
     while (true) {
       receiveUdpOnce();

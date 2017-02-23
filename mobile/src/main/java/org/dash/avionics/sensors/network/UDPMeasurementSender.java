@@ -23,8 +23,7 @@ public class UDPMeasurementSender implements SensorListener {
   SensorPreferences_ preferences;
 
   public UDPMeasurementSender() {
-    socket = new UDPSocketHelper(NetworkConstants.UDP_SEND_PORT,
-        NetworkConstants.UDP_RECEIVE_PORT);
+    socket = new UDPSocketHelper(0);  // Send *from* any port.
   }
 
   @Override
