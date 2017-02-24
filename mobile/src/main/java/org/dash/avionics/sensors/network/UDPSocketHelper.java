@@ -21,15 +21,15 @@ public class UDPSocketHelper {
     this.port = port;
   }
 
-  private void tryOpenSocket() throws IOException {
+  private void tryOpenSocket(int localPort) throws IOException {
     if (socket == null || !socket.isBound() || socket.isClosed() ||
-        (port != 0 && socket.getLocalPort() != port)) {
-      Log.i("Dash.UDP", "(re)creating UDP socket on port " + port);
+        (localPort != 0 && socket.getLocalPort() != localPort)) {
+      Log.i("Dash.UDP", "(re)creating UDP socket on port " + localPort);
       if (socket != null) {
         Log.d("Dash.UDP", "Old socket: bound=" + socket.isBound() + "; closed=" + socket.isClosed
             () + "; port=" + socket.getLocalPort());
       }
-      socket = new DatagramSocket(port);
+      socket = new DatagramSocket(localPort);
     }
     if (!socket.isBound()) {
       throw new IOException("Socket not bound");
@@ -48,7 +48,7 @@ public class UDPSocketHelper {
     DatagramPacket packet =
         new DatagramPacket(data, data.length, lastPeerAddress, port);
     synchronized (this) {
-      tryOpenSocket();
+      tryOpenSocket(0);  // Send *from* any port.
       socket.send(packet);
     }
 //    Log.v("Dash.UDP", "Sent packet to " + lastPeerAddress + ":" + port);
@@ -59,7 +59,7 @@ public class UDPSocketHelper {
     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
     DatagramSocket lastSocket;
     synchronized (this) {
-      tryOpenSocket();
+      tryOpenSocket(port);
       lastSocket = socket;
     }
     lastSocket.receive(packet);

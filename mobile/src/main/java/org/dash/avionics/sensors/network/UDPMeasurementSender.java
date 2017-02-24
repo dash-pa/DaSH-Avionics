@@ -32,7 +32,7 @@ public class UDPMeasurementSender implements SensorListener {
       return;
     }
     if (socket == null) {
-      socket = new UDPSocketHelper(0);  // Send *from* any port.
+      socket = new UDPSocketHelper(NetworkConstants.UDP_RECEIVE_PORT);
     }
 
     String address = preferences.getUdpSendingAddress().get();
