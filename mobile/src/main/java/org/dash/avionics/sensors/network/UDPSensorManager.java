@@ -33,9 +33,14 @@ public class UDPSensorManager implements SensorManager {
   }
 
   private void receiveUdpOnce() {
+    UDPSocketHelper lastSocket = socket;
+    if (socket == null) {
+      return;
+    }
+
     byte[] buffer;
     try {
-      buffer = socket.receive();
+      buffer = lastSocket.receive();
     } catch (IOException e) {
       Log.w("Dash.UDP", "Unable to receive datagram", e);
       return;

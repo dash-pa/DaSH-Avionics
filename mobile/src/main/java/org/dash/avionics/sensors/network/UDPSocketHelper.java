@@ -47,10 +47,12 @@ public class UDPSocketHelper {
 
     DatagramPacket packet =
         new DatagramPacket(data, data.length, lastPeerAddress, port);
+    DatagramSocket lastSocket;
     synchronized (this) {
       tryOpenSocket(0);  // Send *from* any port.
-      socket.send(packet);
+      lastSocket = socket;
     }
+    lastSocket.send(packet);
 //    Log.v("Dash.UDP", "Sent packet to " + lastPeerAddress + ":" + port);
   }
 
