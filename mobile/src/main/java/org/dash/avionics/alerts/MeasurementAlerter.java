@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -23,39 +24,33 @@ import org.dash.avionics.data.MeasurementListener;
 import org.dash.avionics.data.MeasurementObserver;
 import org.dash.avionics.data.MeasurementType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 @EBean
 public class MeasurementAlerter
-    implements MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener {
+        implements MeasurementListener, SharedPreferences.OnSharedPreferenceChangeListener {
   // Only start "unknown" sound alerts after 2s.
   private static final long MAX_DATA_STALENESS_MS = 2000;
-
-  private static class AlertTypeMapping {
-    private AlertTypeMapping(AlertType low, AlertType normal, AlertType high, AlertType unknown) {
-      this.low = low;
-      this.normal = normal;
-      this.high = high;
-      this.unknown = unknown;
-    }
-
-    AlertType low, normal, high, unknown;
-  }
-  private static final Map<MeasurementType, AlertTypeMapping> ALERT_MAPPING =
-      ImmutableMap.<MeasurementType, AlertTypeMapping>builder()
-          .put(MeasurementType.AIRSPEED, new AlertTypeMapping(AlertType.LOW_SPEED,
-              AlertType.NORMAL_SPEED, AlertType.HIGH_SPEED, AlertType.UNKNOWN_SPEED))
-          .put(MeasurementType.HEIGHT, new AlertTypeMapping(AlertType.LOW_HEIGHT,
-              AlertType.NORMAL_HEIGHT, AlertType.HIGH_HEIGHT, AlertType.UNKNOWN_HEIGHT))
-          .build();
-
   private final List<AlertListener> listeners = Lists.newArrayList();
-  private final Map<MeasurementType, Range<Float>> expectedRanges =
-      Maps.newEnumMap(MeasurementType.class);
-  private Map<MeasurementType, Long> lastUpdateByType =
-      Maps.newEnumMap(MeasurementType.class);
+  private final List<MeasurementAlert> alerts = Arrays.asList(
+          (MeasurementAlert) new ValueRangeMeasurementAlert(MeasurementType.AIRSPEED,
+                  AlertType.LOW_SPEED, AlertType.NORMAL_SPEED,
+                  AlertType.HIGH_SPEED, AlertType.UNKNOWN_SPEED),
+          (MeasurementAlert) new ValueRangeMeasurementAlert(MeasurementType.HEIGHT,
+                  AlertType.LOW_HEIGHT, AlertType.NORMAL_HEIGHT,
+                  AlertType.HIGH_HEIGHT, AlertType.UNKNOWN_HEIGHT),
+          (MeasurementAlert) new RotateAlert()
+  );
+  private final Map<MeasurementType, Long> lastUpdateByType =
+          Maps.newEnumMap(MeasurementType.class);
   private final Set<MeasurementType> hadNormalReadings = Sets.newHashSet();
   private final Set<AlertType> activeAlerts = Sets.newHashSet();
 
@@ -96,14 +91,14 @@ public class MeasurementAlerter
 
     PreferenceManager.getDefaultSharedPreferences(context).registerOnSharedPreferenceChangeListener(this);
     updateSettings();
-    this.observer = new MeasurementObserver(new Handler(), context.getContentResolver(), this);
+    observer = new MeasurementObserver(new Handler(), context.getContentResolver(), this);
     observer.start();
     periodicAlertUpdate();
   }
 
   public void stop() {
     PreferenceManager.getDefaultSharedPreferences(context)
-        .unregisterOnSharedPreferenceChangeListener(this);
+            .unregisterOnSharedPreferenceChangeListener(this);
     observer.stop();
   }
 
@@ -113,16 +108,8 @@ public class MeasurementAlerter
   }
 
   private void updateSettings() {
-    synchronized (expectedRanges) {
-      float targetSpeed = CruiseSpeedCalculator.getCruiseAirspeedFromSettings(settings);
-      float speedMargin = settings.getMaxSpeedDelta().get();
-      expectedRanges.put(MeasurementType.AIRSPEED,
-          Range.closed(targetSpeed - speedMargin, targetSpeed + speedMargin));
-
-      float targetHeight = settings.getTargetHeight().get();
-      float heightMargin = settings.getMaxHeightDelta().get();
-      expectedRanges.put(MeasurementType.HEIGHT,
-          Range.closed(targetHeight - heightMargin, targetHeight + heightMargin));
+    for (MeasurementAlert alert : alerts) {
+      alert.updateSettings(settings);
     }
   }
 
@@ -149,20 +136,11 @@ public class MeasurementAlerter
   }
 
   private void updateAlert(MeasurementType type, Float value) {
-    Range<Float> expectedRange;
-    synchronized (expectedRanges) {
-      expectedRange = expectedRanges.get(type);
-    }
-    if (expectedRange == null) {
-      return;
-    }
-    AlertTypeMapping mapping = ALERT_MAPPING.get(type);
-
     if (!hadNormalReadings.contains(type)) {
       // Don't alert about unknown or abnormal values until the first time a normal value is seen.
       // This accounts for edge conditions such as takeoff (low speed, low altitude) which then
       // transition into the normal regime (cruise).
-      if (value == null || !expectedRange.contains(value)) {
+      if (value == null) {
         return;
       }
 
@@ -170,32 +148,16 @@ public class MeasurementAlerter
     }
 
     synchronized (activeAlerts) {
-      Set<AlertType> newActiveAlerts = Sets.newHashSet(activeAlerts);
-      if (value == null) {
-        newActiveAlerts.remove(mapping.low);
-        newActiveAlerts.remove(mapping.normal);
-        newActiveAlerts.remove(mapping.high);
-        newActiveAlerts.add(mapping.unknown);
-      } else if (expectedRange.contains(value)) {
-        newActiveAlerts.remove(mapping.low);
-        newActiveAlerts.add(mapping.normal);
-        newActiveAlerts.remove(mapping.high);
-        newActiveAlerts.remove(mapping.unknown);
-      } else if (value <= expectedRange.lowerEndpoint()) {
-        newActiveAlerts.add(mapping.low);
-        newActiveAlerts.remove(mapping.normal);
-        newActiveAlerts.remove(mapping.high);
-        newActiveAlerts.remove(mapping.unknown);
-      } else {
-        Preconditions.checkState(value >= expectedRange.upperEndpoint());
-        newActiveAlerts.remove(mapping.low);
-        newActiveAlerts.remove(mapping.normal);
-        newActiveAlerts.add(mapping.high);
-        newActiveAlerts.remove(mapping.unknown);
+      Set<AlertType> newActiveAlerts = Sets.newHashSet(); //Sets.newHashSet(activeAlerts);
+      for (MeasurementAlert alert : alerts) {
+        AlertType alertType = alert.updateMeasurment(type, value);
+        if (alertType != null) {
+          newActiveAlerts.add(alertType);
+        }
       }
 
       Sets.SetView<AlertType> alertChanges =
-          Sets.symmetricDifference(activeAlerts, newActiveAlerts);
+              Sets.symmetricDifference(activeAlerts, newActiveAlerts);
       if (!alertChanges.isEmpty()) {
         activeAlerts.clear();
         activeAlerts.addAll(newActiveAlerts);

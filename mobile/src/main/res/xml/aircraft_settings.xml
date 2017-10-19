@@ -31,6 +31,10 @@
         android:key="@string/settings_key_cruise_speed"
         android:persistent="false"
         android:title="Target cruise speed"/>
+    <EditTextPreference
+        android:key="@string/settings_key_rotate_speed"
+        android:numeric="decimal"
+        android:title="@string/settings_rotate_speed"/>
 
     <EditTextPreference
         android:key="@string/settings_key_target_height"

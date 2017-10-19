@@ -19,6 +19,9 @@ public interface AircraftSettings {
   @DefaultFloat(value = 5.0f, keyRes = R.string.settings_key_target_height)
   float getTargetHeight();
 
+  @DefaultFloat(value = 21.6f, keyRes = R.string.settings_key_rotate_speed)
+  float getRotateAirspeed();
+
   @DefaultFloat(value = 2.0f, keyRes = R.string.settings_key_height_delta)
   float getMaxHeightDelta();
 

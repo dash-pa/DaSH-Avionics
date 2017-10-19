@@ -53,6 +53,7 @@ public class AircraftSettingsFragment extends PreferenceFragment
     bindPreferenceSummary(R.string.settings_key_crank_prop_ratio,
         settings.getCrankToPropellerRatio().get());
     bindPreferenceSummary(R.string.settings_key_speed_delta, settings.getMaxSpeedDelta().get());
+    bindPreferenceSummary(R.string.settings_key_rotate_speed, settings.getRotateAirspeed().get());
     bindPreferenceSummary(R.string.settings_key_target_height, settings.getTargetHeight().get());
     bindPreferenceSummary(R.string.settings_key_height_delta, settings.getMaxHeightDelta().get());
     bindPreferenceSummary(R.string.settings_key_send_udp_address,

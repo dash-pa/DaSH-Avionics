@@ -68,6 +68,8 @@ public class MeasurementAlertSounds implements MeasurementAlerter.AlertListener 
       loadSound(AlertType.LOW_HEIGHT, R.raw.low, 90, 15);
       loadSound(AlertType.HIGH_HEIGHT, R.raw.high, 30, -1);
       loadSound(AlertType.UNKNOWN_HEIGHT, R.raw.height, 1, 5);
+
+      loadSound(AlertType.NORMAL_ROTATE, R.raw.rotate, 90, 3);
     }
   }
 
