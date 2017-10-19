@@ -56,15 +56,24 @@ public class CruiseSpeedCalculator {
   private static final Map<AircraftType, RangeMap<Float, LinearSpeedInterpolation>> REFERENCE_SPEEDS;
 
   static {
+    //Pilot weight indexes (kg)
+    //{50.8, 56.7, 61.24, 65.77, 74.84, 83.91, 90.0};
     REFERENCE_SPEEDS = Maps.newEnumMap(AircraftType.class);
+    //33.3m wing
     REFERENCE_SPEEDS.put(AircraftType.V5, buildInterpolationRanges(
-            new float[]{22.37f, 23.05f, 23.56f, 24.06f, 25.02f, 25.96f, 26.56f}
+            new float[]{23.04f, 23.70f, 24.2f, 24.68f, 25.63f, 26.54f, 27.13f}
     ));
-    REFERENCE_SPEEDS.put(AircraftType.V6, buildInterpolationRanges(
-            new float[]{21.84f, 22.52f, 23.01f, 23.5f, 24.44f, 25.34f, 25.93f}
+    //36.3m Wing (V5 WE)
+    REFERENCE_SPEEDS.put(AircraftType.V5_EXTENDED_WINGS, buildInterpolationRanges(
+            new float[]{22.51f, 23.15f, 23.63f, 24.09f, 25.01f, 25.9f, 26.47f}
     ));
+    //40.3m wing V6 WE / V5 LWE
     REFERENCE_SPEEDS.put(AircraftType.V6_EXTENDED_WINGS, buildInterpolationRanges(
-            new float[]{21.36f, 22f, 22.48f, 22.95f, 23.86f, 24.73f, 25.3f}
+            new float[]{21.56f, 22.17f, 22.62f, 23.06f, 23.94f, 24.77f, 25.32f}
+    ));
+    //44m wing, V6 LWE
+    REFERENCE_SPEEDS.put(AircraftType.V6_LONG_EXTENDED_WINGS, buildInterpolationRanges(
+            new float[]{21.62f, 22.22f, 22.67f, 23.11f, 23.98f, 24.82f, 25.36f}
     ));
   }
 
@@ -83,4 +92,5 @@ public class CruiseSpeedCalculator {
     float pilotWeightKg = settings.getPilotWeight().get();
     return getCruiseAirspeed(aircraftType, pilotWeightKg);
   }
+
 }
