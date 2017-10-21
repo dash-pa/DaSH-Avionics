@@ -30,7 +30,7 @@
         android:selectable="false"
         android:key="@string/settings_key_cruise_speed"
         android:persistent="false"
-        android:title="Target cruise speed"/>
+        android:title="@string/settings_target_cruise_speed"/>
     <EditTextPreference
         android:key="@string/settings_key_rotate_speed"
         android:numeric="decimal"

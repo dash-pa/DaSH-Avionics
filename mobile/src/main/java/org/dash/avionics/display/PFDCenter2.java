@@ -4,6 +4,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 
 import org.dash.avionics.display.crank.CrankGauge;
+import org.dash.avionics.display.speed.SpeedGauge;
 import org.dash.avionics.display.widget.Container;
 
 /**
@@ -23,5 +24,10 @@ public class PFDCenter2 extends Container {
         config, resources, assets,
         x, 0f,
         width, height, true, model));
+
+    mChildren.add(new SpeedGauge(
+            config, resources, assets,
+            x, instrumentGap,
+            width, height, true, model));
   }
 }

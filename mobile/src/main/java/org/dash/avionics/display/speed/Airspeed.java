@@ -22,9 +22,11 @@ class Airspeed extends Widget {
   private final int kpSpeedColor = Color.GRAY;
   private final int impSpeedColor = Color.DKGRAY;
   private final SpeedGauge.Model model;
+  private boolean singleLine;
 
-  public Airspeed(DisplayConfiguration config, AssetManager assets, float x, float y, float w, float h, SpeedGauge.Model model) {
+  public Airspeed(DisplayConfiguration config, AssetManager assets, float x, float y, float w, float h, boolean singleLineOnly, SpeedGauge.Model model) {
     super(x, y, w, h);
+    singleLine = singleLineOnly;
 
     this.model = model;
 
@@ -46,6 +48,8 @@ class Airspeed extends Widget {
     String speedText = (airSpeed.isValid() ? String.format("%3.0f", airSpeed.getValue()) : "xxx") + "kph";
     textPaint.setColor(airSpeedColor);
     canvas.drawText("  " + speedText, getX() + 0.95f * getWidth(), textSize, textPaint);
+
+    if (singleLine) return;
 
     ValueModel<Float> kpSpeed = model.getKpSpeed();
     String kpText = (kpSpeed.isValid() ? String.format("%3.0f", kpSpeed.getValue()) : "xxx") + "kph";

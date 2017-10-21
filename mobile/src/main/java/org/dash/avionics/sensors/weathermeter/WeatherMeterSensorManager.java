@@ -54,7 +54,9 @@ public class WeatherMeterSensorManager extends BTLESensorManager {
   @Override
   protected boolean onDeviceFound(BluetoothDevice device) {
     //If the kingpost meter is enabled, reject the sensor dedicated for the kingpost
-    if (preferences.isKingpostMeterEnabled().get() && device.getName().contains("787")) {
+    if (preferences.isKingpostMeterEnabled().get() &&
+          (device.getName().contains("787") || device.getName().contains("782"))
+    ) {
       return false;
     }
 

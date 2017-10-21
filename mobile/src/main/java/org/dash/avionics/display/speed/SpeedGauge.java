@@ -24,6 +24,7 @@ public class SpeedGauge extends Container {
   public SpeedGauge(
           DisplayConfiguration config, Resources res, AssetManager assets,
           float x, float y, float w, float h,
+          boolean singleLineOnly,
           final SpeedGauge.Model model) {
     moveTo(x, y);
     sizeTo(w, h);
@@ -31,7 +32,7 @@ public class SpeedGauge extends Container {
     float padding = .05f * h;
     float iconHeight = .4f * h;
 
-    speed = new Airspeed(config, assets, 0, iconHeight + padding, w, h, model);
+    speed = new Airspeed(config, assets, 0, iconHeight + padding, w, h, singleLineOnly, model);
     mChildren.add(speed);
   }
 }

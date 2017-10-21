@@ -21,7 +21,8 @@ public class KingpostSensorManager extends WeatherMeterSensorManager {
 
   protected boolean onDeviceFound(BluetoothDevice device) {
     //Only Weathermeter Device #787 can be used for the kingpost
-    return device.getName().contains("787");
+
+    return device.getName().contains("787") || device.getName().contains("782");
   }
 
   protected MeasurementType getMeasurmentType() {

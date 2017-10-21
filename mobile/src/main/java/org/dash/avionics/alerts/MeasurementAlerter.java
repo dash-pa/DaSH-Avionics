@@ -148,12 +148,9 @@ public class MeasurementAlerter
     }
 
     synchronized (activeAlerts) {
-      Set<AlertType> newActiveAlerts = Sets.newHashSet(); //Sets.newHashSet(activeAlerts);
+      Set<AlertType> newActiveAlerts = Sets.newHashSet(activeAlerts);
       for (MeasurementAlert alert : alerts) {
-        AlertType alertType = alert.updateMeasurment(type, value);
-        if (alertType != null) {
-          newActiveAlerts.add(alertType);
-        }
+        alert.updateMeasurment(type, value, newActiveAlerts);
       }
 
       Sets.SetView<AlertType> alertChanges =

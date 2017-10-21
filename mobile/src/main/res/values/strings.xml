@@ -98,14 +98,15 @@
   <string name="settings_send_udp">Send telemetry</string>
   <string name="settings_telemetry">Telemetry</string>
   <string name="settings_rotate_speed">Rotate Speed (kph)</string>
+  <string name="settings_target_cruise_speed">Target cruise speed (kph)</string>
   <string name="settings_send_udp_address">IP address to send telemetry to</string>
   <string name="settings_my_ip">My IP addresses</string>
 
   <string-array name="settings_aircraft_type_names">
     <item>V5</item>
     <item>V5 extended wing</item>
-    <item>V6 EW / V5 LEW</item>
-    <item>V6 long extended wing</item>
+    <item>V6 WE / V5 LWE</item>
+    <item>V6 long wing extensions</item>
   </string-array>
   <string-array name="settings_aircraft_types">
     <item>V5</item>

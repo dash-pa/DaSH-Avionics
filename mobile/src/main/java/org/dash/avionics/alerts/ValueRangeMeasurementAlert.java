@@ -8,6 +8,8 @@ import org.dash.avionics.aircraft.AircraftSettings_;
 import org.dash.avionics.aircraft.CruiseSpeedCalculator;
 import org.dash.avionics.data.MeasurementType;
 
+import java.util.Set;
+
 /**
  * Class to handle alerts for general aircraft measurments (height and airspeed)
  */
@@ -46,30 +48,43 @@ public class ValueRangeMeasurementAlert implements MeasurementAlert {
     }
   }
 
-  @Nullable
+
   @Override
-  public AlertType updateMeasurment(MeasurementType type, Float value) {
+  public void updateMeasurment(MeasurementType type, Float value, Set<AlertType> activeAlerts) {
     synchronized (this) {
       if (expectedRange == null || type != measurementType) {
-        return null;
+        return;
       }
       if (value == null) {
-        return unknown;
+          activeAlerts.remove(low);
+          activeAlerts.remove(normal);
+          activeAlerts.remove(high);
+          activeAlerts.add(unknown);
+        return;
       }
       //only arm an alert after it has had a "normal" reading
       if (expectedRange.contains(value)) {
         armed = true;
       }
       if (!armed) {
-        return null;
+        return;
       }
 
       if (expectedRange.contains(value)) {
-        return normal;
+        activeAlerts.remove(low);
+        activeAlerts.add(normal);
+        activeAlerts.remove(high);
+        activeAlerts.remove(unknown);
       } else if (value <= expectedRange.lowerEndpoint()) {
-        return low;
+        activeAlerts.add(low);
+        activeAlerts.remove(normal);
+        activeAlerts.remove(high);
+        activeAlerts.remove(unknown);
       } else {
-        return high;
+        activeAlerts.remove(low);
+        activeAlerts.remove(normal);
+        activeAlerts.add(high);
+        activeAlerts.remove(unknown);
       }
     }
   }

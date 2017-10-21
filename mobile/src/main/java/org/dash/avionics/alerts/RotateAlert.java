@@ -9,6 +9,8 @@ import org.dash.avionics.aircraft.AircraftSettings_;
 import org.dash.avionics.aircraft.CruiseSpeedCalculator;
 import org.dash.avionics.data.MeasurementType;
 
+import java.util.Set;
+
 /**
  * Class to handle alerts for general aircraft measurments (height and airspeed)
  */
@@ -19,12 +21,12 @@ public class RotateAlert implements MeasurementAlert {
           high = AlertType.HIGH_ROTATE, unknown = AlertType.UNKNOWN_ROTATE;
   private boolean armed = true, active = false;
   //Alarm should only be active this long
-  private final long MAX_ACTIVE_TIME_MS = 4000;
+  private final long MAX_ACTIVE_TIME_MS = 2300;
   private long activeStart;
 
   @Override
   /**
-   * Only Airspeed and height supported
+   * ROtate is based on airpseed alone
    */
   public void updateSettings(AircraftSettings_ settings) {
     synchronized (this) {
@@ -32,19 +34,19 @@ public class RotateAlert implements MeasurementAlert {
         float targetSpeed = settings.getRotateAirspeed().get();
         float speedMargin = settings.getMaxSpeedDelta().get();
 
-        expectedRange = Range.closed(targetSpeed, targetSpeed + speedMargin);
+        //Reset the alert if the airspeed drops way below target speed
+        expectedRange = Range.closed((targetSpeed - speedMargin) / 2, targetSpeed);
       }
 
       active = false;
     }
   }
 
-  @Nullable
   @Override
-  public AlertType updateMeasurment(MeasurementType type, Float value) {
+  public void updateMeasurment(MeasurementType type, Float value, Set<AlertType> activeAlerts) {
     synchronized (this) {
       if (value == null || expectedRange == null || type != measurementType) {
-        return null;
+        return;
       }
 
       if (value < expectedRange.lowerEndpoint()) {
@@ -62,10 +64,12 @@ public class RotateAlert implements MeasurementAlert {
       }
 
       if (active) {
-        return normal;
+        activeAlerts.remove(low);
+        activeAlerts.add(normal);
+      } else {
+        activeAlerts.remove(normal);
+        activeAlerts.add(low);
       }
-
-      return low;
     }
   }
 }

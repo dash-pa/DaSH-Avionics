@@ -65,6 +65,6 @@ public class PFDCenter1 extends Container {
     mChildren.add(new SpeedGauge(
         config, resources, assets,
         x, vitalsHeight + instrumentGap,
-        airSpeedWidth, airspeedHeight, model));
+        airSpeedWidth, airspeedHeight, false, model));
   }
 }
