@@ -79,13 +79,21 @@ public class PFDActivity extends Activity {
   protected void hideSystemUi() {
     //noinspection ConstantConditions
     getActionBar().hide();
+//    Disabling this as it prevents the first click on the UI from registering which creates user confusion
+//    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+  }
 
-    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+  @Click(R.id.settings_button)
+  protected void onSettingsButtonClicked() {
+    AircraftSettingsActivity_.intent(this).start();
   }
 
   @LongClick(R.id.pfdView)
   protected void onLongClickI() {
-    AircraftSettingsActivity_.intent(this).start();
+    // Disabling long click as this occurs during phone mounting often.
+    // Leaving the function registered to prevent a long click from being read
+    // as a regular click.
+    // AircraftSettingsActivity_.intent(this).start();
   }
 
   @Click(R.id.pfdView)

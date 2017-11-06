@@ -3,6 +3,7 @@ package org.dash.avionics.sensors.arduino;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.androidannotations.annotations.Background;
@@ -112,10 +113,12 @@ public class ArduinoSensorManager implements SensorManager {
   private BluetoothDevice findArduinoDevice() {
     // Get the HC-06 BlueTooth Transceiver device object
     BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
-    Set<BluetoothDevice> pairedDevices = BTAdapter.getBondedDevices();
-    for (BluetoothDevice device : pairedDevices) {
-      if ("HC-06".equals(device.getName())) {
-        return device;
+    if (BTAdapter != null) {
+      Set<BluetoothDevice> pairedDevices = BTAdapter.getBondedDevices();
+      for (BluetoothDevice device : pairedDevices) {
+        if ("HC-06".equals(device.getName())) {
+          return device;
+        }
       }
     }
     return null;
@@ -142,6 +145,10 @@ public class ArduinoSensorManager implements SensorManager {
   // Reads (blocking) from the socket up until a newline, then returns
   // everything before the newline.
   private String readLine() throws IOException {
+    if (arduinoOutput == null) {
+      return "";
+    }
+
     StringBuilder builder = new StringBuilder(32);
     while (true) {
       char chr = (char) arduinoOutput.read();
@@ -163,7 +170,11 @@ public class ArduinoSensorManager implements SensorManager {
     return builder.toString();
   }
 
+  @Nullable
   private Measurement parseUpdate(String line) {
+    if (line == null || line == "") {
+      return null;
+    }
     int splitPos = line.indexOf(':');
     if (splitPos == -1 || line.length() < splitPos + 1) {
       Log.e("Arduino", "Malformed line '" + line + "'.");

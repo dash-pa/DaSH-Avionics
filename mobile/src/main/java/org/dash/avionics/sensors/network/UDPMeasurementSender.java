@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.common.collect.Lists;
 
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.dash.avionics.data.Measurement;
@@ -23,6 +24,7 @@ public class UDPMeasurementSender implements SensorListener {
   SensorPreferences_ preferences;
 
   @Override
+  @Background(serial = "send")
   public void onNewMeasurement(Measurement measurement) {
     if (!preferences.isUdpSendingEnabled().get()) {
       if (socket != null) {

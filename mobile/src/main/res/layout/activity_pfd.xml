@@ -11,4 +11,13 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
 
+  <ImageButton
+      android:id="@+id/settings_button"
+      android:layout_height="25pt"
+      android:layout_width="25pt"
+      android:layout_gravity="left|bottom"
+      android:background="#0000"
+      android:layout_marginLeft="30pt"
+      android:src="@drawable/gear" />
+
 </FrameLayout>

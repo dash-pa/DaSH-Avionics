@@ -125,12 +125,16 @@ class AntSensorImpl implements MultiDeviceSearch.SearchCallbacks, RssiCallback,
     deviceSearch.close();
     deviceSearch = null;
 
-    // Keep searching.
-    try {
-      Thread.sleep(2000);
-      startSearching();
-    } catch (InterruptedException e) {
-      // Do nothing.
+    // If the error was a timeout, Keep searching.
+    if(result.getIntValue() == RequestAccessResult.SEARCH_TIMEOUT.getIntValue()
+          || result.getIntValue() == RequestAccessResult.USER_CANCELLED.getIntValue()
+    ) {
+      try {
+        Thread.sleep(2000);
+        startSearching();
+      } catch (InterruptedException e) {
+        // Do nothing.
+      }
     }
   }
 

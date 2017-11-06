@@ -58,7 +58,9 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
   public void disconnect() {
     //noinspection deprecation
     Log.d("BTLE", "Disconnecting");
-    btadapter.stopLeScan(this);
+    if (btadapter != null) {
+      btadapter.stopLeScan(this);
+    }
     if (gatt != null) {
       gatt.disconnect();
       gatt.close();
@@ -71,7 +73,9 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
     // TODO: Update for API 22.
     Log.d("BTLE", "Starting BTLE scan");
     //noinspection deprecation
-    btadapter.startLeScan(this);
+    if (btadapter != null) {
+      btadapter.startLeScan(this);
+    }
   }
 
   @Override
@@ -84,7 +88,9 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
 //    Log.d("BTLE", "Searching for device with prefix " + deviceNamePrefix);
     if (device.getName().startsWith(deviceNamePrefix) && onDeviceFound(device)) {
       //noinspection deprecation
-      btadapter.stopLeScan(this);
+      if (btadapter != null) {
+        btadapter.stopLeScan(this);
+      }
       gatt = device.connectGatt(context, false, this); // set this as the gatt handler
     }
   }

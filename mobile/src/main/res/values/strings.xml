@@ -110,7 +110,7 @@
   </string-array>
   <string-array name="settings_aircraft_types">
     <item>V5</item>
-    <item>V5_EXTENTED_WINGS</item>
+    <item>V5_EXTENDED_WINGS</item>
     <item>V6_EXTENDED_WINGS</item>
     <item>V6_LONG_EXTENDED_WINGS</item>
   </string-array>ss
