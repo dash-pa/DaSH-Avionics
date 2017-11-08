@@ -31,16 +31,14 @@ public class ArduinoSensorManager implements SensorManager {
   @Background(serial = "arduino-loop")
   @Override
   public void connect(SensorListener updater) {
+    Log.i("Arduino", "Starting Arduino Sensor Listener");
     // Keep trying to connect and read from the sensors.
     while (true) {
-      try {
-        connectToDevice();
-      } catch (IOException e) {
-        Log.e("Arduino", "Failed to initialize", e);
+      if (!connectToDevice()) {
         disconnectFromDevice();
         try {
           //noinspection BusyWait
-          Thread.sleep(500);
+          Thread.sleep(2000);
         } catch (InterruptedException ie) {
           // Do nothing.
         }
@@ -60,10 +58,10 @@ public class ArduinoSensorManager implements SensorManager {
     }
   }
 
-  private void connectToDevice() throws IOException {
+  private boolean connectToDevice() {
     if (socket != null) {
       if (socket.isConnected()) {
-        return;
+        return true;
       }
 
       // Connection is stale, try to reconnect.
@@ -74,11 +72,17 @@ public class ArduinoSensorManager implements SensorManager {
     Log.i("Arduino", "Connecting");
     BluetoothDevice arduinoDevice = findArduinoDevice();
     if (arduinoDevice != null) {
-      openSocket(arduinoDevice);
-      Log.i("Arduino", "Connected");
-    } else {
-      throw new IOException("Arduino device not found");
+      try {
+        openSocket(arduinoDevice);
+        Log.i("Arduino", "Connected");
+        return true;
+      } catch (IOException e) {
+        Log.e("Arduino", "Failed to connect", e);
+      }
     }
+
+    Log.w("Arduino", "Device not found");
+    return false;
   }
 
   @Override
@@ -90,7 +94,7 @@ public class ArduinoSensorManager implements SensorManager {
 
   private void disconnectFromDevice() {
     if (socket == null || arduinoOutput == null) {
-      Log.w("Arduino", "Trying to disconnect already-disconnected socket");
+      Log.v("Arduino", "Trying to disconnect already-disconnected socket");
       return;
     }
 
@@ -192,6 +196,8 @@ public class ArduinoSensorManager implements SensorManager {
 
     if (MeasurementType.IMPELLER_SPEED == type) {
       value = getCalibratedSpeed(value);
+    } else if (MeasurementType.HEIGHT == type) {
+      value = value/100;
     }
 
     return new Measurement(type, value);

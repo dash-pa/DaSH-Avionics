@@ -61,12 +61,19 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
     if (btadapter != null) {
       btadapter.stopLeScan(this);
     }
+    closegatt(gatt);
+  }
+
+  private void closegatt(BluetoothGatt gatt) {
     if (gatt != null) {
       gatt.disconnect();
-      gatt.close();
+      gatt.close();;
     }
-    characteristicsEnabled = false;
-    setWriteDescriptorStatus(WriteDescriptorStatus.DONE);
+    synchronized (writeStatusLock) {
+      characteristicsEnabled = false;
+      setWriteDescriptorStatus(WriteDescriptorStatus.DONE);
+    }
+
   }
 
   private void startScan() {
@@ -86,11 +93,7 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
 
 //    Log.d("BTLE", "BTLE device: " + device.getName() + ",  Address: " + device.getAddress());
 //    Log.d("BTLE", "Searching for device with prefix " + deviceNamePrefix);
-    if (device.getName().startsWith(deviceNamePrefix) && onDeviceFound(device)) {
-      //noinspection deprecation
-      if (btadapter != null) {
-        btadapter.stopLeScan(this);
-      }
+    if (!characteristicsEnabled && device.getName().startsWith(deviceNamePrefix) && onDeviceFound(device)) {
       gatt = device.connectGatt(context, false, this); // set this as the gatt handler
     }
   }
@@ -109,8 +112,12 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
   @Override
   public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
     if (newState == BluetoothProfile.STATE_CONNECTED) {
-      Log.i("BTLE", "BTGatt connected");
-      gatt.discoverServices();
+        Log.i("BTLE", "BTGatt connected");
+        gatt.discoverServices();
+    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+      //Reconnect if we were disconnected but this is the correct device.
+        closegatt(gatt);
+        Log.i("BTLE", "BTGatt disconnected");
     } else {
       Log.w("BTLE", "BTGatt state " + newState);
     }

@@ -23,12 +23,6 @@ public class MeasurementAlertSounds implements MeasurementAlerter.AlertListener 
     private final int priority;
     private final int numLoops;
 
-    private AlertSoundDescription(int soundId, int priority) {
-      this.soundId = soundId;
-      this.priority = priority;
-      this.numLoops = -1;
-    }
-
     private AlertSoundDescription(int soundId, int priority, int numLoops) {
       this.soundId = soundId;
       this.priority = priority;
@@ -60,12 +54,12 @@ public class MeasurementAlertSounds implements MeasurementAlerter.AlertListener 
           .setAudioAttributes(audioAttributes)
           .build();
 
-      loadSound(AlertType.LOW_SPEED, R.raw.slow, 100, -1);
+      loadSound(AlertType.LOW_SPEED, R.raw.slow, 100, 5);
       loadSound(AlertType.HIGH_SPEED, R.raw.fast, 50, -1);
       loadSound(AlertType.UNKNOWN_SPEED, R.raw.speed, 1, 5);
 
       // Only repeat low height 15 times so we're not too annoying during landing.
-      loadSound(AlertType.LOW_HEIGHT, R.raw.low, 90, 15);
+      loadSound(AlertType.LOW_HEIGHT, R.raw.low, 90, 5);
       loadSound(AlertType.HIGH_HEIGHT, R.raw.high, 30, -1);
       loadSound(AlertType.UNKNOWN_HEIGHT, R.raw.height, 1, 5);
 

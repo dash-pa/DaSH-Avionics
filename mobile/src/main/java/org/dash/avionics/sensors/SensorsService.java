@@ -182,14 +182,14 @@ public class SensorsService extends Service implements SensorListener {
 
   private ImmutableMultiset<SensorManager> getEnabledSensorManagers() {
     ImmutableMultiset.Builder<SensorManager> builder = new ImmutableMultiset.Builder<>();
-    if (preferences.isFakeDataEnabled().get()) builder.add(fakeSensor);
+//    if (preferences.isFakeDataEnabled().get()) builder.add(fakeSensor);
     if (preferences.isViiiivaEnabled().get()) builder.add(vivaSensor);
     if (preferences.isWeatherMeterEnabled().get()) builder.add(weatherMeterSensor);
     if (preferences.isKingpostMeterEnabled().get()) builder.add(weatherMeterSensorKingPost);
     if (preferences.isAntPlusEnabled().get()) builder.add(antSensor);
     if (preferences.isArduinoEnabled().get()) builder.add(arduinoSensor);
     if (preferences.isGpsEnabled().get()) builder.add(gpsSensor);
-    if (preferences.isAttitudeEnabled().get()) builder.add(attitudeSensor);
+//    if (preferences.isAttitudeEnabled().get()) builder.add(attitudeSensor);
     if (preferences.isUdpReceivingEnabled().get()) builder.add(udpSensor);
     return builder.build();
   }
