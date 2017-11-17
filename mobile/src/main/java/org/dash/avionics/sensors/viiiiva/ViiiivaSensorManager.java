@@ -60,7 +60,7 @@ public class ViiiivaSensorManager extends BTLESensorManager {
 
     // enable cadence notifications
     // TODO(Tony): Enable and test
-//    enableCharacteristic(CADENCE_SERVICE_UUID, CADENCE_CHARACTERISTIC, "cadence");
+    enableCharacteristic(CADENCE_SERVICE_UUID, CADENCE_CHARACTERISTIC, "cadence");
   }
 
   @Override
@@ -128,7 +128,20 @@ public class ViiiivaSensorManager extends BTLESensorManager {
     // Offset 1 - Cumulative wheel revolutions (4 bytes)
     // Offset 5 - Last wheel event time (2 bytes)
     // Offset 7 - Cumulative crank revolutions (2 bytes)
-    Integer lastCrankEvent = characteristic.getIntValue(FORMAT_UINT16, 9);
+    Integer flags = characteristic.getIntValue(FORMAT_UINT8, 0);
+    int offset = 9;
+
+    //Flags bit 2 indicates if crank data is present
+    if ((flags & 0x02) == 0) {
+      Log.w("Viiiiva", "No crank data availible");
+      return;
+    }
+    //If the first bit is 0, we don't have wheel data and use a smaller offset for crank data.
+    if ((flags & 0x01) == 0) {
+      offset = 3;
+    }
+
+    Integer lastCrankEvent = characteristic.getIntValue(FORMAT_UINT16, offset);
     if (lastCrankEvent == null) {
       Log.w("Viiiiva", "Invalid crank event time " + Arrays.toString(characteristic.getValue()));
       return;
@@ -142,7 +155,11 @@ public class ViiiivaSensorManager extends BTLESensorManager {
 
       float crankPeriodSeconds =
           (lastCrankEvent.floatValue() - previousCrankEvent.floatValue()) / 1024.0f;
-      float crankFrequencyRpm = 60.0f / crankPeriodSeconds;
+      float crankFrequencyRpm = 0;
+
+      if (crankPeriodSeconds != 0) {
+        crankFrequencyRpm = 60.0f / crankPeriodSeconds;
+      }
 
       getListener().onNewMeasurement(new Measurement(MeasurementType.CRANK_RPM, crankFrequencyRpm));
     }
