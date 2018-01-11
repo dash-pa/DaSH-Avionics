@@ -61,6 +61,11 @@
 
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="@string/settings_key_sensor_disto"
+        android:title="@string/settings_sensor_disto"/>
+
+    <CheckBoxPreference
+        android:defaultValue="false"
         android:key="@string/settings_key_sensor_weathermeter"
         android:title="@string/settings_sensor_weathermeter"/>
 

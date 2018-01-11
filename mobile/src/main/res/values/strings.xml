@@ -54,6 +54,7 @@
   <string name="settings_alert_height_delta">Height error to alert at (m)</string>
   <string name="settings_sensor_arduino">Enable Arduino</string>
   <string name="settings_sensor_viiiiva">Enable Viiiiva</string>
+  <string name="settings_sensor_disto">Enable Disto</string>
   <string name="settings_sensor_weathermeter">Enable WeatherMeter</string>
   <string name="settings_sensor_kingpost">Enable Kingpost Meter</string>
   <string name="settings_sensor_antplus">Enable Quarq</string>
@@ -71,6 +72,7 @@
   <string name="settings_key_height_delta">alert_height_delta</string>
   <string name="settings_key_sensor_arduino">sensors_enable_arduino</string>
   <string name="settings_key_sensor_viiiiva">sensors_enable_viiiiva</string>
+  <string name="settings_key_sensor_disto">sensors_enable_disto</string>
   <string name="settings_key_sensor_weathermeter">sensors_enable_weathermeter</string>
   <string name="settings_key_sensor_kingpost">sensors_enable_kingpost</string>
   <string name="settings_key_sensor_antplus">sensors_enable_antplus</string>

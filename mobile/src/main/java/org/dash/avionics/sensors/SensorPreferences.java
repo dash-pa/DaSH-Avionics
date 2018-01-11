@@ -14,6 +14,9 @@ public interface SensorPreferences {
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_viiiiva)
   boolean isViiiivaEnabled();
 
+  @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_disto)
+  boolean isDistoEnabled();
+
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_weathermeter)
   boolean isWeatherMeterEnabled();
 

@@ -166,7 +166,12 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
   protected abstract void enableCharacteristics();
 
   protected void enableCharacteristic(UUID serviceUuid, UUID characteristicUuid, String
-      serviceName) {
+          serviceName) {
+    enableCharacteristic(serviceUuid, characteristicUuid, serviceName, false);
+  }
+
+  protected void enableCharacteristic(UUID serviceUuid, UUID characteristicUuid, String
+      serviceName, boolean enableIndication) {
     BluetoothGattService service = gatt.getService(serviceUuid);
     if (service == null) {
       Log.w("BTLE", serviceName + " service is null!");
@@ -202,7 +207,11 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
 
     // Set Enable or Disable notification on the descriptor depending on argument val
     Log.v("BTLE", "Enabling notifications for " + descriptor.getUuid());
-    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+    if (enableIndication) {
+      descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+    } else {
+      descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+    }
 
     // Wait for any possible descriptor writing to finish
     waitForWriteDescriptorNotWorking();

@@ -29,6 +29,7 @@ import org.dash.avionics.display.PFDActivity_;
 import org.dash.avionics.sensors.ant.AntSensorManager;
 import org.dash.avionics.sensors.arduino.ArduinoSensorManager;
 import org.dash.avionics.sensors.attitude.AttitudeSensorManager;
+import org.dash.avionics.sensors.disto.DistoSensorManager;
 import org.dash.avionics.sensors.fake.FakeSensorManager;
 import org.dash.avionics.sensors.gps.GpsSensorManager;
 import org.dash.avionics.sensors.network.UDPMeasurementSender;
@@ -57,6 +58,8 @@ public class SensorsService extends Service implements SensorListener {
   protected FakeSensorManager fakeSensor;
   @Bean
   protected ViiiivaSensorManager vivaSensor;
+  @Bean
+  protected DistoSensorManager distoSensor;
   @Bean
   protected GpsSensorManager gpsSensor;
   @Bean
@@ -184,6 +187,7 @@ public class SensorsService extends Service implements SensorListener {
     ImmutableMultiset.Builder<SensorManager> builder = new ImmutableMultiset.Builder<>();
 //    if (preferences.isFakeDataEnabled().get()) builder.add(fakeSensor);
     if (preferences.isViiiivaEnabled().get()) builder.add(vivaSensor);
+    if (preferences.isDistoEnabled().get()) builder.add(distoSensor);
     if (preferences.isWeatherMeterEnabled().get()) builder.add(weatherMeterSensor);
     if (preferences.isKingpostMeterEnabled().get()) builder.add(weatherMeterSensorKingPost);
     if (preferences.isAntPlusEnabled().get()) builder.add(antSensor);
