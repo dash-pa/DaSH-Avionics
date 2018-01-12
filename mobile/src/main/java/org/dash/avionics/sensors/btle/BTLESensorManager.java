@@ -29,6 +29,8 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
   private static final UUID CLIENT_CHARACTERISTIC_CONFIG =
       UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
+  private static final int MAX_SERVICE_RETRIES = 3;
+
   private final Context context;
   private final String deviceNamePrefix;
   private final BluetoothAdapter btadapter;
@@ -94,6 +96,7 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
 //    Log.d("BTLE", "BTLE device: " + device.getName() + ",  Address: " + device.getAddress());
 //    Log.d("BTLE", "Searching for device with prefix " + deviceNamePrefix);
     if (!characteristicsEnabled && device.getName().startsWith(deviceNamePrefix) && onDeviceFound(device)) {
+      Log.d("BTLE", "Connected to device " + device.getName());
       gatt = device.connectGatt(context, false, this); // set this as the gatt handler
     }
   }
@@ -173,10 +176,24 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
   protected void enableCharacteristic(UUID serviceUuid, UUID characteristicUuid, String
       serviceName, boolean enableIndication) {
     BluetoothGattService service = gatt.getService(serviceUuid);
+    int tries = 0;
+    while (service == null && tries < MAX_SERVICE_RETRIES) {
+      tries++;
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        Log.w("BTLE", "Interrupted while sleeping for service " + serviceName);
+        return;
+      }
+      service = gatt.getService(serviceUuid);
+    }
+
     if (service == null) {
       Log.w("BTLE", serviceName + " service is null!");
       return;
     }
+
+    Log.w("BTLE", serviceName + " service found on try #" + (tries + 1));
 
     BluetoothGattCharacteristic characteristic = service.getCharacteristic(characteristicUuid);
     if (characteristic == null) {
