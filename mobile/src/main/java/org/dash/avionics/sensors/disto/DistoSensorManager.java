@@ -7,8 +7,10 @@ import android.util.Log;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementType;
+import org.dash.avionics.sensors.SensorPreferences_;
 import org.dash.avionics.sensors.btle.BTLESensorManager;
 
 import java.nio.ByteBuffer;
@@ -34,9 +36,14 @@ public class DistoSensorManager extends BTLESensorManager {
   public static final UUID CHARACTERISTIC_UNKNOWN3 =
           UUID.fromString("3ab1010c-f831-4395-b29d-570977d5bf94");
 
+  private MeasurementType measurementType;
+
   public DistoSensorManager(Context context) {
     super(context, "DISTO");
   }
+
+  @Pref
+  SensorPreferences_ preferences;
 
   @Background
   @Override
@@ -66,6 +73,9 @@ public class DistoSensorManager extends BTLESensorManager {
   }
 
   protected MeasurementType getMeasurmentType() {
+    if (preferences.isArduinoEnabled().get()) {
+      return MeasurementType.LASER_HEIGHT;
+    }
     return MeasurementType.HEIGHT;
   }
 }
