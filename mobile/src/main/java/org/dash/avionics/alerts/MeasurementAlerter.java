@@ -4,13 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 
 import org.androidannotations.annotations.Background;
@@ -18,21 +14,15 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.dash.avionics.aircraft.AircraftSettings_;
-import org.dash.avionics.aircraft.CruiseSpeedCalculator;
 import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementListener;
 import org.dash.avionics.data.MeasurementObserver;
 import org.dash.avionics.data.MeasurementType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 @EBean
 public class MeasurementAlerter

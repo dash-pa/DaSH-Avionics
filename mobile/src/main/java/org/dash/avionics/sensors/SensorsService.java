@@ -2,11 +2,15 @@ package org.dash.avionics.sensors;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.IBinder;
@@ -95,7 +99,7 @@ public class SensorsService extends Service implements SensorListener {
     wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "sensors");
     wakeLock.acquire();
 
-    Notification.Builder notificationBuilder = new Notification.Builder(this);
+    Notification.Builder notificationBuilder = new Notification.Builder(this, "pfd_sensor_service");
     notificationBuilder.setLights(0xffff00ff, 400, 200);
     notificationBuilder.setOngoing(true);
     notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
@@ -116,6 +120,13 @@ public class SensorsService extends Service implements SensorListener {
 
     notificationBuilder.addAction(android.R.drawable.ic_delete, "Stop",
         PendingIntent.getService(this, REQUEST_STOP, stopIntent, 0));
+
+    NotificationChannel chan = new NotificationChannel("pfd_sensor_service", "DaSH PFD Sensor Service", NotificationManager.IMPORTANCE_HIGH);
+    chan.setLightColor(Color.BLUE);
+    chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+    NotificationManager service = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    service.createNotificationChannel(chan);
+
     startForeground(1234, notificationBuilder.build());
   }
 

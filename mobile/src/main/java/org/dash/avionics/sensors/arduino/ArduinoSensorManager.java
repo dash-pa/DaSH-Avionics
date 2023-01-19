@@ -3,7 +3,7 @@ package org.dash.avionics.sensors.arduino;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import org.androidannotations.annotations.Background;

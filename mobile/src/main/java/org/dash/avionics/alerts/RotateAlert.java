@@ -1,12 +1,8 @@
 package org.dash.avionics.alerts;
 
-import android.provider.Settings;
-import android.support.annotation.Nullable;
-
 import com.google.common.collect.Range;
 
 import org.dash.avionics.aircraft.AircraftSettings_;
-import org.dash.avionics.aircraft.CruiseSpeedCalculator;
 import org.dash.avionics.data.MeasurementType;
 
 import java.util.Set;

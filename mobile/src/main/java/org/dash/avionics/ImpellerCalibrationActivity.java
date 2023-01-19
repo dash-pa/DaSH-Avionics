@@ -64,7 +64,7 @@ public class ImpellerCalibrationActivity extends Activity implements
     super.onCreate(savedInstanceState);
 
     Intent intent = SensorsService_.intent(getApplicationContext()).get();
-    startService(intent);
+    startForegroundService(intent);
 
     observer = new MeasurementObserver(new Handler(), getContentResolver(),
         this);

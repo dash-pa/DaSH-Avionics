@@ -2,9 +2,15 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/dash.iml" filepath="$PROJECT_DIR$/dash.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
-      <module fileurl="file://$PROJECT_DIR$/wear/wear.iml" filepath="$PROJECT_DIR$/wear/wear.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DaSH-Avionics.iml" filepath="$PROJECT_DIR$/.idea/modules/DaSH-Avionics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mobile/DaSH-Avionics.mobile.iml" filepath="$PROJECT_DIR$/.idea/modules/mobile/DaSH-Avionics.mobile.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mobile/DaSH-Avionics.mobile.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/mobile/DaSH-Avionics.mobile.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mobile/DaSH-Avionics.mobile.main.iml" filepath="$PROJECT_DIR$/.idea/modules/mobile/DaSH-Avionics.mobile.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mobile/DaSH-Avionics.mobile.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/mobile/DaSH-Avionics.mobile.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wear/DaSH-Avionics.wear.iml" filepath="$PROJECT_DIR$/.idea/modules/wear/DaSH-Avionics.wear.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wear/DaSH-Avionics.wear.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/wear/DaSH-Avionics.wear.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wear/DaSH-Avionics.wear.main.iml" filepath="$PROJECT_DIR$/.idea/modules/wear/DaSH-Avionics.wear.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wear/DaSH-Avionics.wear.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/wear/DaSH-Avionics.wear.unitTest.iml" />
     </modules>
   </component>
 </project>

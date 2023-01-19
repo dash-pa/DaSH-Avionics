@@ -1,7 +1,5 @@
 package org.dash.avionics.alerts;
 
-import android.support.annotation.Nullable;
-
 import com.google.common.collect.Range;
 
 import org.dash.avionics.aircraft.AircraftSettings_;

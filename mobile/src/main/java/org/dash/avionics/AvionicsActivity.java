@@ -70,7 +70,7 @@ public class AvionicsActivity extends Activity
     super.onCreate(savedInstanceState);
 
     serviceIntent = SensorsService_.intent(getApplicationContext()).get();
-    startService(serviceIntent);
+    startForegroundService(serviceIntent);
 
     observer = new MeasurementObserver(new Handler(), getContentResolver(),
         this);

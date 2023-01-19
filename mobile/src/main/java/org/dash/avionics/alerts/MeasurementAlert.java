@@ -1,7 +1,5 @@
 package org.dash.avionics.alerts;
 
-import android.support.annotation.Nullable;
-
 import org.dash.avionics.aircraft.AircraftSettings_;
 import org.dash.avionics.data.MeasurementType;
 

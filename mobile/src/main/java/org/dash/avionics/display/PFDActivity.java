@@ -60,7 +60,7 @@ public class PFDActivity extends Activity {
     speedAlerter.start();
 
     serviceIntent = SensorsService_.intent(getApplicationContext()).get();
-    startService(serviceIntent);
+    startForegroundService(serviceIntent);
   }
 
   @Override
