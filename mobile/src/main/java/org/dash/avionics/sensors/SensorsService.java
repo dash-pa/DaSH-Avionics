@@ -1,5 +1,7 @@
 package org.dash.avionics.sensors;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -10,12 +12,14 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
@@ -112,14 +116,14 @@ public class SensorsService extends Service implements SensorListener {
     notificationBuilder.setSmallIcon(R.drawable.ic_launcher);
 
     notificationBuilder.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0,
-        PFDActivity_.intent(getApplicationContext()).get(), 0));
+        PFDActivity_.intent(getApplicationContext()).get(), FLAG_IMMUTABLE));
 
     Intent stopIntent = new Intent();
     stopIntent.setClass(getApplicationContext(), SensorsService_.class);
     stopIntent.putExtra(EXTRA_STOP, true);
 
     notificationBuilder.addAction(android.R.drawable.ic_delete, "Stop",
-        PendingIntent.getService(this, REQUEST_STOP, stopIntent, 0));
+        PendingIntent.getService(this, REQUEST_STOP, stopIntent, FLAG_IMMUTABLE));
 
     NotificationChannel chan = new NotificationChannel("pfd_sensor_service", "DaSH PFD Sensor Service", NotificationManager.IMPORTANCE_HIGH);
     chan.setLightColor(Color.BLUE);
@@ -195,15 +199,28 @@ public class SensorsService extends Service implements SensorListener {
   }
 
   private ImmutableMultiset<SensorManager> getEnabledSensorManagers() {
+    Context context = getApplicationContext();
     ImmutableMultiset.Builder<SensorManager> builder = new ImmutableMultiset.Builder<>();
 //    if (preferences.isFakeDataEnabled().get()) builder.add(fakeSensor);
-    if (preferences.isViiiivaEnabled().get()) builder.add(vivaSensor);
-    if (preferences.isDistoEnabled().get()) builder.add(distoSensor);
-    if (preferences.isWeatherMeterEnabled().get()) builder.add(weatherMeterSensor);
-    if (preferences.isKingpostMeterEnabled().get()) builder.add(weatherMeterSensorKingPost);
-    if (preferences.isAntPlusEnabled().get()) builder.add(antSensor);
-    if (preferences.isArduinoEnabled().get()) builder.add(arduinoSensor);
-    if (preferences.isGpsEnabled().get()) builder.add(gpsSensor);
+    // Do not add any BT sensors if we don't have permission
+    if (context.checkSelfPermission("android.permission.BLUETOOTH_CONNECT") == PackageManager.PERMISSION_GRANTED) {
+      if (preferences.isViiiivaEnabled().get()) builder.add(vivaSensor);
+      if (preferences.isDistoEnabled().get()) builder.add(distoSensor);
+      if (preferences.isWeatherMeterEnabled().get()) builder.add(weatherMeterSensor);
+      if (preferences.isKingpostMeterEnabled().get()) builder.add(weatherMeterSensorKingPost);
+      if (preferences.isAntPlusEnabled().get()) builder.add(antSensor);
+      if (preferences.isArduinoEnabled().get()) builder.add(arduinoSensor);
+    } else {
+      Log.w("SensorService", "Unable to start BT sensors");
+      Toast.makeText(getApplicationContext(), "Unable to start BT sensors, please grant requried permissions", Toast.LENGTH_LONG).show();
+    }
+    // Can't add GPS without the correct permissions
+    if (context.checkSelfPermission("android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+      if (preferences.isGpsEnabled().get()) builder.add(gpsSensor);
+    } else {
+      Log.w("SensorService", "Unable to start Location sensors");
+      Toast.makeText(getApplicationContext(), "Unable to start Location sensors, please grant requried permissions", Toast.LENGTH_LONG).show();
+    }
 //    if (preferences.isAttitudeEnabled().get()) builder.add(attitudeSensor);
     if (preferences.isUdpReceivingEnabled().get()) builder.add(udpSensor);
     return builder.build();

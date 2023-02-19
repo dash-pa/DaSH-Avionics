@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,7 +15,6 @@ import org.dash.avionics.R;
 import org.dash.avionics.data.MeasurementStorageColumns;
 import org.dash.avionics.data.MeasurementType;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -33,7 +31,7 @@ public class CsvDataDumper {
   private ProgressDialog progress;
 
   @Background
-  public void dumpAllData() {
+  public void dumpAllData(FileOutputStream output) {
     ContentResolver contentResolver = context.getContentResolver();
 
     Cursor cursor = contentResolver.query(
@@ -45,7 +43,7 @@ public class CsvDataDumper {
     }
 
     try {
-      writeCsvFile(cursor);
+      writeCsvFile(cursor, output);
     } catch (IOException e) {
       Log.w("DUMP", "Failed to write CSV", e);
       showFailure();
@@ -67,10 +65,8 @@ public class CsvDataDumper {
     Toast.makeText(context, R.string.dump_failed, Toast.LENGTH_LONG).show();
   }
 
-  private void writeCsvFile(Cursor cursor) throws IOException {
-    FileOutputStream output = null;
+  private void writeCsvFile(Cursor cursor, FileOutputStream output) throws IOException {
     try {
-      output = getOutputStream();
       writeCsvHeader(output);
       int idIdx = cursor.getColumnIndexOrThrow(MeasurementStorageColumns._ID);
       int timeIdx = cursor.getColumnIndexOrThrow(MeasurementStorageColumns.VALUE_TIMESTAMP);
@@ -148,26 +144,8 @@ public class CsvDataDumper {
     output.write(builder.toString().getBytes("UTF-8"));
   }
 
-  private String formatTimestamp(long time) {
+  public String formatTimestamp(long time) {
     Date when = new Date(time);
     return TIMESTAMP_FORMAT.format(when);
-  }
-
-  private FileOutputStream getOutputStream() throws IOException {
-    String storageState = Environment.getExternalStorageState();
-    if (!Environment.MEDIA_MOUNTED.equals(storageState)) {
-      throw new IOException("External media not available (" + storageState + ")");
-    }
-
-    File dir = Environment.getExternalStorageDirectory();
-    File file = new File(dir, formatTimestamp(System.currentTimeMillis()) + ".csv");
-    if (file.exists()) {
-      throw new IOException("File already exists");
-    }
-    if (!file.createNewFile()) {
-      throw new IOException("Unable to create file");
-    }
-    Log.i("DUMP", "Dumping data to file '" + file.getCanonicalPath() + "'.");
-    return new FileOutputStream(file);
   }
 }

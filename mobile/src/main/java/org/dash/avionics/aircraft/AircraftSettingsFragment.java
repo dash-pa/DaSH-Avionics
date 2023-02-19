@@ -1,11 +1,18 @@
 package org.dash.avionics.aircraft;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.provider.DocumentsContract;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
@@ -15,6 +22,8 @@ import org.dash.avionics.data.DataDeleter;
 import org.dash.avionics.data.files.CsvDataDumper;
 import org.dash.avionics.sensors.SensorPreferences_;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -40,6 +49,8 @@ public class AircraftSettingsFragment extends PreferenceFragment
 
   private AircraftType currentAircraftType;
   private float currentPilotWeight;
+
+  private static final int DUMP_ALL_DATA_TO_CSV = 2;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -136,7 +147,14 @@ public class AircraftSettingsFragment extends PreferenceFragment
   @Override
   public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
     if (getString(R.string.settings_action_dump_data).equals(preference.getKey())) {
-      dumper.dumpAllData();
+      // Ask the user where to save the file
+      String fileName = dumper.formatTimestamp(System.currentTimeMillis()) + ".csv";
+      Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+      intent.addCategory(Intent.CATEGORY_OPENABLE);
+      intent.setType("application/csv");
+      intent.putExtra(Intent.EXTRA_TITLE, fileName);
+      intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, Environment.DIRECTORY_DOCUMENTS);
+      startActivityForResult(intent, DUMP_ALL_DATA_TO_CSV);
     } else if (getString(R.string.settings_action_erase_data).equals(preference.getKey())) {
       deleter.deleteAllData();
     } else {
@@ -144,6 +162,56 @@ public class AircraftSettingsFragment extends PreferenceFragment
     }
     return true;
   }
+
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+    if ((requestCode == DUMP_ALL_DATA_TO_CSV) && (resultCode == Activity.RESULT_OK)) {
+      // The result data contains a URI for the document or directory that
+      // the user selected.
+      Uri uri = null;
+      if (resultData != null) {
+        uri = resultData.getData();
+        ParcelFileDescriptor pfd = null;
+        try {
+          pfd = getActivity().getContentResolver().openFileDescriptor(uri, "w");
+        } catch (IOException e) {
+          Log.w("DUMP", "Failed to write CSV", e);
+          Toast.makeText(getContext(), R.string.dump_failed, Toast.LENGTH_LONG).show();
+          return;
+        }
+        FileOutputStream output = new FileOutputStream(pfd.getFileDescriptor());
+        // Dump the data to the requested file
+        dumper.dumpAllData(output);
+      }
+    }
+  }
+
+//  @Override
+//  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//    switch (requestCode) {
+//      case FILE_PERM_REQ_CODE:
+//        // If request is cancelled, the result arrays are empty.
+//        if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+//          btEnabled = true;
+//        }  else {
+//          btEnabled = false;
+//        }
+//        break;
+//      case LOC_REQ_CODE:
+//        // If request is cancelled, the result arrays are empty.
+//        if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+//          locEnabled = true;
+//        }  else {
+//          locEnabled = false;
+//        }
+//        break;
+//    }
+//    if (btEnabled && locEnabled && (serviceIntent == null)) {
+//      Log.i("PFDActivity", "Starting sensors after permissions granted");
+//      serviceIntent = SensorsService_.intent(getApplicationContext()).get();
+//      startForegroundService(serviceIntent);
+//    }
+//  }
 
   private void updateDerivedValues() {
     float cruiseAirspeed = CruiseSpeedCalculator.getCruiseAirspeed(currentAircraftType, currentPilotWeight);

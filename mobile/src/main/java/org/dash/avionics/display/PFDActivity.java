@@ -2,8 +2,9 @@ package org.dash.avionics.display;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -29,20 +30,88 @@ public class PFDActivity extends Activity {
   protected PFDView_ pfdView;
 
   private Intent serviceIntent;
-  @Bean PFDModel model;
+  @Bean
+  PFDModel model;
   @Bean
   MeasurementAlerter speedAlerter;
   @Bean
   MeasurementAlertSounds speedAlertSounds;
+
+  private final int BT_REQ_CODE = 1;
+  private final int LOC_REQ_CODE = 2;
+
+  private boolean locEnabled = false;
+
+  private boolean btEnabled = false;
+
+  private boolean requestingPermission = false;
 
   @AfterViews
   protected void setModel() {
     pfdView.setModel(model);
   }
 
+  private void checkPermissions() {
+    // Before we start the sensors, ask for permissions
+    if (checkSelfPermission("android.permission.ACCESS_FINE_LOCATION") != PackageManager.PERMISSION_GRANTED) {
+      if (!requestingPermission) {
+        requestingPermission = true;
+        Log.w("PFDActivity", "Requesting location permissions");
+        requestPermissions(new String[]{"android.permission.ACCESS_FINE_LOCATION"}, LOC_REQ_CODE);
+      }
+    } else {
+      locEnabled = true;
+    }
+    if (
+        (checkSelfPermission("android.permission.BLUETOOTH_SCAN") != PackageManager.PERMISSION_GRANTED) ||
+            (checkSelfPermission("android.permission.BLUETOOTH_CONNECT") != PackageManager.PERMISSION_GRANTED)
+    ) {
+      if (!requestingPermission) {
+        requestingPermission = true;
+        Log.w("PFDActivity", "Requesting Bluetooth permissions");
+        requestPermissions(
+            new String[]{"android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT"},
+            BT_REQ_CODE
+        );
+      }
+    } else {
+      btEnabled = true;
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    switch (requestCode) {
+      case BT_REQ_CODE:
+        requestingPermission = false;
+        // If request is cancelled, the result arrays are empty.
+        if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+          btEnabled = true;
+        } else {
+          btEnabled = false;
+        }
+        break;
+      case LOC_REQ_CODE:
+        requestingPermission = false;
+        // If request is cancelled, the result arrays are empty.
+        if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+          locEnabled = true;
+        } else {
+          locEnabled = false;
+        }
+        break;
+    }
+    if (btEnabled && locEnabled && (serviceIntent == null)) {
+      Log.i("PFDActivity", "Starting sensors after permissions granted");
+      serviceIntent = SensorsService_.intent(getApplicationContext()).get();
+      startForegroundService(serviceIntent);
+    }
+  }
+
   @Override
   protected void onPostCreate(Bundle savedInstanceState) {
     super.onPostCreate(savedInstanceState);
+    checkPermissions();
 
     // Trigger the initial hide() shortly after the activity has been
     // created, to briefly hint to the user that UI controls
@@ -53,6 +122,7 @@ public class PFDActivity extends Activity {
   @Override
   protected void onResume() {
     super.onResume();
+    checkPermissions();
 
     model.start();
     speedAlertSounds.start();

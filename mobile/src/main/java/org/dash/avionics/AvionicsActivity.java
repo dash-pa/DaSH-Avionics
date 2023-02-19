@@ -3,6 +3,7 @@ package org.dash.avionics;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -65,12 +66,41 @@ public class AvionicsActivity extends Activity
   private MeasurementAlerter speedAlerter;
   private Intent serviceIntent;
 
+  private final int BT_REQ_CODE = 1;
+  private final int LOC_REQ_CODE = 2;
+
+  private boolean locEnabled = false;
+
+  private boolean btEnabled = false;
+
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    serviceIntent = SensorsService_.intent(getApplicationContext()).get();
-    startForegroundService(serviceIntent);
+    // Before we start the sensors, ask for permissions
+    if (checkSelfPermission("android.permission.ACCESS_FINE_LOCATION") != PackageManager.PERMISSION_GRANTED) {
+      Log.w("AvionicsActivity", "Requesting location permissions");
+      requestPermissions(new String[]{"android.permission.ACCESS_FINE_LOCATION"}, LOC_REQ_CODE);
+    } else {
+      locEnabled = true;
+    }
+    if (
+        (checkSelfPermission("android.permission.BLUETOOTH_SCAN") != PackageManager.PERMISSION_GRANTED) ||
+            (checkSelfPermission("android.permission.BLUETOOTH_CONNECT") != PackageManager.PERMISSION_GRANTED)
+    ) {
+      Log.w("AvionicsActivity", "Requesting Bluetooth permissions");
+      requestPermissions(
+          new String[]{"android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT"},
+          BT_REQ_CODE
+      );
+    } else {
+      btEnabled = true;
+    }
+    if (btEnabled && locEnabled) {
+      Log.w("AvionicsActivity", "Starting sensors onCreate");
+      serviceIntent = SensorsService_.intent(getApplicationContext()).get();
+      startForegroundService(serviceIntent);
+    }
 
     observer = new MeasurementObserver(new Handler(), getContentResolver(),
         this);
@@ -78,6 +108,33 @@ public class AvionicsActivity extends Activity
 
     //noinspection ConstantConditions
     getActionBar().hide();
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    switch (requestCode) {
+      case BT_REQ_CODE:
+        // If request is cancelled, the result arrays are empty.
+        if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+          btEnabled = true;
+        }  else {
+          btEnabled = false;
+        }
+        break;
+      case LOC_REQ_CODE:
+        // If request is cancelled, the result arrays are empty.
+        if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+          locEnabled = true;
+        }  else {
+          locEnabled = false;
+        }
+        break;
+    }
+    if (btEnabled && locEnabled && (serviceIntent == null)) {
+      Log.i("AvionicsActivity", "Starting sensors after permissions granted");
+      serviceIntent = SensorsService_.intent(getApplicationContext()).get();
+      startForegroundService(serviceIntent);
+    }
   }
 
   @AfterViews

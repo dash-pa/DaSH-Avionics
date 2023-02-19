@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import org.dash.avionics.sensors.SensorListener;
@@ -48,8 +49,12 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
 
   @Override
   public void connect(SensorListener listener) {
-    this.listener = listener;
-    startScan();
+    if (context.checkSelfPermission("android.permission.BLUETOOTH_SCAN") == PackageManager.PERMISSION_GRANTED) {
+      this.listener = listener;
+      startScan();
+    } else {
+      Log.e("BTLE", "Unable to connect, permission not granted");
+    }
   }
 
   protected SensorListener getListener() {
@@ -92,6 +97,7 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
     if (device == null || device.getName() == null) {
       return;
     }
+    // Wahoo == TICKR
 
 //    Log.d("BTLE", "BTLE device: " + device.getName() + ",  Address: " + device.getAddress());
 //    Log.d("BTLE", "Searching for device with prefix " + deviceNamePrefix);
