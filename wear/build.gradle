@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 
 
 android {
-  compileSdkVersion 33
-  buildToolsVersion '33.0.1'
+  compileSdkVersion 34
+  buildToolsVersion '34.0.0'
 
   defaultConfig {
     applicationId "org.dash.avionics"
     minSdkVersion 29
-    targetSdkVersion 33
+    targetSdkVersion 34
     versionCode 1
     versionName "1.0"
   }
@@ -25,5 +25,5 @@ dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
   implementation 'com.google.android.wearable:wearable:2.9.0'
   implementation 'com.google.android.support:wearable:2.9.0'
-  implementation 'com.google.android.gms:play-services-wearable:18.0.0'
+  implementation 'com.google.android.gms:play-services-wearable:18.1.0'
 }

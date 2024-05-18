@@ -1,14 +1,45 @@
 apply plugin: 'com.android.application'
 
+class AAGenerator extends DefaultTask {
+  @TaskAction
+  addDependencies() {
+    project.dependencies {
+      annotationProcessor(
+              'org.androidannotations:androidannotations:4.8.0')
+    }
+  }
+}
+
+tasks.register("generateAAClasses", AAGenerator) {
+  group('build')
+  description('Generate Q-type classes by queryDsl in build directory with default path')
+  finalizedBy('compileJava')
+  doLast {
+    println("AA classes will gererated and stored in ${compileJava.options.annotationProcessorGeneratedSourcesDirectory}")
+  }
+}
+
 android {
-  compileSdkVersion 33
+  compileSdk 34
+  lintOptions {
+    abortOnError false
+  }
 
   defaultConfig {
     applicationId "org.dash.avionics"
     minSdkVersion 29
-    targetSdkVersion 33
+    targetSdkVersion 34
     versionCode 1
     versionName "1.0"
+
+    javaCompileOptions {
+      annotationProcessorOptions {
+        arguments = [
+                "androidManifestFile": "$projectDir/src/main/AndroidManifest.xml".toString(),
+                "resourcePackageName": "org.dash.avionics"
+        ]
+      }
+    }
   }
   buildTypes {
     release {
@@ -17,7 +48,7 @@ android {
     }
   }
   namespace 'org.dash.avionics'
-  buildToolsVersion '33.0.1'
+  buildToolsVersion '34.0.0'
 }
 
 dependencies {
@@ -26,7 +57,7 @@ dependencies {
   annotationProcessor "org.androidannotations:androidannotations:4.8.0"
   implementation "org.androidannotations:androidannotations-api:4.8.0"
   implementation 'com.google.android.gms:play-services:12.0.1'
-  implementation 'com.google.guava:guava:21.0'
-  implementation 'com.android.support:support-v4:22.0.0'
-  testImplementation 'junit:junit:4.12'
+  implementation 'com.google.guava:guava:23.0'
+  implementation 'com.android.support:support-v4:28.0.0'
+  testImplementation 'junit:junit:4.13.2'
 }
