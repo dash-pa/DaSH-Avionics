@@ -88,6 +88,12 @@ public class SensorsService extends Service implements SensorListener {
 
   private ImmutableMultiset<SensorManager> startedSensors;
 
+  private String lastWmUUID = "";
+  private String lastKpUUID = "";
+
+  // Used to prevent overloading the system with Toast messages
+  private long lastToast = 0;
+
   @Override
   public void onCreate() {
     Log.i("Sensors", "Starting");
@@ -100,13 +106,11 @@ public class SensorsService extends Service implements SensorListener {
   }
 
   private void startForeground() {
-    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "sensors");
-    wakeLock.acquire();
+    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "dashpa:sensors");
+    wakeLock.acquire(12*60*60*1000L /*12 hours*/);
 
     Notification.Builder notificationBuilder = new Notification.Builder(this, "pfd_sensor_service");
-    notificationBuilder.setLights(0xffff00ff, 400, 200);
     notificationBuilder.setOngoing(true);
-    notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
     notificationBuilder.setContentTitle("DaSH");
     notificationBuilder.setContentText("Recording in the background");
     notificationBuilder.setCategory(Notification.CATEGORY_SERVICE);
@@ -131,7 +135,7 @@ public class SensorsService extends Service implements SensorListener {
     NotificationManager service = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
     service.createNotificationChannel(chan);
 
-    startForeground(1234, notificationBuilder.build());
+    startForeground(1073741824 , notificationBuilder.build());
   }
 
   @Override
@@ -169,6 +173,8 @@ public class SensorsService extends Service implements SensorListener {
     for (SensorManager sensor : sensors) {
       sensor.connect(this);
     }
+    lastWmUUID = preferences.getWeathermeterUUID().get();
+    lastKpUUID = preferences.getKingpostWmUUID().get();
 
     // The preferences may change - we want to be sure we later stop the same managers we just
     // started.
@@ -194,14 +200,41 @@ public class SensorsService extends Service implements SensorListener {
       for (SensorManager newSensor : newSensors) {
         newSensor.connect(this);
       }
+      checkSensorUuidChanges(newSensors);
       startedSensors = updatedSensors;
+    } else {
+      checkSensorUuidChanges(ImmutableMultiset.of());
+    }
+    lastWmUUID = preferences.getWeathermeterUUID().get();
+    lastKpUUID = preferences.getKingpostWmUUID().get();
+  }
+
+  private void checkSensorUuidChanges(Multiset<SensorManager> ignoreSensors) {
+    if (preferences.isWeatherMeterEnabled().get()
+      && lastWmUUID != preferences.getWeathermeterUUID().get()
+      && !ignoreSensors.contains(weatherMeterSensor)
+    ) {
+      weatherMeterSensor.disconnect();
+      weatherMeterSensor.connect(this);
+    }
+    if (preferences.isKingpostMeterEnabled().get()
+      && lastKpUUID != preferences.getKingpostWmUUID().get()
+      && !ignoreSensors.contains(weatherMeterSensorKingPost)
+    ) {
+      weatherMeterSensorKingPost.disconnect();
+      weatherMeterSensorKingPost.connect(this);
     }
   }
 
   private ImmutableMultiset<SensorManager> getEnabledSensorManagers() {
     Context context = getApplicationContext();
     ImmutableMultiset.Builder<SensorManager> builder = new ImmutableMultiset.Builder<>();
-//    if (preferences.isFakeDataEnabled().get()) builder.add(fakeSensor);
+    // Check if we need any BT sensors
+    Boolean btRequired = preferences.isViiiivaEnabled().get() ||
+            preferences.isDistoEnabled().get() ||
+            preferences.isWeatherMeterEnabled().get() ||
+            preferences.isKingpostMeterEnabled().get();
+    //    if (preferences.isFakeDataEnabled().get()) builder.add(fakeSensor);
     // Do not add any BT sensors if we don't have permission
     if (context.checkSelfPermission("android.permission.BLUETOOTH_CONNECT") == PackageManager.PERMISSION_GRANTED) {
       if (preferences.isViiiivaEnabled().get()) builder.add(vivaSensor);
@@ -210,16 +243,22 @@ public class SensorsService extends Service implements SensorListener {
       if (preferences.isKingpostMeterEnabled().get()) builder.add(weatherMeterSensorKingPost);
       if (preferences.isAntPlusEnabled().get()) builder.add(antSensor);
       if (preferences.isArduinoEnabled().get()) builder.add(arduinoSensor);
-    } else {
+    } else if (btRequired) {
       Log.w("SensorService", "Unable to start BT sensors");
-      Toast.makeText(getApplicationContext(), "Unable to start BT sensors, please grant requried permissions", Toast.LENGTH_LONG).show();
+      if (System.currentTimeMillis() - lastToast > 5000) {
+        lastToast = System.currentTimeMillis();
+        Toast.makeText(getApplicationContext(), "Unable to start BT sensors, please grant requried permissions", Toast.LENGTH_LONG).show();
+      }
     }
     // Can't add GPS without the correct permissions
     if (context.checkSelfPermission("android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
       if (preferences.isGpsEnabled().get()) builder.add(gpsSensor);
     } else {
       Log.w("SensorService", "Unable to start Location sensors");
-      Toast.makeText(getApplicationContext(), "Unable to start Location sensors, please grant requried permissions", Toast.LENGTH_LONG).show();
+      if (System.currentTimeMillis() - lastToast > 5000) {
+        lastToast = System.currentTimeMillis();
+        Toast.makeText(getApplicationContext(), "Unable to start Location sensors, please grant requried permissions", Toast.LENGTH_LONG).show();
+      }
     }
 //    if (preferences.isAttitudeEnabled().get()) builder.add(attitudeSensor);
     if (preferences.isUdpReceivingEnabled().get()) builder.add(udpSensor);

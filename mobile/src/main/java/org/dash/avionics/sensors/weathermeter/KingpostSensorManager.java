@@ -1,5 +1,6 @@
 package org.dash.avionics.sensors.weathermeter;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 
@@ -21,8 +22,11 @@ public class KingpostSensorManager extends WeatherMeterSensorManager {
 
   protected boolean onDeviceFound(BluetoothDevice device) {
     //Only Weathermeter Device #787 can be used for the kingpost
+    String kingpostUUID = preferences.getKingpostWmUUID().get();
+    @SuppressLint("MissingPermission") String deviceName = device.getName();
 
-    return device.getName().contains("787") || device.getName().contains("782");
+    return (deviceName != null && (deviceName.contains("787") || deviceName.contains("782")))
+            || device.getAddress().compareToIgnoreCase(kingpostUUID) == 0;
   }
 
   protected MeasurementType getMeasurmentType() {

@@ -12,20 +12,26 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.ParcelUuid;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
-import org.dash.avionics.sensors.SensorListener;
-import org.dash.avionics.sensors.SensorManager;
 
+import org.dash.avionics.sensors.SensorListener;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Base class for BTLE sensor managers.
  */
-public abstract class BTLESensorManager extends BluetoothGattCallback
-        implements SensorManager, BluetoothAdapter.LeScanCallback {
+public abstract class BTLESensorPrefScanner extends BluetoothGattCallback
+        implements BluetoothAdapter.LeScanCallback {
   private enum WriteDescriptorStatus {
     FAILURE, DONE, WORKING
   }
@@ -36,67 +42,90 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
   private static final int MAX_SERVICE_RETRIES = 3;
 
   private final Context context;
-  private final String deviceNamePrefix;
+  private final List<String> deviceNamePrefixes;
+  private final List<UUID> requiredCharacteristics;
   private final BluetoothAdapter btadapter;
   private SensorListener listener = null;
-  private BluetoothGatt gatt = null;
+  private List<BluetoothGatt> gatts = null;
   private WriteDescriptorStatus writeStatus = WriteDescriptorStatus.DONE;
   private final Object writeStatusLock = new Object();
-  private boolean characteristicsEnabled;
 
-  public BTLESensorManager(Context context, String deviceNamePrefix) {
+  private List<String> scannedDevices = new ArrayList<String>();
+  private Map<String, String> validDevices = new HashMap<String, String>();
+
+  private UUID SERVICE_UUID = UUID.fromString("961f0001-d2d6-43e3-a417-3bb8217e0e01");
+  private static final UUID CHARACTERISTIC = UUID.fromString("961f0005-d2d6-43e3-a417-3bb8217e0e01");
+
+  /**
+   *
+   * @param context application context
+   * @param deviceNamePrefixes list of allowed device name prefixes (all if empty)
+   * @param requiredCharacteristics list of required BTLE characaristic UUIDs (any if empty)
+   */
+  public BTLESensorPrefScanner(Context context, List<String> deviceNamePrefixes, List<UUID> requiredCharacteristics) {
     this.context = context;
-    this.deviceNamePrefix = deviceNamePrefix;
+    this.deviceNamePrefixes = deviceNamePrefixes;
+    this.requiredCharacteristics = requiredCharacteristics;
     btadapter = BluetoothAdapter.getDefaultAdapter();
+    gatts = new ArrayList<>();
   }
 
-  @Override
-  public void connect(SensorListener listener) {
+  public void startScan(SensorListener listener) {
     if (context.checkSelfPermission("android.permission.BLUETOOTH_SCAN") == PackageManager.PERMISSION_GRANTED) {
       this.listener = listener;
-      Log.d("BTLE", "Starting Scan");
-      startScan();
+      // TODO: Update for API 22.
+      Log.d("BTLEPS", "Trying to start BTLE scan");
+      if (btadapter == null) {
+        Log.e("BTLEPS", "BT adapter is null");
+        return;
+      }
+      if (btadapter.getBluetoothLeScanner() == null) {
+        Log.e("BTLEPS", "BTLE scanner is null");
+        return;
+      }
+      if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED) {
+        Log.d("BTLEPS", "Permissions are valid, starting scan");
+        //noinspection deprecation
+        btadapter.startLeScan(this);
+      }
     } else {
-      Log.e("BTLE", "Unable to connect, permission not granted");
+      Log.e("BTLEPS", "Unable to start scan, permission not granted");
     }
   }
+
+  @SuppressLint("MissingPermission")
+  public void stopScan() {
+    if (btadapter != null) btadapter.stopLeScan(this);
+    this.disconnectAll();
+  }
+
 
   protected SensorListener getListener() {
     return listener;
   }
 
-  @Override
-  public void disconnect() {
-    //noinspection deprecation
-    Log.d("BTLE", "Disconnecting");
-    if (btadapter != null) {
-      btadapter.stopLeScan(this);
+  @SuppressLint("MissingPermission")
+  private void disconnectAll() {
+    Log.d("BTLEPS" ,"Disconnect All");
+    gatts.forEach(g -> {
+      if (g != null) {
+        g.disconnect();
+        g.close();
+      }
+    });
+    gatts.clear();
+    synchronized (writeStatusLock) {
+      setWriteDescriptorStatus(WriteDescriptorStatus.DONE);
     }
-    closegatt(gatt);
   }
 
-  private void closegatt(BluetoothGatt gatt) {
+  @SuppressLint("MissingPermission")
+  private void closeGatt(BluetoothGatt gatt) {
+    Log.d("BTLEPS" ,"closeGatt");
     if (gatt != null) {
       gatt.disconnect();
       gatt.close();
-    }
-    synchronized (writeStatusLock) {
-      characteristicsEnabled = false;
-      setWriteDescriptorStatus(WriteDescriptorStatus.DONE);
-    }
-
-  }
-
-  private void startScan() {
-    // TODO: Update for API 22.
-    Log.d("BTLE", "Starting BTLE scan");
-    if (btadapter != null &&
-        context.checkSelfPermission("android.permission.BLUETOOTH_SCAN") == PackageManager.PERMISSION_GRANTED
-    ) {
-      //noinspection deprecation
-      btadapter.startLeScan(this);
-    } else {
-      Log.e("BTLE", "cannot scan, missing permissions");
+      gatts.remove(gatt);
     }
   }
 
@@ -105,30 +134,46 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
       return;
     }
-    if (device == null) {
+    String dAddress = device.getAddress();
+    if (scannedDevices.contains(dAddress)) {
+      Log.d("BTLEPS", "Skipping already scanned device: " + dAddress);
       return;
     }
-    String deviceName = device.getName();
-    if (deviceName == null) {
-      return;
+    if (device == null || device.getName() == null) return;
+
+    String name = device.getName();
+    boolean validName = deviceNamePrefixes.isEmpty() || deviceNamePrefixes.stream().anyMatch(name::startsWith);
+    if (!validName) return;
+
+    Log.d("BTLEPS", "Device found:" + name + ":" + dAddress);
+
+    validDevices.put(dAddress, name);
+
+    boolean validCharacteristics = requiredCharacteristics.isEmpty();
+    ParcelUuid[] pUUIDs = device.getUuids();
+    if (pUUIDs != null && requiredCharacteristics != null) {
+      List<UUID> deviceCharacteristics = Arrays.stream(device.getUuids()).map(p -> p.getUuid()).collect(Collectors.toList());
+      Log.d("BTLEPS", deviceCharacteristics.toString());
+      //noinspection SlowListContainsAll
+      validCharacteristics = validCharacteristics && deviceCharacteristics.containsAll(requiredCharacteristics);
+    }
+
+    if (validCharacteristics) {
+      // Device is valid, notify the listener of a new device
+      gatts.add(device.connectGatt(context, true, this));
+      scannedDevices.add(dAddress);
+      Log.d("BTLEPS", "Adding device " + name + " -- " + dAddress);
+    } else {
+      Log.w("BTLEPS", "Device rejected by characteristics:" + device.getName() + ":" + device.getAddress());
     }
     // Wahoo == TICKR
 
-    if (!characteristicsEnabled && deviceName.startsWith(deviceNamePrefix) && onDeviceFound(device)) {
-      Log.d("BTLE", "Connected to device " + device.getName());
-      gatt = device.connectGatt(context, false, this); // set this as the gatt handler
-      btadapter.stopLeScan(this);
-    }
-  }
-
-  /**
-   * Allows the Implementing SensorManager class to respond and possibly reject a found device
-   * based on properties beyond the device name.
-   * @param device
-   * @return boolean true if discovered device is acceptable.
-   */
-  protected boolean onDeviceFound(BluetoothDevice device) {
-    return true;
+//    Log.d("BTLEPS", "BTLE device: " + device.getName() + ",  Address: " + device.getAddress());
+//    Log.d("BTLEPS", "Searching for device with prefix " + deviceNamePrefix);
+//    if (!characteristicsEnabled && device.getName().startsWith(deviceNamePrefix) && onDeviceFound(device)) {
+//      Log.d("BTLEPS", "Connected to device " + device.getName());
+//      gatt = device.connectGatt(context, false, this); // set this as the gatt handler
+//    }
   }
 
   // sets isConnected and discovers services when connected
@@ -136,29 +181,31 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
   @Override
   public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
     if (newState == BluetoothProfile.STATE_CONNECTED) {
-        Log.i("BTLE", "BTGatt connected");
+        Log.i("BTLEPS", "BTGatt connected");
         gatt.discoverServices();
     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
       //Reconnect if we were disconnected but this is the correct device.
-        closegatt(gatt);
-        Log.i("BTLE", "BTGatt disconnected");
+      scannedDevices.remove(gatt.getDevice().getAddress());
+      closeGatt(gatt);
+        Log.i("BTLEPS", "BTGatt disconnected");
     } else {
-      Log.w("BTLE", "BTGatt state " + newState);
+      Log.w("BTLEPS", "BTGatt state " + newState);
     }
   }
 
   // enables notification for the power and heart rate characteristics and sets isReady
+  @SuppressLint("MissingPermission")
   @Override
   public void onServicesDiscovered(BluetoothGatt gatt, int status) {
     if (status != BluetoothGatt.GATT_SUCCESS) {
-      Log.w("BTLE", "BTGatt failed to discover services!");
+      Log.w("BTLEPS", "BTGatt failed to discover services!");
       return;
     }
 
-    Log.d("BTLE", "BTGatt services discovered");
+    Log.d("BTLEPS", "BTGatt services discovered");
     List<BluetoothGattService> servicesList = gatt.getServices();
     if (servicesList == null) {
-      Log.w("BTLE", "No services!");
+      Log.w("BTLEPS", "No services!");
       return;
     }
 
@@ -177,25 +224,23 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
       deviceStr.append("\n }");
     }
     deviceStr.append("\n}");
-    Log.v("BTLE", deviceStr.toString());
+    Log.v("BTLEPS", deviceStr.toString());
 
-    synchronized (writeStatusLock) {
-      if (!characteristicsEnabled) {
-        characteristicsEnabled = true;
-        enableCharacteristics();
-      }
-    }
+    String dName = gatt.getDevice().getName();
+    if (dName == null)
+      dName = gatt.getDevice().getAlias();
+    if (dName != null)
+     validDevices.put(gatt.getDevice().getAddress(), dName);
+
+    // If the service we want is on this device, add it to the list of allowed devices if it's not already there.
+    listener.onDeviceListChange(validDevices);
+
+    enableCharacteristic(gatt, SERVICE_UUID, CHARACTERISTIC, "wind");
   }
 
-  protected abstract void enableCharacteristics();
-
-  protected void enableCharacteristic(UUID serviceUuid, UUID characteristicUuid, String
+  @SuppressLint("MissingPermission")
+  protected void enableCharacteristic(BluetoothGatt gatt, UUID serviceUuid, UUID characteristicUuid, String
           serviceName) {
-    enableCharacteristic(serviceUuid, characteristicUuid, serviceName, false);
-  }
-
-  protected void enableCharacteristic(UUID serviceUuid, UUID characteristicUuid, String
-      serviceName, boolean enableIndication) {
     BluetoothGattService service = gatt.getService(serviceUuid);
     int tries = 0;
     while (service == null && tries < MAX_SERVICE_RETRIES) {
@@ -242,38 +287,6 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
       Log.w("BTLE", errStr.toString());
       return;
     }
-
-    // Set Enable or Disable notification on the descriptor depending on argument val
-    Log.v("BTLE", "Enabling notifications for " + descriptor.getUuid());
-    if (enableIndication) {
-      descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
-    } else {
-      descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-    }
-
-    // Wait for any possible descriptor writing to finish
-    waitForWriteDescriptorNotWorking();
-    setWriteDescriptorStatus(WriteDescriptorStatus.WORKING);
-
-    if (!gatt.writeDescriptor(descriptor)) { // failed to initiate descriptor write
-      // We have to free this up for future calls to setNotifyValue to work
-      setWriteDescriptorStatus(WriteDescriptorStatus.DONE);
-      Log.w("BTLE", serviceName + " descriptor write failed.");
-      return;
-    }
-
-    // Wait for the descriptor to be written
-    waitForWriteDescriptorNotWorking();
-
-    // If there was a failure, this would be equal to WD_STATUS_FAILURE instead of WD_STATUS_DONE
-    if (writeStatus != WriteDescriptorStatus.DONE) {
-      // Done writing descriptors
-      setWriteDescriptorStatus(WriteDescriptorStatus.DONE);
-      Log.w("BTLE", serviceName + " descriptor write failed with status " + writeStatus);
-      return;
-    }
-
-    Log.i("BTLE", "enabled " + serviceName + " notifications");
   }
 
   @Override
@@ -290,20 +303,6 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
     synchronized (writeStatusLock) {
       writeStatus = status;
       writeStatusLock.notifyAll();
-    }
-  }
-
-  private void waitForWriteDescriptorNotWorking() {
-    synchronized (writeStatusLock) {
-      Log.v("BTLE", "Starting wait for not working: " + writeStatus);
-      while (writeStatus == WriteDescriptorStatus.WORKING) {
-        try {
-          writeStatusLock.wait();
-        } catch (InterruptedException e) {
-          // Try again.
-        }
-      }
-      Log.v("BTLE", "Done wait for not working: " + writeStatus);
     }
   }
 

@@ -1,5 +1,6 @@
 package org.dash.avionics.sensors.weathermeter;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -12,9 +13,7 @@ import org.dash.avionics.data.Measurement;
 import org.dash.avionics.data.MeasurementType;
 import org.dash.avionics.sensors.SensorPreferences_;
 import org.dash.avionics.sensors.btle.BTLESensorManager;
-import android.util.Log;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT16;
@@ -51,12 +50,20 @@ public class WeatherMeterSensorManager extends BTLESensorManager {
     }
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   protected boolean onDeviceFound(BluetoothDevice device) {
+    String primaryUUID = preferences.getWeathermeterUUID().get();
+    String kingpostUUID = preferences.getKingpostWmUUID().get();
+    String deviceName = device.getName();
+    String deviceAddr = device.getAddress();
+    boolean hasKpName = deviceName != null && (deviceName.contains("787") || deviceName.contains("782"));
     //If the kingpost meter is enabled, reject the sensor dedicated for the kingpost
-    if (preferences.isKingpostMeterEnabled().get() &&
-          (device.getName().contains("787") || device.getName().contains("782"))
-    ) {
+    if (preferences.isKingpostMeterEnabled().get() && (hasKpName || deviceAddr.compareToIgnoreCase(kingpostUUID) == 0)) {
+      return false;
+    }
+    // If a meter was selected in prefs, only use that one
+    if (primaryUUID != null && primaryUUID.length() > 10 && deviceAddr.compareToIgnoreCase(primaryUUID) != 0) {
       return false;
     }
 

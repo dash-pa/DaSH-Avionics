@@ -55,8 +55,11 @@
   <string name="settings_sensor_arduino">Enable Arduino</string>
   <string name="settings_sensor_viiiiva">Enable Viiiiva</string>
   <string name="settings_sensor_disto">Enable Disto</string>
+  <string name="settings_sensor_disto_select">Select Disto Sensor</string>
   <string name="settings_sensor_weathermeter">Enable WeatherMeter</string>
+  <string name="settings_sensor_weathermeter_select">Select WeatherMeter</string>
   <string name="settings_sensor_kingpost">Enable Kingpost Meter</string>
+  <string name="settings_sensor_kingpost_select">Select Kingpost Sensor</string>
   <string name="settings_sensor_antplus">Enable Quarq</string>
   <string name="settings_sensor_gps">Enable GPS</string>
   <string name="settings_sensor_attitude">Enable attitude</string>
@@ -73,8 +76,13 @@
   <string name="settings_key_sensor_arduino">sensors_enable_arduino</string>
   <string name="settings_key_sensor_viiiiva">sensors_enable_viiiiva</string>
   <string name="settings_key_sensor_disto">sensors_enable_disto</string>
+  <string name="settings_key_sensor_disto_select">sensors_select_disto</string>
   <string name="settings_key_sensor_weathermeter">sensors_enable_weathermeter</string>
+  <string name="settings_key_sensor_weathermeter_select">sensors_select_weathermeter</string>
+  <string name="settings_key_sensor_weathermeter_name">sensors_select_weathermeter_name</string>
   <string name="settings_key_sensor_kingpost">sensors_enable_kingpost</string>
+  <string name="settings_key_sensor_kingpost_select">sensors_select_kingpost</string>
+  <string name="settings_key_sensor_kingpost_name">sensors_select_kingpost_name</string>
   <string name="settings_key_sensor_antplus">sensors_enable_antplus</string>
   <string name="settings_key_sensor_gps">sensors_enable_gps</string>
   <string name="settings_key_sensor_attitude">sensors_enable_attitude</string>
@@ -115,5 +123,11 @@
     <item>V5_EXTENDED_WINGS</item>
     <item>V6_EXTENDED_WINGS</item>
     <item>V6_LONG_EXTENDED_WINGS</item>
-  </string-array>ss
+  </string-array>
+  <string-array name="empty_sensor_list_names">
+    <item>-None-</item>
+  </string-array>
+  <string-array name="empty_sensor_list">
+    <item></item>
+  </string-array>
 </resources>

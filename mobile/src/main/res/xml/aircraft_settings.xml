@@ -63,17 +63,41 @@
         android:defaultValue="false"
         android:key="@string/settings_key_sensor_disto"
         android:title="@string/settings_sensor_disto"/>
+<!--    <ListPreference-->
+<!--        android:dependency="@string/settings_key_sensor_disto"-->
+<!--        android:key="@string/settings_key_sensor_disto_select"-->
+<!--        android:title="@string/settings_sensor_disto_select"-->
+<!--        android:dialogTitle="@string/settings_sensor_disto_select"-->
+<!--        android:entries="@array/empty_sensor_list_names"-->
+<!--        android:entryValues="@array/empty_sensor_list"-->
+<!--    />-->
 
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="@string/settings_key_sensor_weathermeter"
         android:title="@string/settings_sensor_weathermeter"/>
+    <ListPreference
+        android:dependency="@string/settings_key_sensor_weathermeter"
+        android:key="@string/settings_key_sensor_weathermeter_select"
+        android:title="@string/settings_sensor_weathermeter_select"
+        android:dialogTitle="@string/settings_sensor_weathermeter_select"
+        android:entries="@array/empty_sensor_list_names"
+        android:entryValues="@array/empty_sensor_list"
+        android:shouldDisableView="true"
+        />
 
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="@string/settings_key_sensor_kingpost"
         android:title="@string/settings_sensor_kingpost"/>
-
+    <ListPreference
+        android:dependency="@string/settings_key_sensor_kingpost"
+        android:key="@string/settings_key_sensor_kingpost_select"
+        android:title="@string/settings_sensor_kingpost_select"
+        android:dialogTitle="@string/settings_sensor_kingpost_select"
+        android:entries="@array/empty_sensor_list_names"
+        android:entryValues="@array/empty_sensor_list"
+    />
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="@string/settings_key_sensor_antplus"
@@ -89,10 +113,10 @@
         android:key="@string/settings_key_sensor_attitude"
         android:title="@string/settings_sensor_attitude"/>
 
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="@string/settings_key_sensor_fake"
-        android:title="@string/settings_sensor_fake"/>
+<!--    <CheckBoxPreference-->
+<!--        android:defaultValue="false"-->
+<!--        android:key="@string/settings_key_sensor_fake"-->
+<!--        android:title="@string/settings_sensor_fake"/>-->
 
   </PreferenceCategory>
 

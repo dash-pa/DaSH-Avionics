@@ -20,8 +20,20 @@ public interface SensorPreferences {
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_weathermeter)
   boolean isWeatherMeterEnabled();
 
+  @DefaultString(value="", keyRes = R.string.settings_key_sensor_weathermeter_select)
+  String getWeathermeterUUID();
+
+  @DefaultString(value="", keyRes = R.string.settings_key_sensor_weathermeter_name)
+  String getWeathermeterName();
+
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_kingpost)
   boolean isKingpostMeterEnabled();
+
+  @DefaultString(value="", keyRes = R.string.settings_key_sensor_kingpost_select)
+  String getKingpostWmUUID();
+
+  @DefaultString(value="", keyRes = R.string.settings_key_sensor_kingpost_name)
+  String getKingpostWmName();
 
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_antplus)
   boolean isAntPlusEnabled();
@@ -40,7 +52,7 @@ public interface SensorPreferences {
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_udp)
   boolean isUdpReceivingEnabled();
 
-  @DefaultBoolean(value=true, keyRes = R.string.settings_key_sensor_fake)
+  @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_fake)
   boolean isFakeDataEnabled();
 
 }

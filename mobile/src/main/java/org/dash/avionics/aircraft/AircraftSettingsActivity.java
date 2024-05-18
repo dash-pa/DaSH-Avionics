@@ -7,20 +7,32 @@ import androidx.core.app.NavUtils;
 import android.view.MenuItem;
 
 import org.androidannotations.annotations.EActivity;
+import org.dash.avionics.BTActivityPermissionManager;
 
 import java.util.List;
 
 @EActivity
 public class AircraftSettingsActivity extends PreferenceActivity {
 
+  private BTActivityPermissionManager btpm = new BTActivityPermissionManager();
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-      // Show the Up button in the action bar.
-      getActionBar().setDisplayHomeAsUpEnabled(true);
+    if (!btpm.checkPermissions()) {
+      btpm.requestPermissions(this);
+    } else {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        // Show the Up button in the action bar.
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+      }
     }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    btpm.onRequestPermissionsResult(requestCode, permissions, grantResults);
   }
 
   @Override
