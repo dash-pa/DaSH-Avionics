@@ -26,6 +26,9 @@ public interface SensorPreferences {
   @DefaultString(value="", keyRes = R.string.settings_key_sensor_weathermeter_name)
   String getWeathermeterName();
 
+  @DefaultString(value="", keyRes = R.string.settings_key_sensor_weathermeter_active_id)
+  String activeWeathermeterId();
+
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_kingpost)
   boolean isKingpostMeterEnabled();
 
@@ -34,6 +37,9 @@ public interface SensorPreferences {
 
   @DefaultString(value="", keyRes = R.string.settings_key_sensor_kingpost_name)
   String getKingpostWmName();
+
+  @DefaultString(value="", keyRes = R.string.settings_key_sensor_kingpost_active_id)
+  String activeKingpostMeterId();
 
   @DefaultBoolean(value=false, keyRes = R.string.settings_key_sensor_antplus)
   boolean isAntPlusEnabled();

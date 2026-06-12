@@ -80,9 +80,11 @@
   <string name="settings_key_sensor_weathermeter">sensors_enable_weathermeter</string>
   <string name="settings_key_sensor_weathermeter_select">sensors_select_weathermeter</string>
   <string name="settings_key_sensor_weathermeter_name">sensors_select_weathermeter_name</string>
+  <string name="settings_key_sensor_weathermeter_active_id">sensors_weathermeter_active_id</string>
   <string name="settings_key_sensor_kingpost">sensors_enable_kingpost</string>
   <string name="settings_key_sensor_kingpost_select">sensors_select_kingpost</string>
   <string name="settings_key_sensor_kingpost_name">sensors_select_kingpost_name</string>
+  <string name="settings_key_sensor_kingpost_active_id">sensors_kingpost_active_id</string>
   <string name="settings_key_sensor_antplus">sensors_enable_antplus</string>
   <string name="settings_key_sensor_gps">sensors_enable_gps</string>
   <string name="settings_key_sensor_attitude">sensors_enable_attitude</string>

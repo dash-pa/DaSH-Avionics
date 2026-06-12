@@ -169,6 +169,7 @@ public class SensorsService extends Service implements SensorListener {
   }
 
   private void startSensors() {
+    Log.i("Sensors", "Starting");
     ImmutableMultiset<SensorManager> sensors = getEnabledSensorManagers();
     for (SensorManager sensor : sensors) {
       sensor.connect(this);

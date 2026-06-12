@@ -142,6 +142,7 @@ public abstract class BTLESensorManager extends BluetoothGattCallback
       //Reconnect if we were disconnected but this is the correct device.
         closegatt(gatt);
         Log.i("BTLE", "BTGatt disconnected");
+        startScan();
     } else {
       Log.w("BTLE", "BTGatt state " + newState);
     }

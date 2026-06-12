@@ -15,7 +15,6 @@ import org.dash.avionics.data.MeasurementType;
 import org.dash.avionics.sensors.SensorPreferences_;
 import org.dash.avionics.sensors.btle.BTLESensorManager;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -66,17 +65,18 @@ public class WeatherMeterSensorManager extends BTLESensorManager {
     String deviceAddr = device.getAddress();
 
     // If this is a windmeter, ensure it is in the preferences list of meters
-
-    boolean hasKpName = deviceName != null && (deviceName.contains("787") || deviceName.contains("782"));
-    //If the kingpost meter is enabled, reject the sensor dedicated for the kingpost
-    if (preferences.isKingpostMeterEnabled().get() && (hasKpName || deviceAddr.compareToIgnoreCase(kingpostUUID) == 0)) {
+    if (preferences.isKingpostMeterEnabled().get() && deviceAddr.compareToIgnoreCase(kingpostUUID) == 0) {
       return false;
     }
     // If a meter was selected in prefs, only use that one
-    if (primaryUUID.length() > 10 && deviceAddr.compareToIgnoreCase(primaryUUID) != 0) {
-      Log.w("WeatherMeterSensorManager", "Rejecting device " + deviceName + "#" + deviceAddr + "as primary wind speed" );
+    if (deviceAddr.compareToIgnoreCase(primaryUUID) != 0) {
+      Log.w("WeatherMeterSensorManager", "Rejecting device " + deviceName + "#" + deviceAddr + " as primary wind speed" );
       return false;
     }
+
+    preferences.activeWeathermeterId().put(deviceName + "#" + deviceAddr);
+    Log.i("WeatherMeterSensorManager", "Connecting device " + deviceName + "#" + deviceAddr + " as primary wind speed" );
+
 
     return true;
   }

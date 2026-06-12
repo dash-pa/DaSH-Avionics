@@ -109,8 +109,8 @@ public class AircraftSettingsFragment extends PreferenceFragment
     // Checks if the value is not null and splits the name off from the combined names and address
     Optional<String> wmName = extractName(wmResource);
     Optional<String> kpName = extractName(kpResource);
-    List<String> deviceKeys = new ArrayList<>();
-    List<String> deviceLabels = new ArrayList<>();
+    List<String> deviceKeys = new ArrayList<>(List.of(""));
+    List<String> deviceLabels = new ArrayList<>(List.of("-None-"));
     // set the device list to the last two devices used
     if (wmName.isPresent()) {
       deviceKeys.add(wmResource);
@@ -120,19 +120,26 @@ public class AircraftSettingsFragment extends PreferenceFragment
       deviceKeys.add(kpResource);
       deviceLabels.add(kpName.get());
     }
+    //Get active meter from the PFD
+    String activeMeter = Optional.ofNullable(sensorPreferences.activeWeathermeterId().get()).orElse("");
+    if (activeMeter.contains("#") && !deviceKeys.contains(activeMeter)) {
+      deviceKeys.add(activeMeter);
+      deviceLabels.add(extractName(activeMeter).orElse("Active Meter"));
+    }
+    String activeKpMeter = Optional.ofNullable(sensorPreferences.activeKingpostMeterId().get()).orElse("");
+    if (activeKpMeter.contains("#") && !deviceKeys.contains(activeKpMeter)) {
+      deviceKeys.add(activeKpMeter);
+      deviceLabels.add(extractName(activeKpMeter).orElse("Active Meter"));
+    }
     // set the preference values based last used for each
-    if (wmName.isPresent()) {
-      ListPreference wmListPref = (ListPreference) findPreference(R.string.settings_key_sensor_weathermeter_select);
-      wmListPref.setEntryValues(deviceKeys.toArray(new String[0]));
-      wmListPref.setEntries(deviceLabels.toArray(new String[0]));
-      wmListPref.setSummary(wmName.get());
-    }
-    if (kpName.isPresent()) {
-      ListPreference kpListPref = (ListPreference) findPreference(R.string.settings_key_sensor_kingpost_select);
-      kpListPref.setEntryValues(deviceKeys.toArray(new String[0]));
-      kpListPref.setEntries(deviceLabels.toArray(new String[0]));
-      kpListPref.setSummary(kpName.get());
-    }
+    ListPreference wmListPref = (ListPreference) findPreference(R.string.settings_key_sensor_weathermeter_select);
+    wmListPref.setEntryValues(deviceKeys.toArray(new String[0]));
+    wmListPref.setEntries(deviceLabels.toArray(new String[0]));
+    wmListPref.setSummary(wmName.orElse(""));
+    ListPreference kpListPref = (ListPreference) findPreference(R.string.settings_key_sensor_kingpost_select);
+    kpListPref.setEntryValues(deviceKeys.toArray(new String[0]));
+    kpListPref.setEntries(deviceLabels.toArray(new String[0]));
+    kpListPref.setSummary(kpName.orElse(""));
   }
 
   private void setupWsSensScan() {
@@ -175,6 +182,17 @@ public class AircraftSettingsFragment extends PreferenceFragment
           deviceResources.add(name + "#" + mac);
           deviceNames.add(name);
         });
+        //Get active meter from the PFD
+        String activeMeter = Optional.ofNullable(sensorPreferences.activeWeathermeterId().get()).orElse("");
+        if (activeMeter.contains("#") && !deviceResources.contains(activeMeter)) {
+          deviceResources.add(activeMeter);
+          deviceNames.add(extractName(activeMeter).orElse("Active Meter"));
+        }
+        String activeKpMeter = Optional.ofNullable(sensorPreferences.activeKingpostMeterId().get()).orElse("");
+        if (activeKpMeter.contains("#") && !deviceResources.contains(activeMeter)) {
+          deviceResources.add(activeKpMeter);
+          deviceNames.add(extractName(activeKpMeter).orElse("Active Meter"));
+        }
         String kpResource = sensorPreferences.getKingpostNameAndAddress().get();
         Optional<String> kpn = extractName(kpResource);
         String wmResource = sensorPreferences.getWeathermeterNameAndAddress().get();

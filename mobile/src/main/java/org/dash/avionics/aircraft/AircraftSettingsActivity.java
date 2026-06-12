@@ -15,9 +15,6 @@ import java.util.List;
 @EActivity
 public class AircraftSettingsActivity extends PreferenceActivity {
 
-  @Extra
-  String[] discoveredDevices;
-
   private BTActivityPermissionManager btpm = new BTActivityPermissionManager();
 
   @Override

@@ -27,11 +27,16 @@ public class KingpostSensorManager extends WeatherMeterSensorManager {
     String kingpostUUID = Optional.ofNullable(preferences.getKingpostNameAndAddress().get())
             .map(s -> s.split("#")[1])
             .orElse("");
-    String deviceAddr = device.getAddress();
-    @SuppressLint("MissingPermission") String deviceName = device.getName();
+    String deviceAddr = Optional.ofNullable(device.getAddress()).orElse("");
+    @SuppressLint("MissingPermission") String deviceName =  Optional.ofNullable(device.getName()).orElse("");
 
-    return (deviceName != null && (deviceName.contains("787") || deviceName.contains("782")))
-            || deviceAddr.compareToIgnoreCase(kingpostUUID) == 0;
+    if (deviceAddr.compareToIgnoreCase(kingpostUUID) == 0) {
+      preferences.activeKingpostMeterId().put(deviceName + "#" + deviceAddr);
+
+      return true;
+    }
+
+    return false;
   }
 
   protected MeasurementType getMeasurmentType() {
