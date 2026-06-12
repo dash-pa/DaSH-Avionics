@@ -33,11 +33,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @EFragment
@@ -95,28 +97,41 @@ public class AircraftSettingsFragment extends PreferenceFragment
   private void bindWmSensorLists() {
     bindOnPreferenceChange(
             R.string.settings_key_sensor_weathermeter_select,
-            sensorPreferences.getWeathermeterUUID().get()
+            sensorPreferences.getWeathermeterNameAndAddress().get()
     );
     bindOnPreferenceChange(
             R.string.settings_key_sensor_kingpost_select,
-            sensorPreferences.getKingpostWmUUID().get()
+            sensorPreferences.getKingpostNameAndAddress().get()
     );
     // Ensure the previously selected sensors show in the list for weathermeters
-    String wmn = sensorPreferences.getWeathermeterName().get();
-    String wmu = sensorPreferences.getWeathermeterUUID().get();
-    String kpn = sensorPreferences.getKingpostWmName().get();
-    String kpu = sensorPreferences.getKingpostWmUUID().get();
-    if (wmu != "" && wmu != null) {
-      ListPreference wml = (ListPreference) findPreference(R.string.settings_key_sensor_weathermeter_select);
-      wml.setEntryValues(new CharSequence[]{wmu, kpu});
-      wml.setEntries(new CharSequence[]{wmn, kpn});
-      wml.setSummary(wmn);
+    String wmResource = sensorPreferences.getWeathermeterNameAndAddress().get();
+    String kpResource = sensorPreferences.getKingpostNameAndAddress().get();
+    // Checks if the value is not null and splits the name off from the combined names and address
+    Optional<String> wmName = extractName(wmResource);
+    Optional<String> kpName = extractName(kpResource);
+    List<String> deviceKeys = new ArrayList<>();
+    List<String> deviceLabels = new ArrayList<>();
+    // set the device list to the last two devices used
+    if (wmName.isPresent()) {
+      deviceKeys.add(wmResource);
+      deviceLabels.add(wmName.get());
     }
-    if (kpu != "" && kpu != null) {
-      ListPreference kpl = (ListPreference) findPreference(R.string.settings_key_sensor_kingpost_select);
-      kpl.setEntryValues(new CharSequence[]{wmu, kpu});
-      kpl.setEntries(new CharSequence[]{wmn, kpn});
-      kpl.setSummary(kpn);
+    if (kpName.isPresent()) {
+      deviceKeys.add(kpResource);
+      deviceLabels.add(kpName.get());
+    }
+    // set the preference values based last used for each
+    if (wmName.isPresent()) {
+      ListPreference wmListPref = (ListPreference) findPreference(R.string.settings_key_sensor_weathermeter_select);
+      wmListPref.setEntryValues(deviceKeys.toArray(new String[0]));
+      wmListPref.setEntries(deviceLabels.toArray(new String[0]));
+      wmListPref.setSummary(wmName.get());
+    }
+    if (kpName.isPresent()) {
+      ListPreference kpListPref = (ListPreference) findPreference(R.string.settings_key_sensor_kingpost_select);
+      kpListPref.setEntryValues(deviceKeys.toArray(new String[0]));
+      kpListPref.setEntries(deviceLabels.toArray(new String[0]));
+      kpListPref.setSummary(kpName.get());
     }
   }
 
@@ -153,25 +168,32 @@ public class AircraftSettingsFragment extends PreferenceFragment
       }
       @Override
       public void onDeviceListChange(Map<String, String> devices) {
-        String wmn = sensorPreferences.getWeathermeterName().get();
-        String wmu = sensorPreferences.getWeathermeterUUID().get();
-        if (wmu != null && wmu != "" && !devices.containsKey(wmu)) {
-          devices.put(wmu, wmn);
-        }
-        String kpn = sensorPreferences.getKingpostWmName().get();
-        String kpu = sensorPreferences.getKingpostWmUUID().get();
-        if (kpu != null && kpu != "" && !devices.containsKey(kpu)) {
-          devices.put(kpu, kpn);
-        }
         Log.d("WMSCANNER", "Devices: " + devices);
-        Set<String> entryKeys = devices.keySet();
-        Collection<String> entryVals = devices.values();
-        Log.d("WMSCANNER", "keys: " + entryKeys);
-        Log.d("WMSCANNER", "vals: " + entryVals);
-        wml.setEntries(entryVals.toArray(new String[0]));
-        wml.setEntryValues(entryKeys.toArray(new String[0]));
-        kpl.setEntries(entryVals.toArray(new String[0]));
-        kpl.setEntryValues(entryKeys.toArray(new String[0]));
+        List<String> deviceResources = new ArrayList<>(List.of(""));
+        List<String> deviceNames = new ArrayList<>(List.of("- None -"));
+        devices.forEach((mac, name) -> {
+          deviceResources.add(name + "#" + mac);
+          deviceNames.add(name);
+        });
+        String kpResource = sensorPreferences.getKingpostNameAndAddress().get();
+        Optional<String> kpn = extractName(kpResource);
+        String wmResource = sensorPreferences.getWeathermeterNameAndAddress().get();
+        Optional<String> wmn = extractName(wmResource);
+        if (wmn.isPresent() && !deviceResources.contains(wmResource)) {
+          deviceResources.add(wmResource);
+          deviceNames.add(wmn.get());
+        }
+        if (kpn.isPresent() && !devices.containsKey(kpResource)) {
+          deviceResources.add(kpResource);
+          deviceNames.add(kpn.get());
+        }
+        Log.d("WMSCANNER", "keys: " + deviceResources);
+        Log.d("WMSCANNER", "vals: " + deviceNames);
+
+        wml.setEntries(deviceNames.toArray(new String[0]));
+        wml.setEntryValues(deviceResources.toArray(new String[0]));
+        kpl.setEntries(deviceNames.toArray(new String[0]));
+        kpl.setEntryValues(deviceResources.toArray(new String[0]));
       }
     });
   }
@@ -240,14 +262,16 @@ public class AircraftSettingsFragment extends PreferenceFragment
       if (preference.getKey() == getPreferenceKeyByResId(R.string.settings_key_aircraft_type)) {
         currentAircraftType = AircraftType.valueOf(stringValue);
       } else if (preference.getKey() == getPreferenceKeyByResId(R.string.settings_key_sensor_weathermeter_select)) {
-        if (stringValue != sensorPreferences.getWeathermeterUUID().get()) {
-          sensorPreferences.getWeathermeterName().put(enumValue.toString());
-          Log.i("WMSCANNER", "storing wm name " + enumValue);
+        if (!stringValue.isEmpty() && !stringValue.equals(sensorPreferences.getWeathermeterNameAndAddress().get())) {
+          sensorPreferences.getWeathermeterNameAndAddress().put(stringValue);
+          sensorPreferences.getWeathermeterName().put(extractName(stringValue).orElse("Unknown"));
+          Log.i("WMSCANNER", "storing wm " + stringValue);
         }
       } else if (preference.getKey() == getPreferenceKeyByResId(R.string.settings_key_sensor_kingpost_select)) {
-        if (stringValue != sensorPreferences.getKingpostWmUUID().get()) {
-          sensorPreferences.getKingpostWmName().put(enumValue.toString());
-          Log.i("WMSCANNER", "storing kp name " + enumValue);
+        if (!stringValue.isEmpty() && !stringValue.equals(sensorPreferences.getKingpostWmName().get())) {
+          sensorPreferences.getKingpostNameAndAddress().put(stringValue);
+          sensorPreferences.getKingpostWmName().put(extractName(stringValue).orElse("Unknown"));
+          Log.i("WMSCANNER", "storing kp " + stringValue);
         }
       }
     } else {
@@ -338,5 +362,17 @@ public class AircraftSettingsFragment extends PreferenceFragment
 
     findPreference(R.string.settings_key_cruise_speed).setSummary(
         String.format("%.1f", cruiseAirspeed));
+  }
+
+  private Optional<String> extractName(String nameAndAddress) {
+    if (nameAndAddress == null) {
+      return Optional.empty();
+    }
+    ArrayList<String> out = new ArrayList<>(Arrays.asList(nameAndAddress.split("#")));
+    if (out.size() < 2) {
+      return Optional.empty();
+    }
+
+    return Optional.of(out.get(0));
   }
 }

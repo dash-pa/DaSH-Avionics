@@ -21,7 +21,7 @@ public interface SensorPreferences {
   boolean isWeatherMeterEnabled();
 
   @DefaultString(value="", keyRes = R.string.settings_key_sensor_weathermeter_select)
-  String getWeathermeterUUID();
+  String getWeathermeterNameAndAddress();
 
   @DefaultString(value="", keyRes = R.string.settings_key_sensor_weathermeter_name)
   String getWeathermeterName();
@@ -30,7 +30,7 @@ public interface SensorPreferences {
   boolean isKingpostMeterEnabled();
 
   @DefaultString(value="", keyRes = R.string.settings_key_sensor_kingpost_select)
-  String getKingpostWmUUID();
+  String getKingpostNameAndAddress();
 
   @DefaultString(value="", keyRes = R.string.settings_key_sensor_kingpost_name)
   String getKingpostWmName();

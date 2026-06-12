@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
+import android.util.Log;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
@@ -14,6 +15,8 @@ import org.dash.avionics.data.MeasurementType;
 import org.dash.avionics.sensors.SensorPreferences_;
 import org.dash.avionics.sensors.btle.BTLESensorManager;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT16;
@@ -53,17 +56,25 @@ public class WeatherMeterSensorManager extends BTLESensorManager {
   @SuppressLint("MissingPermission")
   @Override
   protected boolean onDeviceFound(BluetoothDevice device) {
-    String primaryUUID = preferences.getWeathermeterUUID().get();
-    String kingpostUUID = preferences.getKingpostWmUUID().get();
+    String primaryUUID = Optional.ofNullable(preferences.getWeathermeterNameAndAddress().get())
+            .map(s -> s.contains("#") ? s.split("#")[1] : s)
+            .orElse("");
+    String kingpostUUID = Optional.ofNullable(preferences.getKingpostNameAndAddress().get())
+            .map(s -> s.contains("#") ? s.split("#")[1] : s)
+            .orElse("");
     String deviceName = device.getName();
     String deviceAddr = device.getAddress();
+
+    // If this is a windmeter, ensure it is in the preferences list of meters
+
     boolean hasKpName = deviceName != null && (deviceName.contains("787") || deviceName.contains("782"));
     //If the kingpost meter is enabled, reject the sensor dedicated for the kingpost
     if (preferences.isKingpostMeterEnabled().get() && (hasKpName || deviceAddr.compareToIgnoreCase(kingpostUUID) == 0)) {
       return false;
     }
     // If a meter was selected in prefs, only use that one
-    if (primaryUUID != null && primaryUUID.length() > 10 && deviceAddr.compareToIgnoreCase(primaryUUID) != 0) {
+    if (primaryUUID.length() > 10 && deviceAddr.compareToIgnoreCase(primaryUUID) != 0) {
+      Log.w("WeatherMeterSensorManager", "Rejecting device " + deviceName + "#" + deviceAddr + "as primary wind speed" );
       return false;
     }
 

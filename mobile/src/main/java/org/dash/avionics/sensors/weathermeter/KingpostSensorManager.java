@@ -7,6 +7,8 @@ import android.content.Context;
 import org.androidannotations.annotations.EBean;
 import org.dash.avionics.data.MeasurementType;
 
+import java.util.Optional;
+
 /**
  * Manager for the Kingpost WeatherMeter sensor.
  * Will only pair with a single weathermeter "WFAN-02 787"
@@ -22,11 +24,14 @@ public class KingpostSensorManager extends WeatherMeterSensorManager {
 
   protected boolean onDeviceFound(BluetoothDevice device) {
     //Only Weathermeter Device #787 can be used for the kingpost
-    String kingpostUUID = preferences.getKingpostWmUUID().get();
+    String kingpostUUID = Optional.ofNullable(preferences.getKingpostNameAndAddress().get())
+            .map(s -> s.split("#")[1])
+            .orElse("");
+    String deviceAddr = device.getAddress();
     @SuppressLint("MissingPermission") String deviceName = device.getName();
 
     return (deviceName != null && (deviceName.contains("787") || deviceName.contains("782")))
-            || device.getAddress().compareToIgnoreCase(kingpostUUID) == 0;
+            || deviceAddr.compareToIgnoreCase(kingpostUUID) == 0;
   }
 
   protected MeasurementType getMeasurmentType() {

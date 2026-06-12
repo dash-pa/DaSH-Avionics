@@ -173,8 +173,8 @@ public class SensorsService extends Service implements SensorListener {
     for (SensorManager sensor : sensors) {
       sensor.connect(this);
     }
-    lastWmUUID = preferences.getWeathermeterUUID().get();
-    lastKpUUID = preferences.getKingpostWmUUID().get();
+    lastWmUUID = preferences.getWeathermeterNameAndAddress().get();
+    lastKpUUID = preferences.getKingpostNameAndAddress().get();
 
     // The preferences may change - we want to be sure we later stop the same managers we just
     // started.
@@ -205,20 +205,20 @@ public class SensorsService extends Service implements SensorListener {
     } else {
       checkSensorUuidChanges(ImmutableMultiset.of());
     }
-    lastWmUUID = preferences.getWeathermeterUUID().get();
-    lastKpUUID = preferences.getKingpostWmUUID().get();
+    lastWmUUID = preferences.getWeathermeterNameAndAddress().get();
+    lastKpUUID = preferences.getKingpostNameAndAddress().get();
   }
 
   private void checkSensorUuidChanges(Multiset<SensorManager> ignoreSensors) {
     if (preferences.isWeatherMeterEnabled().get()
-      && lastWmUUID != preferences.getWeathermeterUUID().get()
+      && lastWmUUID != preferences.getWeathermeterNameAndAddress().get()
       && !ignoreSensors.contains(weatherMeterSensor)
     ) {
       weatherMeterSensor.disconnect();
       weatherMeterSensor.connect(this);
     }
     if (preferences.isKingpostMeterEnabled().get()
-      && lastKpUUID != preferences.getKingpostWmUUID().get()
+      && lastKpUUID != preferences.getKingpostNameAndAddress().get()
       && !ignoreSensors.contains(weatherMeterSensorKingPost)
     ) {
       weatherMeterSensorKingPost.disconnect();

@@ -7,12 +7,16 @@ import androidx.core.app.NavUtils;
 import android.view.MenuItem;
 
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.dash.avionics.BTActivityPermissionManager;
 
 import java.util.List;
 
 @EActivity
 public class AircraftSettingsActivity extends PreferenceActivity {
+
+  @Extra
+  String[] discoveredDevices;
 
   private BTActivityPermissionManager btpm = new BTActivityPermissionManager();
 
